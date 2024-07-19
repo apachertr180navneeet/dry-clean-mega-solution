@@ -33,22 +33,6 @@ class OrderController extends Controller
         $this->smsService = $smsService;
     }
 
-    // public function index()
-    // {
-    //     $discounts = DB::table('discounts')->get();
-    //     $products = DB::table('products')->get();
-    //     return view('admin.EditOrder', compact('discounts','products'));
-    // }
-
-    // public function index()
-    // {
-    //     $productItems = ProductItem::with(['categories','categories.service'])->get();
-
-    //      //dd($productItems->toArray());
-    //     $discounts = Discount::all();
-    //     return view('admin.EditOrder', compact('productItems', 'discounts'));
-    // }
-
     function generateRandomString($length = 6) {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -61,11 +45,6 @@ class OrderController extends Controller
     public function index()
     {
         $tenantId = tenant('id');
-
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
 
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
@@ -119,11 +98,6 @@ class OrderController extends Controller
     {
         $tenantId = tenant('id');
 
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
-
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
                         ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
@@ -157,11 +131,6 @@ class OrderController extends Controller
     public function getServiceData(Request $request)
     {
         $tenantId = tenant('id');
-
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
 
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
@@ -376,176 +345,6 @@ class OrderController extends Controller
         return [$totalPriceDis, $totalDiscount];
     }
 
-
-
-
-    //     public function editOrder(Request $request, $id)
-    //     {
-    //         $order = Order::select("users.name", "users.mobile", "orders.*")
-    //             ->join('users', 'users.id', '=', 'orders.user_id')
-    //             ->findOrFail($id);
-
-    //         $orderItems = OrderItem::where('order_id', $id)
-    //             ->join('product_categories', 'product_categories.id', '=', 'order_items.product_category_id')
-    //             ->join('operations', 'operations.id', '=', 'order_items.operation_id')
-    //             ->select('order_items.*', 'product_categories.name as category_name', 'operations.name as service_name')
-    //             ->get();
-    //         // ->mapWithKeys(function ($item) {
-    //         //     return [
-    //         //         $item['product_item_id'] => [
-    //         //             'id' => $item['id'],
-    //         //             'category_id' => $item['product_category_id'],
-    //         //             'service_id' => $item['operation_id'],
-    //         //             'product_item_id' => $item['product_item_id'],
-    //         //             'qty' => $item['quantity'],
-    //         //             'unit_price' => $item['operation_price'],
-    //         //             'category_name' => $item['category_name'],
-    //         //             'service_name' => $item['service_name'],
-    //         //             'Operations' => [
-    //         //                 [
-    //         //                     'service_id' => $item['operation_id'],
-    //         //                     'unit_price' => $item['operation_price'],
-    //         //                     'qty' => $item['quantity'],
-    //         //                 ]
-    //         //             ]
-    //         //         ]
-    //         //     ];
-    //         // })->toArray();
-
-    //         // $productItems = ProductItem::with('categories')->get();
-    //         $productItems = ProductItem::with(['categories', 'categories.service'])->get();
-
-    //         // $productItems = ProductItem::whereHas('categories', function ($query) use ($orderItems) {
-    //         //     // Filter product items based on order items related to the specific order ID
-    //         //     $query->whereIn('id', $orderItems->pluck('product_category_id')->unique());
-    //         // })->with('categories')->get();
-
-    //         $groupedProductItems = [];
-    //         $others = [];
-
-    //         foreach ($productItems as $productItem) {
-    //             $uniqueCategories = [];
-    //             $uniqueCategoriesV1 = [];
-
-    //             // Collect unique categories for the current product
-    //             foreach ($productItem->categories as $category) {
-    //                 $categoryName = $category->name;
-    //                 if (!in_array($categoryName, $uniqueCategoriesV1)) {
-    //                     $uniqueCategories[$category->id] = $categoryName;
-    //                     $uniqueCategoriesV1[] = $categoryName;
-    //                 }
-    //             }
-
-    //             $categoryItems = [];
-    //             foreach ($uniqueCategories as $categoryId => $categoryName) {
-    //                 // Debugging: Check current product and category being processed
-    //                 // dd('Processing Product ID: ' . $productItem->id . ', Product Name: ' . $productItem->name . ', Category: ' . $categoryName);
-
-    //                 // Filter orderItems to get operations for the current product and category
-    //                 $operations = collect($orderItems)->filter(function ($item) use ($productItem, $categoryName) {
-    //                 //  dd('Checking Order Item - Product ID: ' . $item->product_id . ', Product Name: ' . $item->product_name . ', Category: ' . $item->category_name);
-    //                     return $item->product_item_id == $productItem->id && $item->category_name == $categoryName;
-    //                 })->map(function ($item) use ($productItem) {
-    //                     return [
-    //                         'product_name' => $productItem->name,
-    //                         'category_name' => $item->category_name,
-    //                         'category_id' => $item->product_category_id,
-    //                         'service_id' => $item->operation_id,
-    //                         'service_name' => $item->service_name,
-    //                         'unit_price' => $item->operation_price,
-    //                         'qty' => $item->quantity,
-    //                     ];
-    //                 })->values()->all();
-
-    //                 // Debugging: Check if operations were found
-    //                 // dd('Found Operations: ', $operations);
-
-    //                 $categoryItems[] = [
-    //                     'name' => $categoryName,
-    //                     'Operations' => $operations
-    //                 ];
-    //             }
-
-    //             // Build $others array
-    //             $others[$productItem->id] = [
-    //                 'id' => $productItem->id,
-    //                 'name' => $productItem->name,
-    //                 'Operations' => array_merge([], ...array_column($categoryItems, 'Operations'))
-    //             ];
-
-    //             // Get all operation data for the current product
-    //             $operationData = $this->getAllOperationData($productItem->id, $categoryName, $others);
-
-    //             // Group product items with their associated categories and operations
-    //             $groupedProductItems[] = [
-    //                 'product' => $productItem,
-    //                 'image' => $productItem->image,
-    //                 'CatItems' => $categoryItems,
-    //                 'operationData' => $operationData
-    //             ];
-    //         }
-
-    //         // Debugging: Check final grouped product items
-    //     //    dd('Grouped Product Items: ', $groupedProductItems);
-
-
-    //         // Debugging: Check final grouped product items
-    //         // dd('Grouped Product Items: ', $groupedProductItems);
-
-
-    //         //new code for operations
-    //        // Prepare operationsArray for all product items and categories
-    // $operationsArray = [];
-
-    // foreach ($productItems as $productItem) {
-    //     $productOperations = [];
-
-    //     // Create a temporary array to group operations by category name
-    //     $categoryOperationsMap = [];
-
-    //     foreach ($productItem->categories as $category) {
-    //         $service = $category->service;
-    //         if ($service) {
-    //             // Initialize category in map if not already present
-    //             if (!isset($categoryOperationsMap[$category->name])) {
-    //                 $categoryOperationsMap[$category->name] = [];
-    //             }
-
-    //             // Add operation to the corresponding category name
-    //             $categoryOperationsMap[$category->name][] = [
-    //                 'service_id' => $service->id ?? null,
-    //                 'service_name' => $service->name ?? '',
-    //                 'unit_price' => $category->price ?? 0, // Get price from ProductCategory
-    //                 'qty' => 1, // Quantity is not provided in your structure, defaulting to 1
-    //             ];
-    //         }
-    //     }
-
-    //     // Convert the category operations map to the required structure
-    //     foreach ($categoryOperationsMap as $categoryName => $operations) {
-    //         $productOperations[] = [
-    //             'category_name' => $categoryName,
-    //             'operations' => $operations,
-    //         ];
-    //     }
-
-    //     $operationsArray[] = [
-    //         'product_name' => $productItem->name,
-    //         'categories' => $productOperations,
-    //     ];
-    // }
-
-
-    //     // dd($operationsArray);
-    //         //end code
-
-
-    //         // dd($groupedProductItems);
-    //         $discounts = Discount::all();
-
-    //         return view('admin.orderupdate', compact('groupedProductItems', 'discounts', 'order', 'orderItems', 'others','operationsArray'));
-    //     }
-
     public function getServices(Request $request)
     {
         $item = $request->input('item');
@@ -585,11 +384,6 @@ class OrderController extends Controller
     public function editOrder(Request $request, $id)
     {
         $tenantId = tenant('id');
-
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
 
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
@@ -665,26 +459,6 @@ class OrderController extends Controller
         return view('admin.orderupdate', compact('discounts', 'order', 'orderItems', 'operationsArray', 'productItems', 'services'));
     }
 
-
-
-
-
-    // public function getAllOperationData($pid, $pname, $others = [])
-    // {
-    //     $data = DB::table('operations')
-    //         ->select('operations.id as op_id', 'operations.name as op_name', 'pc.price', 'pc.id as item_cat_id', 'pc.product_item_id as pid')
-    //         ->where([
-    //             'pc.product_item_id' => $pid,
-    //             'pc.name' => $pname,
-    //         ])
-    //         ->join('product_categories as pc', 'operations.id', '=', 'pc.operation_id')
-    //         ->get();
-
-    //     // Return the operation view with data and others
-    //     // dd($data);
-    //     return view('admin.operation.editoperationview', ['data' => $data, "others" => $others])->render();
-    // }
-
     public function getAllOperationData($pid, $pname, $others = [])
     {
         $data = DB::table('operations')
@@ -705,14 +479,8 @@ class OrderController extends Controller
                         $operationData->isMatch = true;
                     }
                 }
-                // && $operation['category_id'] == $operationData->item_cat_id
             }
-            // dd($operationData->isMatch);
-            // dd(['operationData' => $operationData, 'others' => $others[$operationData->pid]['Operations']]);
         }
-        // dd($others[$operationData->pid]['Operations']);
-        // dd($others);
-        // dd($data);
         return view('admin.operation.editoperationview', ['data' => $data, "others" => $others])->render();
     }
 
@@ -727,612 +495,150 @@ class OrderController extends Controller
         return $this->getAllOperationData($pId, $pname, $others);
     }
 
-    // public function getAllServiceData(Request $request)
-    // {
-    //     $operationName = $request->input('name');
-    //     $PrdId = $request->input('id');
-    //     $others = $request->input('others');
+    //new code
+    public function updateOrder(Request $request, $id)
+    {
+        try {
+            // Fetch the order and its items
+            $order = Order::findOrFail($id);
+            $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
+                return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
+            });
 
-    //     // Fetch the operations data
-    //     $operations = Service::where('name', $operationName)
-    //         ->whereHas('productItem', function ($query) use ($PrdId) {
-    //             $query->where('product_id', $PrdId);
-    //         })
-    //         ->get();
+            $formattedItems = json_decode($request->input('order_items_data'), true);
 
-    //     // Prepare the response data
-    //     $data = [];
-    //     foreach ($operations as $operation) {
-    //         $isMatch = false;
-    //         if (!empty($others[$operation->productItem->id]) && isset($others[$operation->productItem->id]['Operations'])) {
-    //             foreach ($others[$operation->productItem->id]['Operations'] as $op) {
-    //                 if ($op['service_id'] == $operation->id && $op['category_id'] == $operation->item_cat_id) {
-    //                     $isMatch = true;
-    //                 }
-    //             }
-    //         }
-    //         $data[] = [
-    //             'pid' => $operation->productItem->id,
-    //             'isMatch' => $isMatch
-    //         ];
-    //     }
+            $updatedItemIds = [];
 
-    //     // Return JSON response
-    //     return response()->json([
-    //         'html' => view('partials.operations', compact('operations'))->render(),
-    //         'data' => $data
-    //     ]);
-    // }
+            // Format the incoming request data
+            foreach ($formattedItems as $category) {
+                $categoryId = $category['category'];
 
+                foreach ($category['types'] as $type) {
+                    $typeId = $type['type'];
 
+                    foreach ($type['services'] as $service) {
+                        $serviceId = $service['service'];
+                        $qty = $service['quantity'];
+                        $unitPrice = $service['price'];
 
+                        $key = $categoryId . '-' . $typeId . '-' . $serviceId;
+                        $existingItem = $existingOrderItems[$key] ?? null;
 
-
-    // public function updateOrder(Request $request, $id)
-    // {
-    //     try {
-
-
-    //         $order = Order::findOrFail($id);
-    //         $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
-    //             return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
-    //         });
-    //         $formattedItems = [];
-    //         $excludeRemoveIds = [];
-    //         $rIdIndex = 0;
-    //         foreach ($request->items as $productId => $categories) {
-    //             foreach ($categories as $categoryId => $services) {
-    //                 foreach ($services as $serviceId => $details) {
-    //                     $key = $productId . '-' . $categoryId . '-' . $serviceId;
-    //                     if (!empty($existingOrderItems[$key]->id)) {
-    //                         $excludeRemoveIds[$rIdIndex++] = $existingOrderItems[$key]->id;
-    //                     }
-    //                     $formattedItems[] = [
-    //                         'id' => $existingOrderItems[$key]->id ?? null,
-    //                         'product_id' => $productId,
-    //                         'category_id' => $categoryId,
-    //                         'service_id' => $serviceId,
-    //                         'qty' => $details['qty'],
-    //                         'unit_price' => $details['unit_price'],
-    //                     ];
-    //                 }
-    //             }
-    //         }
-    //         //    dd($existingOrderItems->toArray(),$excludeRemoveIds,$formattedItems);
-    //         foreach ($existingOrderItems as $existItem) {
-    //             if (!in_array($existItem->id, $excludeRemoveIds)) {
-    //                 OrderItem::where('id', $existItem->id)->delete();
-    //             }
-    //         }
-    //         $client = DB::table('users')->where('mobile', $request->client_num)->first();
-    //         if ($client) {
-    //             $user = User::updated([
-    //                 'name' => $request->name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $client->id;
-    //         } else {
-    //             $user = User::create([
-    //                 'name' => $request->name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $user->id;
-    //         }
-
-    //         // Calculate discount
-    //         $discountId = match ($request->discount) {
-    //             '5' => 1,
-    //             '10' => 2,
-    //             '15' => 3,
-    //             '20' => 4,
-    //             default => 0
-    //         };
-    //         $operationId = explode('|', $request->categoryPriceItem);
-    //         $service_id = !empty($operationId[0]) ? $operationId[0] : 1;
-    //         $grossPrice = $request->gross_total;
-    //         $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
-    //         $totalPriceDis = $grossPrice - $totalDiscount;
-    //         if ($request->express_charge == '1') {
-    //             $totalPriceDis += ($totalPriceDis * 50) / 100;
-    //         }
-
-    //         // Update the order
-    //         $updateorder = $order->update([
-    //             'user_id' => $user_id,
-    //             'order_date' => $request->booking_date,
-    //             'order_time' => $request->booking_time,
-    //             'delivery_date' => $request->delivery_date,
-    //             'delivery_time' => $request->delivery_time,
-    //             'discount_id' => $discountId,
-    //             'service_id' => $service_id,
-    //             'total_qty' => $request->total_qty,
-    //             'total_price' => $totalPriceDis,
-    //         ]);
-
-
-    //         $updatedItemIds = [];
-    //         foreach ($formattedItems as $item) {
-    //             if (isset($item['id'])) {
-    //                 $orderItem = OrderItem::find($item['id']);
-    //                 $orderItem->update([
-    //                     'product_item_id' => $item['product_id'],
-    //                     'product_category_id' => $item['category_id'],
-    //                     'operation_id' => $item['service_id'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['unit_price'],
-    //                     'price' => $item['qty'] * $item['unit_price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $item['id'];
-    //             } else {
-    //                 $orderItem = $order->orderItems()->create([
-    //                     'product_item_id' => $item['product_id'],
-    //                     'product_category_id' => $item['category_id'],
-    //                     'operation_id' => $item['service_id'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['unit_price'],
-    //                     'price' => $item['qty'] * $item['unit_price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $orderItem->id;
-    //             }
-    //         }
-
-    //         // Delete removed items
-    //         /*  foreach ($existingOrderItems as $itemId => $item) {
-    //             if (!in_array($itemId, $updatedItemIds)) {
-    //                 OrderItem::destroy($itemId);
-    //             }
-    //         } */
-
-    //         return redirect()->route('viewOrder');
-    //     } catch (\Exception $exception) {
-    //         // dd($exception->getMessage());
-    //         return redirect()->back()->with('error', $exception->getMessage());
-    //     }
-    // }
-//new code
-public function updateOrder(Request $request, $id)
-{
-    try {
-        // Fetch the order and its items
-        $order = Order::findOrFail($id);
-        $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
-            return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
-        });
-
-        $formattedItems = json_decode($request->input('order_items_data'), true);
-
-        $updatedItemIds = [];
-
-        // Format the incoming request data
-        foreach ($formattedItems as $category) {
-            $categoryId = $category['category'];
-
-            foreach ($category['types'] as $type) {
-                $typeId = $type['type'];
-
-                foreach ($type['services'] as $service) {
-                    $serviceId = $service['service'];
-                    $qty = $service['quantity'];
-                    $unitPrice = $service['price'];
-
-                    $key = $categoryId . '-' . $typeId . '-' . $serviceId;
-                    $existingItem = $existingOrderItems[$key] ?? null;
-
-                    if ($existingItem) {
-                        // Update existing item
-                        $existingItem->update([
-                            'quantity' => $qty,
-                            'operation_price' => $unitPrice,
-                            'price' => $qty * $unitPrice,
-                        ]);
-                        $updatedItemIds[] = $existingItem->id;
-                    } else {
-                        // Create new item
-                        $newItem = $order->orderItems()->create([
-                            'product_item_id' => $categoryId,
-                            'product_category_id' => $typeId,
-                            'operation_id' => $serviceId,
-                            'quantity' => $qty,
-                            'operation_price' => $unitPrice,
-                            'price' => $qty * $unitPrice,
-                            'status' => 'pending'
-                        ]);
-                        $updatedItemIds[] = $newItem->id;
+                        if ($existingItem) {
+                            // Update existing item
+                            $existingItem->update([
+                                'quantity' => $qty,
+                                'operation_price' => $unitPrice,
+                                'price' => $qty * $unitPrice,
+                            ]);
+                            $updatedItemIds[] = $existingItem->id;
+                        } else {
+                            // Create new item
+                            $newItem = $order->orderItems()->create([
+                                'product_item_id' => $categoryId,
+                                'product_category_id' => $typeId,
+                                'operation_id' => $serviceId,
+                                'quantity' => $qty,
+                                'operation_price' => $unitPrice,
+                                'price' => $qty * $unitPrice,
+                                'status' => 'pending'
+                            ]);
+                            $updatedItemIds[] = $newItem->id;
+                        }
                     }
                 }
             }
-        }
 
-        // Delete items that are no longer in the order
-        foreach ($existingOrderItems as $existItem) {
-            $key = $existItem->product_item_id . '-' . $existItem->product_category_id . '-' . $existItem->operation_id;
-            if (!in_array($existItem->id, $updatedItemIds)) {
-                $existItem->delete();
+            // Delete items that are no longer in the order
+            foreach ($existingOrderItems as $existItem) {
+                $key = $existItem->product_item_id . '-' . $existItem->product_category_id . '-' . $existItem->operation_id;
+                if (!in_array($existItem->id, $updatedItemIds)) {
+                    $existItem->delete();
+                }
             }
-        }
 
-        // Handle client user creation or updating
-        $client = DB::table('users')->where('mobile', $request->client_num)->first();
-        // dd($client);
-        if ($client) {
-            $user = User::where('id', $client->id)->update([
-                'name' => $request->client_name,
-                'mobile' => $request->client_num,
-                'role_id' => 2
+            // Handle client user creation or updating
+            $client = DB::table('users')->where('mobile', $request->client_num)->first();
+            // dd($client);
+            if ($client) {
+                $user = User::where('id', $client->id)->update([
+                    'name' => $request->client_name,
+                    'mobile' => $request->client_num,
+                    'role_id' => 2
+                ]);
+                $user_id = $client->id;
+            } else {
+                $user = User::create([
+                    'name' => $request->client_name,
+                    'mobile' => $request->client_num,
+                    'role_id' => 2
+                ]);
+                $user_id = $user->id;
+            }
+
+            // Calculate discount and total price
+            $discountId = match ($request->discount) {
+                '5' => 1,
+                '10' => 2,
+                '15' => 3,
+                '20' => 4,
+                default => 0
+            };
+
+            // Check if discountId is valid, otherwise set to null
+            if (!DB::table('discounts')->where('id', $discountId)->exists()) {
+                $discountId = null;
+            }
+
+            $grossPrice = $request->gross_total;
+            $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
+            $totalPriceDis = $grossPrice - $totalDiscount;
+            if ($request->express_charge == '1') {
+                $totalPriceDis += ($totalPriceDis * 50) / 100;
+            }
+
+            // Update the order details
+            $order->update([
+                'user_id' => $user_id,
+                'order_date' => $request->booking_date,
+                'order_time' => $request->booking_time,
+                'delivery_date' => $request->delivery_date,
+                'delivery_time' => $request->delivery_time,
+                'discount_id' => $discountId,
+                'total_qty' => $request->total_qty,
+                'total_price' => $totalPriceDis,
+                'status' => 'pending'
             ]);
-            $user_id = $client->id;
-        } else {
-            $user = User::create([
-                'name' => $request->client_name,
-                'mobile' => $request->client_num,
-                'role_id' => 2
+
+            // Prepare SMS message
+            $message = sprintf(
+                "Dear %s, your order (ID: %s) of %s is Updated. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
+                $request->client_name,
+                $order->id,
+                $order->total_price,
+                $request->delivery_date
+            );
+
+            // Format the client's phone number
+            $clientPhoneNumber = '+91' . $request->client_num;
+
+            // Attempt to send SMS and handle any exceptions
+            try {
+                $this->smsService->sendSms($clientPhoneNumber, $message);
+            } catch (\Exception $e) {
+                // Log the SMS error and continue with order update
+                Log::error('Error sending SMS: ' . $e->getMessage());
+            }
+
+            return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
+        } catch (\Exception $exception) {
+            dd([
+                'message' => $exception->getMessage(),
+                'line' => $exception->getLine(),
             ]);
-            $user_id = $user->id;
+            return redirect()->back()->with('error', $exception->getMessage());
         }
-
-        // Calculate discount and total price
-        $discountId = match ($request->discount) {
-            '5' => 1,
-            '10' => 2,
-            '15' => 3,
-            '20' => 4,
-            default => 0
-        };
-
-        // Check if discountId is valid, otherwise set to null
-        if (!DB::table('discounts')->where('id', $discountId)->exists()) {
-            $discountId = null;
-        }
-
-        $grossPrice = $request->gross_total;
-        $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
-        $totalPriceDis = $grossPrice - $totalDiscount;
-        if ($request->express_charge == '1') {
-            $totalPriceDis += ($totalPriceDis * 50) / 100;
-        }
-
-        // Update the order details
-        $order->update([
-            'user_id' => $user_id,
-            'order_date' => $request->booking_date,
-            'order_time' => $request->booking_time,
-            'delivery_date' => $request->delivery_date,
-            'delivery_time' => $request->delivery_time,
-            'discount_id' => $discountId,
-            'total_qty' => $request->total_qty,
-            'total_price' => $totalPriceDis,
-            'status' => 'pending'
-        ]);
-
-        // Prepare SMS message
-        $message = sprintf(
-            "Dear %s, your order (ID: %s) of %s is Updated. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
-            $request->client_name,
-            $order->id,
-            $order->total_price,
-            $request->delivery_date
-        );
-
-        // Format the client's phone number
-        $clientPhoneNumber = '+91' . $request->client_num;
-
-        // Attempt to send SMS and handle any exceptions
-        try {
-            $this->smsService->sendSms($clientPhoneNumber, $message);
-        } catch (\Exception $e) {
-            // Log the SMS error and continue with order update
-            Log::error('Error sending SMS: ' . $e->getMessage());
-        }
-
-        return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
-    } catch (\Exception $exception) {
-        dd([
-            'message' => $exception->getMessage(),
-            'line' => $exception->getLine(),
-        ]);
-        return redirect()->back()->with('error', $exception->getMessage());
     }
-}
-
-//end new code
-//start prev//
-    // public function updateOrder(Request $request, $id)
-    // {
-    //     // dd('Request Data: ', $request->all());
-    //     try {
-    //         // Fetch the order and its items
-    //         $order = Order::findOrFail($id);
-    //         $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
-    //             return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
-    //         });
-
-    //         $formattedItems = json_decode($request->input('order_items_data'), true);
-    //         // dd($formattedItems);
-    //         $excludeRemoveIds = [];
-    //         $updatedItemIds = [];
-    //         $rIdIndex = 0;
-    //         // dd("hello");
-
-    //         // Format the incoming request data
-    //         foreach ($formattedItems as $category) {
-    //             $categoryId = $category['category'];
-
-    //             foreach ($category['types'] as $type) {
-    //                 $typeId = $type['type'];
-
-    //                 foreach ($type['services'] as $service) {
-    //                     $serviceId = $service['service'];
-    //                     $qty = $service['quantity'];
-    //                     $unitPrice = $service['price'];
-
-    //                     $key = $categoryId . '-' . $typeId . '-' . $serviceId;
-    //                     $existingItem = $existingOrderItems[$key] ?? null;
-
-    //                     if ($existingItem) {
-    //                         // Update existing item
-    //                         $existingItem->update([
-    //                             'quantity' => $qty,
-    //                             'operation_price' => $unitPrice,
-    //                             'price' => $qty * $unitPrice,
-    //                         ]);
-    //                         $updatedItemIds[] = $existingItem->id;
-    //                     } else {
-    //                         // Create new item
-    //                         $newItem = $order->orderItems()->create([
-    //                             'product_item_id' => $categoryId, // Assuming this is product_item_id
-    //                             'product_category_id' => $typeId, // Assuming this is product_category_id
-    //                             'operation_id' => $serviceId, // Assuming this is operation_id
-    //                             'quantity' => $qty,
-    //                             'operation_price' => $unitPrice,
-    //                             'price' => $qty * $unitPrice,
-    //                         ]);
-    //                         $updatedItemIds[] = $newItem->id;
-    //                     }
-
-    //                     $excludeRemoveIds[] = $key;
-    //                 }
-    //             }
-    //         }
-    //         // dd("hello");
-    //         dd($formattedItems);
-
-    //        // Delete items that are no longer in the order
-    //     foreach ($existingOrderItems as $existItem) {
-    //         $key = $existItem->product_item_id . '-' . $existItem->product_category_id . '-' . $existItem->operation_id;
-    //         if (!in_array($existItem->id, $updatedItemIds)) {
-    //             $existItem->delete();
-    //         }
-    //     }
-
-    //         // Handle client user creation or updating
-    //         $client = DB::table('users')->where('mobile', $request->client_num)->first();
-    //         if ($client) {
-    //             $user = User::where('id', $client->id)->update([
-    //                 'name' => $request->client_name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $client->id;
-    //         } else {
-    //             $user = User::create([
-    //                 'name' => $request->client_name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $user->id;
-    //         }
-
-    //         // Calculate discount and total price
-    //         $discountId = match ($request->discount) {
-    //             '5' => 1,
-    //             '10' => 2,
-    //             '15' => 3,
-    //             '20' => 4,
-    //             default => 0
-    //         };
-    //         $operationId = explode('|', $request->categoryPriceItem);
-    //         $service_id = !empty($operationId[0]) ? $operationId[0] : 1;
-    //         $grossPrice = $request->gross_total;
-    //         $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
-    //         $totalPriceDis = $grossPrice - $totalDiscount;
-    //         if ($request->express_charge == '1') {
-    //             $totalPriceDis += ($totalPriceDis * 50) / 100;
-    //         }
-
-    //         // Update the order details
-    //         $order->update([
-    //             'user_id' => $user_id,
-    //             'order_date' => $request->booking_date,
-    //             'order_time' => $request->booking_time,
-    //             'delivery_date' => $request->delivery_date,
-    //             'delivery_time' => $request->delivery_time,
-    //             'discount_id' => $discountId,
-    //             'service_id' => $service_id,
-    //             'total_qty' => $request->total_qty,
-    //             'total_price' => $totalPriceDis,
-    //         ]);
-
-    //         // Update or create order items
-    //         $updatedItemIds = [];
-    //         foreach ($formattedItems as $item) {
-    //             if (isset($item['id'])) {
-    //                 $orderItem = OrderItem::find($item['id']);
-    //                 $orderItem->update([
-    //                     'product_item_id' => $item['category'],
-    //                     'product_category_id' => $item['types'],
-    //                     'operation_id' => $item['services'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['price'],
-    //                     'price' => $item['qty'] * $item['price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $item['id'];
-    //             } else {
-    //                 $orderItem = $order->orderItems()->create([
-    //                     'product_item_id' => $item['category'],
-    //                     'product_category_id' => $item['types'],
-    //                     'operation_id' => $item['services'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['price'],
-    //                     'price' => $item['qty'] * $item['price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $orderItem->id;
-    //             }
-    //         }
-
-    //         // dd("hello guys", $updatedItemIds[]);
-    //         return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
-    //     } catch (\Exception $exception) {
-    //         dd([
-    //             'message' => $exception->getMessage(),
-    //             'line' => $exception->getLine(),
-    //         ]);
-    //         return redirect()->back()->with('error', $exception->getMessage());
-    //     }
-    // }
-
-
-//##### previous code here
-
-    // public function updateOrder(Request $request, $id)
-    // {
-    //     try {
-    //         // Fetch the order and its items
-    //         $order = Order::findOrFail($id);
-    //         $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
-    //             return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
-    //         });
-
-    //         $formattedItems = [];
-    //         $excludeRemoveIds = [];
-    //         $rIdIndex = 0;
-    //         // dd("hello");
-
-    //         // Format the incoming request data
-    //         if (is_array($request->items)) {
-    //             foreach ($request->items as $productId => $categories) {
-    //                 if (is_array($categories)) {
-    //                     foreach ($categories as $categoryId => $services) {
-    //                         if (is_array($services)) {
-    //                             foreach ($services as $serviceId => $details) {
-    //                                 $key = $productId . '-' . $categoryId . '-' . $serviceId;
-    //                                 if (!empty($existingOrderItems[$key]->id)) {
-    //                                     $excludeRemoveIds[] = $existingOrderItems[$key]->id;
-    //                                 }
-    //                                 $formattedItems[] = [
-    //                                     'id' => $existingOrderItems[$key]->id ?? null,
-    //                                     'product_id' => $productId,
-    //                                     'category_id' => $categoryId,
-    //                                     'service_id' => $serviceId,
-    //                                     'qty' => $details['qty'],
-    //                                     'unit_price' => $details['unit_price'],
-    //                                 ];
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         } else {
-    //             throw new \Exception("Request items must be an array.");
-    //         }
-    //         // dd("hello");
-    //         // dd($formattedItems);
-
-    //         // Delete items that are no longer in the order
-    //         foreach ($existingOrderItems as $existItem) {
-    //             if (!in_array($existItem->id, $excludeRemoveIds)) {
-    //                 OrderItem::where('id', $existItem->id)->delete();
-    //             }
-    //         }
-
-    //         // Handle client user creation or updating
-    //         $client = DB::table('users')->where('mobile', $request->client_num)->first();
-    //         if ($client) {
-    //             $user = User::where('id', $client->id)->update([
-    //                 'name' => $request->name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $client->id;
-    //         } else {
-    //             $user = User::create([
-    //                 'name' => $request->name,
-    //                 'mobile' => $request->client_num,
-    //                 'role_id' => 2
-    //             ]);
-    //             $user_id = $user->id;
-    //         }
-
-    //         // Calculate discount and total price
-    //         $discountId = match ($request->discount) {
-    //             '5' => 1,
-    //             '10' => 2,
-    //             '15' => 3,
-    //             '20' => 4,
-    //             default => 0
-    //         };
-    //         $operationId = explode('|', $request->categoryPriceItem);
-    //         $service_id = !empty($operationId[0]) ? $operationId[0] : 1;
-    //         $grossPrice = $request->gross_total;
-    //         $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
-    //         $totalPriceDis = $grossPrice - $totalDiscount;
-    //         if ($request->express_charge == '1') {
-    //             $totalPriceDis += ($totalPriceDis * 50) / 100;
-    //         }
-
-    //         // Update the order details
-    //         $order->update([
-    //             'user_id' => $user_id,
-    //             'order_date' => $request->booking_date,
-    //             'order_time' => $request->booking_time,
-    //             'delivery_date' => $request->delivery_date,
-    //             'delivery_time' => $request->delivery_time,
-    //             'discount_id' => $discountId,
-    //             'service_id' => $service_id,
-    //             'total_qty' => $request->total_qty,
-    //             'total_price' => $totalPriceDis,
-    //         ]);
-
-    //         // Update or create order items
-    //         $updatedItemIds = [];
-    //         foreach ($formattedItems as $item) {
-    //             if (isset($item['id'])) {
-    //                 $orderItem = OrderItem::find($item['id']);
-    //                 $orderItem->update([
-    //                     'product_item_id' => $item['product_id'],
-    //                     'product_category_id' => $item['category_id'],
-    //                     'operation_id' => $item['service_id'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['unit_price'],
-    //                     'price' => $item['qty'] * $item['unit_price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $item['id'];
-    //             } else {
-    //                 $orderItem = $order->orderItems()->create([
-    //                     'product_item_id' => $item['product_id'],
-    //                     'product_category_id' => $item['category_id'],
-    //                     'operation_id' => $item['service_id'],
-    //                     'quantity' => $item['qty'],
-    //                     'operation_price' => $item['unit_price'],
-    //                     'price' => $item['qty'] * $item['unit_price'],
-    //                 ]);
-    //                 $updatedItemIds[] = $orderItem->id;
-    //             }
-    //         }
-
-    //         // dd("hello guys", $updatedItemIds[]);
-    //         return redirect()->route('viewOrder');
-    //     } catch (\Exception $exception) {
-    //         dd([
-    //             'message' => $exception->getMessage(),
-    //             'line' => $exception->getLine(),
-    //         ]);
-    //         return redirect()->back()->with('error', $exception->getMessage());
-    //     }
-    // }
-
-
     public function OrderDetail(Request $request, $orderId)
     {
         try {
@@ -1360,20 +666,6 @@ public function updateOrder(Request $request, $id)
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
-
-    // public function viewOrder(Request $request)
-    // {
-    //     try {
-    //         $orders = Order::select('orders.id','users.name','users.mobile','orders.total_qty')
-    //         ->join('users','users.id','=','orders.user_id')
-    //         ->where('orders.is_deleted',0)
-    //         ->orderBy('orders.created_at', 'desc')
-    //         ->get();
-    //         return view('admin.viewOrder', ['orders' => $orders]);
-    //     } catch (Throwable $throwable) {
-    //         dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
-    //     }
-    // }
 
     public function viewOrder(Request $request)
     {
@@ -1465,14 +757,7 @@ public function updateOrder(Request $request, $id)
     public function downloadReceipt(Request $request, $orderId)
     {
         try {
-            // Fetch the latest order with related order items, user, and discounts
-            // $order = Order::with([
-            //     'orderItems.productCategory',
-            //     'orderItems.productItem',
-            //     'orderItems.opertions',
-            //     'user',
-            //     'discounts'
-            // ])->latest()->firstOrFail();
+
             $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
                 ->findOrFail($orderId);
 
@@ -1506,14 +791,6 @@ public function updateOrder(Request $request, $id)
     public function downloadInvoice(Request $request, $orderId)
     {
         try {
-            // Fetch the latest order with related order items, user, and discounts
-            // $order = Order::with([
-            //     'orderItems.productCategory',
-            //     'orderItems.productItem',
-            //     'orderItems.opertions',
-            //     'user',
-            //     'discounts'
-            // ])->latest()->firstOrFail();
             $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
                 ->findOrFail($orderId);
 
@@ -1660,6 +937,8 @@ public function updateOrder(Request $request, $id)
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
+            $customPaper = array(0,0,200.00,283.80);
+
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [
                 'order' => $order,
@@ -1667,7 +946,7 @@ public function updateOrder(Request $request, $id)
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
                 'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
-            ]);
+            ])->setPaper($customPaper, 'portrait');
 
             // Return the generated PDF for download
             return $pdf->stream("taglist-{$order->id}.pdf");

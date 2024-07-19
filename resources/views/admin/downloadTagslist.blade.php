@@ -5,8 +5,6 @@
     <style>
         .table-item-container {
             width: 38mm;
-            margin-right: 10px;
-            margin-bottom: 10px;
             display: inline-block;
         }
 
