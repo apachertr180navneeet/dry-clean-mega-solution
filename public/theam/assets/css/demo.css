@@ -1,0 +1,508 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+
+.light-style .menu .app-brand.demo {
+  height: 135px;
+}
+
+.dark-style .menu .app-brand.demo {
+  height: 135px;
+}
+
+.app-brand-logo.demo {
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  display: -ms-flexbox;
+  display: flex;
+  width: 34px;
+  height: 24px;
+}
+
+.app-brand-logo.demo svg {
+  width: 35px;
+  height: 24px;
+}
+
+.app-brand-text.demo {
+  font-size: 1.375rem;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+  padding-top: 64px !important;
+}
+
+.layout-navbar-fixed .layout-wrapper:not(.layout-horizontal):not(.layout-without-menu) .layout-page {
+  padding-top: 78px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+  z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks>* {
+  display: block !important;
+}
+
+.demo-inline-spacing>* {
+  margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing>* {
+  margin-top: 1rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg>* {
+  margin-top: 1.875rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-lg.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl>* {
+  margin-top: 5rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-xl.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.rtl-only {
+  display: none !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+[dir='rtl'] .rtl-only {
+  display: block !important;
+}
+
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.layout-demo-placeholder img {
+  width: 900px;
+}
+
+.layout-demo-info {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+
+
+/* HP Work */
+
+.login_page_section_hp .card {
+  background: #ffffffd1;
+  backdrop-filter: blur(1px);
+  box-shadow: 0 0 15px #00000026;
+}
+
+.btn_1F446E_hp {
+  background: #1F446E;
+  border-radius: 5px;
+  padding: 10px 25px;
+  color: #fff !important;
+}
+
+.btn_1F446E_hp:hover,
+.btn_1F446E_hp:focus,
+.btn_1F446E_hp:active {
+  background: #5484ba;
+  background-color: #5484ba !important;
+  border-radius: 5px;
+  padding: 10px 25px;
+  color: #fff !important;
+}
+
+.text_14355a_hp {
+  color: #14355a !important;
+}
+
+.bg_1F446E_hp {
+  background-color: #1F446E !important;
+}
+
+.sidebar_section_hp.menu-vertical {
+  width: 15.5rem;
+}
+
+.sidebar_section_hp .menu-inner .menu-item .menu-link {
+  color: #fff !important;
+}
+
+.sidebar_section_hp .menu-inner .menu-item .menu-link:hover {
+  background-color: #5484ba !important;
+}
+
+.sidebar_section_hp .menu-inner .menu-item.open>.menu-link {
+  background-color: #5484ba !important;
+}
+
+.page_content_section_hp {
+  padding-left: 15.5rem;
+  padding-top: 100px;
+}
+
+.layout-navbar-fixed .layout-navbar.navbar-detached {
+  /* left: 15.5rem !important; */
+  width: calc(100% - calc(1.5rem * 2) - 15.5rem)
+}
+
+.add_client_form_area_hp h4 {
+  font-size: 20px;
+  color: #1f446E;
+  font-weight: 700;
+
+}
+
+.client_list_area_hp .client_list_heading_area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.client_list_area_hp .client_list_heading_area .client_list_heading_search_area {
+  position: relative;
+}
+
+.client_list_area_hp .client_list_heading_area .client_list_heading_search_area i {
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  color: #1f446e;
+}
+
+.client_list_area_hp .client_list_heading_area .client_list_heading_search_area input {
+  padding: 6.7052px 15px 6.752px 35px;
+}
+
+.client_list_area_hp .client_list_heading_area h4 {
+  font-size: 20px;
+  color: #1f446E;
+  font-weight: 700;
+  margin-bottom: 6px;
+  padding-bottom: 0px;
+
+}
+
+.table-responsive {
+  border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar {
+  height: 5px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #1f446E;
+  border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #5484ba;
+}
+
+
+table .table_head_1f446E {
+  background-color: #1f446E !important;
+  color: #fff;
+}
+
+table .table_head_1f446E tr th {
+  color: #fff !important;
+  white-space: nowrap;
+}
+
+table tbody tr td .Client_table_action_area {
+  display: flex;
+  align-items: center;
+}
+
+table tbody tr td .Client_table_action_area .Client_table_action_icon:hover {
+  color: #1f446E !important;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+
+table thead tr th,
+table tbody tr td {
+  padding: 8px 10px !important;
+  white-space: nowrap;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.layout-container {
+  min-height: 90vh !important;
+}
+
+.order_list_action_menu_dropmenu.dropstart .dropdown-toggle::before {
+  display: none;
+}
+
+.order_list_action_menu_dropmenu .dropdown-menu .dropdown-item:hover {
+  background-color: #5484ba;
+  color: #fff;
+}
+
+.OrderDetail_page_section {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 0.375rem;
+}
+
+.OrderDetail_page_section .OrderDetail_page_gird_item_area label {
+  color: #808080;
+  font-size: 16px;
+}
+
+.OrderDetail_page_section .OrderDetail_page_gird_item_area p {
+  color: #808080;
+  font-size: 12px;
+  padding-left: 5px;
+  margin-bottom: 0;
+
+}
+
+.OrderDetail_page_section .OrderDetail_page_gird_item_area h4 {
+  color: #1f446E;
+  font-size: 18px;
+  font-weight: 700;
+  padding-left: 5px;
+  margin-bottom: 0;
+}
+
+.OrderDetail_page_heading {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 0.375rem;
+  margin-bottom: 15px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+}
+
+.OrderDetail_page_heading .OrderDetail_page_heading_title {
+  display: flex;
+  align-items: center;
+}
+
+.OrderDetail_page_heading .OrderDetail_page_heading_action_icons {
+  display: flex;
+  align-items: center;
+}
+
+.OrderDetail_page_heading .OrderDetail_page_heading_action_icons button {
+  background-color: #1f446e;
+  color: #fff;
+  border: 1px solid #1f446e;
+  transition: 0.5s;
+  padding: 8px 12px;
+}
+
+.OrderDetail_page_heading .OrderDetail_page_heading_action_icons button:hover {
+  border: 1px solid #5484ba;
+  background-color: #5484ba;
+  color: #fff;
+}
+
+.Back_btn_hp {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #1f446E;
+  color: #fff !important;
+  border: none;
+  display: flex;
+  align-items: center;
+  transition: 0.5s;
+  justify-content: center;
+}
+
+.Back_btn_hp:hover {
+  background: #5484ba !important;
+}
+
+.Add_order_page_section .Add_order_btn_area button {
+  background: #1f446e;
+  color: #fff;
+}
+
+
+.Add_order_page_section .Add_order_btn_area button:hover {
+  background: #5484ba;
+  color: #fff;
+}
+
+.Add_order_page_section table tr td {
+  min-width: 210px;
+}
+
+/* .Add_order_page_section table tr td:first-child {
+  min-width: auto;
+} */
+
+.Add_order_page_section table tr td:last-child {
+  min-width: auto;
+}
+
+@media (max-width: 1199.98px) {
+  .page_content_section_hp {
+    padding-left: 2px;
+    padding-top: 100px;
+  }
+
+  .sidebar_toggle_btn_area a {
+    color: #fff !important;
+  }
+
+  .layout-navbar-fixed .layout-navbar.navbar-detached {
+    left: 0rem !important;
+    width: calc(100% - calc(1.5rem * 2) - 0rem)
+  }
+}
+
+@media (max-width: 576.98px) {
+  .authentication-wrapper.authentication-basic .authentication-inner::after {
+    display: none;
+  }
+
+  .page_content_section_hp .client_list_area_hp .card-body {
+    padding: 20px 15px;
+  }
+
+  .authentication-wrapper.authentication-basic .card-body {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .client_list_area_hp .client_list_heading_area .client_list_heading_search_area {
+    width: 100%;
+  }
+}
+
+.layout-menu-collapsed .layout-navbar.navbar-detached {
+  width: auto !important;
+}
+
+.layout-menu-collapsed .page_content_section_hp {
+  padding-left: 5.4rem;
+}
+
+.layout-menu-collapsed .layout-navbar {
+  right: 25px;
+  left: 6.75rem !important;
+}
+
+.layout-menu-collapsed .layout-wrapper .layout-container .layout-menu .app-brand {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.layout-menu-collapsed .layout-wrapper .layout-container .layout-menu .app-brand .app-brand-link img {
+  width: 75px;
+}
+
+.layout-menu-hover .layout-wrapper .layout-container .layout-menu .app-brand {
+  width: 100%;
+
+}
+
+.layout-menu-hover .layout-wrapper .layout-container .layout-menu .app-brand .app-brand-link img {
+  width: 60%;
+  margin: auto;
+}
+
+.layout-menu-fixed .layout-wrapper .layout-container .layout-menu .app-brand .app-brand-link img {
+  width: 60%;
+  margin: auto;
+}
+
+.tag_number {
+  width: 100px;
+  height: 30px;
+  background: #1f446ea8;
+  border-radius: 10px;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-bg {
+  background-image: linear-gradient(#ffffffb3, #ffffffb3), url(https://img.freepik.com/free-vector/blue-soap-water-bubbles-floating-white-background_1017-18134.jpg?t=st=1715258131~exp=1715261731~hmac=7bc2d1eb9c3146e7cc63738af520429421abacaccc63f73f5c20470afb9f3fd2&w=740);
+  /* backdrop-filter: blur(100px); */
+  /* background-color: #fff; */
+  position: relative;
+  padding-top: 2.2rem;
+}
+
+.btn-download {
+  width: 30px;
+  height: 30px;
+  border-radius: 147px;
+  font-size: 16px;
+  padding: 16px;
+  background: #eeeeee;
+  color: #1f446e;
+  position: absolute !important;
+  right: 5px;
+  top: 5px;
+  box-shadow: none !important;
+}
+
+.btn-download:hover {
+  background: #eeeeee;
+
+}
