@@ -1,0 +1,637 @@
+@extends('backend.layouts.app')
+@section('content')
+
+<style>
+    .disabled {
+        pointer-events: none;
+    }
+
+</style>
+<div class="content-wrapper page_content_section_hp">
+    <div class="container-xxl">
+        <div class="client_list_area_hp Add_order_page_section">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="client_list_heading_area">
+                                <h4>
+                                    @if (isset($order))
+                                    Edit
+                                    @else
+                                    Add
+                                    @endif Order
+                                </h4>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <form action="{{ route('order.update', $order->id) }}" method="POST" enctype="multipart/form-data" id="addOrderFormValidation">
+                        @method('PUT')
+
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <!-- Form Inputs for Client and Order Details -->
+                                    <div class="row">
+                                        <!-- Client Number -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="client_num" class="form-label">Client Number</label>
+                                                <input type="text" value="{{ old('mobile', $order->mobile ?? '') }}" id="number" name="client_num" class="form-control" placeholder="Client Number">
+                                            </div>
+                                        </div>
+                                        <!-- Client Name -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="client_name" class="form-label">Client Name</label>
+                                                <input type="text" id="client_name" value="{{ old('name', $order->name ?? '') }}" name="client_name" class="form-control" placeholder="Client Name">
+                                            </div>
+                                        </div>
+                                        <!-- Booking Date -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="booking_date" class="form-label">Booking Date</label>
+                                                <input type="date" id="booking_date" value="{{ old('order_date', $order->order_date ?? '') }}" name="booking_date" class="form-control">
+                                            </div>
+                                        </div>
+                                        <!-- Booking Time -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="booking_time" class="form-label">Booking Time</label>
+                                                <input type="time" id="booking_time" value="{{ old('order_time', $order->order_time ?? '') }}" name="booking_time" class="form-control">
+                                            </div>
+                                        </div>
+                                        <!-- Delivery Date -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="delivery_date" class="form-label">Delivery Date</label>
+                                                <input type="date" id="delivery_date" value="{{ old('delivery_date', $order->delivery_date ?? '') }}" name="delivery_date" class="form-control">
+                                            </div>
+                                        </div>
+                                        <!-- Delivery Time -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="delivery_time" class="form-label">Delivery Time</label>
+                                                <input type="time" id="delivery_time" value="{{ old('delivery_time', $order->delivery_time ?? '') }}" name="delivery_time" class="form-control">
+                                            </div>
+                                        </div>
+                                        <!-- Discount Offer -->
+                                        @php
+                                        $discountAmount=0;
+                                       @endphp
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="discount" class="form-label">Discount Offer</label>
+                                                <select name="discount" id="discount" class="form-select">
+                                                    <option value="" selected>Select Discount Offer</option>
+                                                    @foreach ($discounts as $discount)
+                                                    <option @if($discount->id===$order->discount_id)
+                                                        @php
+                                                            $discountAmount=$discount->amount;
+                                                        @endphp
+                                                selected
+                                                    @endif  value="{{ $discount->amount }}">{{ $discount->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        @php
+                                            $grossTotal=0;
+                                            $itemList=[];
+                                        @endphp
+                                        @foreach ($orderItems as $orderItem)
+                                        @php
+                                        $grossTotal+=($orderItem['qty']*$orderItem['unit_price']);
+                                         $itemList[$orderItem['product_item_id']] = ["productName"=>$orderItem['product_item_id'],"category"=>$orderItem['category_id'],"service"=>$orderItem['service_id'],"qty"=>$orderItem['qty'],"unitPrice"=>$orderItem['unit_price']];
+                                            @endphp
+                                        @endforeach
+                                        <!-- Gross Total Section -->
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-3">
+                                            <div class="row justify-content-between">
+                                                <input type="hidden" name="gross_total" id="gross_total" value="{{ $grossTotal }}"/>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12">
+                                                    <h6>Gross Total: </h6>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12 text-end">
+                                                    <h6 id="grossTotal">{{ $grossTotal }}</h6>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-between">
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12">
+                                                    <h6>Discount Amount:</h6>
+                                                </div>
+                                                <div id="discountAmount" class="col-xl-4 col-lg-4 col-md-4 col-12 text-end">
+                                                    <h6>{{ round(($grossTotal*$discountAmount)/100,2) }}</h6>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-between">
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12">
+                                                    <h6>Express Amount:</h6>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12 text-end">
+                                                    <div class="form-check form-switch float-end">
+                                                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="express_charge" value="0" onchange="toggleCheckbox()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-between">
+                                                <input type="hidden" name="total_qty" id="total_qty" value="{{ $order->total_qty }}"/>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12">
+                                                    <h6>Total Count:</h6>
+                                                </div>
+                                                <div id="totalQty" class="col-xl-4 col-lg-4 col-md-4 col-12 text-end">
+                                                    <h6>{{ $order->total_qty }} pc</h6>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-between">
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-12">
+                                                    <h6>Total Amount:</h6>
+                                                </div>
+                                                <div id="totalAmount" class="col-xl-4 col-lg-4 col-md-4 col-12 text-end">
+                                                    <h6>{{ $order->total_price }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="Add_order_btn_area text-end">
+                                                <button class="btn w-100" type="button" data-bs-toggle="modal" data-bs-target="#UpdateOrder">Update</button>
+                                            </div>
+                                        </div>
+                                        <!-- Create Order Model -->
+                                        <div class="modal fade" id="UpdateOrder" tabindex="-1" aria-labelledby="CreateOrderLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="CreateOrderLabel">Create Order</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        <h5>Would you like to Update an Order?</h5>
+                                                        <button type="submit" class="btn btn-primary" id="yesButton" data-bs-toggle="modal" data-bs-target="#yes">Yes</button>
+                                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end -->
+
+                                        <!-- Print Order Model -->
+                                        <div class="modal fade" id="yes" tabindex="-1" aria-labelledby="yesLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        <h5>Please Select from the Following Options</h5>
+                                                        <a type="button" class="btn btn-success mb-2" id="sendWhatsAppMessage" href="{{ url('/send-wh-message') }}">
+                                                            <i class="fab fa-whatsapp me-2"></i> Send On WhatsApp
+                                                        </a>
+                                                        <a type="button" class="btn btn-primary mb-2" href="{{ url('/admin/receipt/{orderId}') }}">
+                                                            <i class="fa-solid fa-file-invoice me-2"></i> Print Receipt
+                                                        </a>
+
+                                                        <button type="button" class="btn btn-success mb-2"><i class="fa-solid fa-tag me-2"></i> Print Tag</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end -->
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <!-- Product Items Section -->
+                                    <div class="client_list_area_hp">
+                                        <div class="client_list_heading_area w-100">
+                                            <div class="client_list_heading_search_area w-100">
+                                                <i class="menu-icon tf-icons ti ti-search"></i>
+                                                <input type="search" class="form-control" placeholder="Searching ...">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" value="" name="categoryPriceItem" id="categoryPriceItem">
+                                    <input type="hidden" value="" name="categoryItem" id="categoryItem">
+
+                                    <div class="row">
+                                        @foreach ($groupedProductItems as $groupedProductItem)
+                                        @php
+                                        $productItem = $groupedProductItem['product_item'];
+                                        $uniqueCategories = $groupedProductItem['unique_categories'];
+                                        @endphp
+
+                                        <div class="border rounded p-2 mb-2">
+                                            <div class="row">
+                                                <div class="col-lg-9 col-md-9 mainopdiv">
+                                                    <h6 class="mb-2 text-dark">{{ $productItem->name }}</h6>
+                                                    <div class="categorysection">
+                                                        @foreach ($uniqueCategories as $categoryId=>$categoryName)
+                                                        <span onclick="categoryItem('{{ $categoryName }}','{{ $productItem->id }}', this)" class="badge text-dark mb-2 subcategory @if(isset($orderItems[$productItem->id]["category_id"]) && $orderItems[$productItem->id]["category_id"]==$categoryId) bg-success @else bg-light @endif">{{ $categoryName }}</span>
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="oprationData  disabled">
+                                                        {!! $groupedProductItem['operationData'] !!}
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 text-center">
+                                                    <img src="{{ url('images/categories_img/'.$productItem->image) }}" alt="{{ $productItem->name }}" style="width: 50px;">
+                                                    <div class="Add_order_btn_area">
+                                                        <button onclick="setPrevQty('{{$orderItems[$productItem->id]['id']??0 }}','{{$orderItems[$productItem->id]['qty']??0 }}')" type="button" id="addbtnpreview" class="btn add-product-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" data-product-name="{{ $productItem->name }}" data-images="{{ url('images/categories_img/'.$productItem->image) }}">Add</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+
+                                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                                            <div class="offcanvas-header">
+                                                <h5 id="offcanvasRightLabel">Curtain Panel</h5>
+                                                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                            </div>
+                                            <div class="offcanvas-body mainopdiv">
+                                                <div class="border-bottom mb-3">
+                                                    <h6 class="mb-2 text-dark" id="categoryPreviewItemName">Chudidar/Payjama</h6>
+                                                </div>
+                                                <div class="border-bottom mb-3">
+                                                    <div>
+                                                        <span id="categoryPreviewCategName" class="badge bg-light text-dark mb-2"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="border-bottom mb-3">
+                                                    <div>
+                                                        <span id="categoryPreviewServiceName" class="badge bg-light text-dark mb-2 oprationData"></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="offcanvas-footer px-4 pb-2">
+                                                    <div class="input-group mb-3">
+                                                        <button type="button" class="input-group-text increase"><i class="fa-solid fa-plus"></i></button>
+                                                        <input type="text" class="form-control text-center piece-count" value="0" id="qtyPlsMns" name="qty" placeholder="Pc" aria-label="Amount (to the nearest dollar)">
+                                                        <button type="button" class="input-group-text decrease"><i class="fa-solid fa-minus"></i></button>
+                                                    </div>
+                                                    <div class="Add_order_btn_area">
+                                                        <button type="button" id="addRightOdrbtn" class="btn w-100">Add</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Create Order Modal -->
+                            <div class="modal fade" id="UpdateOrder" tabindex="-1" aria-labelledby="CreateOrderLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="CreateOrderLabel">Create Order</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <h5>Would you like to create a new order?</h5>
+                                            <button type="submit" class="btn btn-primary" id="yesButton" data-bs-toggle="modal" data-bs-target="#yes">Yes</button>
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Print Order Modal -->
+                            <div class="modal fade" id="yes" tabindex="-1" aria-labelledby="yesLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <h5>Please select from the following options:</h5>
+                                            <a class="btn btn-primary mb-2" href="{{ url('/admin/receipt') }}">
+                                                <i class="fa-solid fa-file-invoice me-2"></i> Print Receipt
+                                            </a>
+                                            <button type="button" class="btn btn-success mb-2">
+                                                <i class="fa-solid fa-tag me-2"></i> Print Tag
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endsection
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
+    <!-- jQuery CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const bookingDateInput = document.getElementById('booking_date');
+            if (!bookingDateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                bookingDateInput.value = today;
+            }
+            updateGrossTotal();
+        });
+        function setPrevQty(serviceId,qty){
+            if(+qty>0){
+                let qtyPlsMns = document.getElementById("qtyPlsMns");
+                qtyPlsMns.value=+qty;
+                if($('#serviceId'+serviceId)){ console.log('dddd','#serviceId'+serviceId);
+                    $('#serviceId'+serviceId).click();
+                }
+            }
+        }
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const bookingTimeInput = document.getElementById('booking_time');
+        //     const updateBookingTime = () => {
+        //         const now = new Date();
+        //         const hours = String(now.getHours()).padStart(2, '0');
+        //         const minutes = String(now.getMinutes()).padStart(2, '0');
+        //         bookingTimeInput.value = `${hours}:${minutes}`;
+        //     };
+
+        //     if (!bookingTimeInput.value) {
+        //         updateBookingTime();
+        //     }
+
+        //     setInterval(updateBookingTime, 50000);
+        // });
+
+        let selectedOperation = '';
+        let selectedDiscount = parseFloat('{{ $discountAmount }}');
+         let items = @json($itemList);
+         console.log('items>>',items);
+        // let items = {{ json_encode($itemList) }};
+
+        $(document).on('click', '.add-product-btn', function() {
+            const parentBorder = this.closest('.border');
+            if (parentBorder) {
+                const categorySection = parentBorder.querySelector('.categorysection');
+                const operationSection = parentBorder.querySelector('.oprationData');
+                if (categorySection) {
+                    const categorySectionClone = categorySection.cloneNode(true);
+                    const operationSectionClone = operationSection.cloneNode(true);
+
+                    $('#categoryPreviewItemName').text($(this).data('product-name'));
+                    $('#categoryPreviewCategName').html(categorySectionClone.outerHTML);
+                    $('#categoryPreviewServiceName').html(removeClassFromHtml(operationSectionClone.outerHTML, 'disabled'));
+                }
+            }
+        });
+
+        const removeClassFromHtml = (htmlString, classNameToRemove) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html');
+            doc.querySelectorAll('.' + classNameToRemove).forEach(element => element.classList.remove(classNameToRemove));
+            return doc.body.innerHTML;
+        };
+
+        const categoryItem = (operationName, PrdId, control) => {
+            $.ajax({
+                url: "{{ url('get-service') }}",
+                type: 'POST',
+                data: {
+                    'name': operationName,
+                    'id': PrdId,
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: response => {
+                    $(control).closest('.mainopdiv').find('.oprationData').html(response);
+                    $(control).closest('.mainopdiv').find('.subcategory').removeClass('bg-success').addClass('bg-light');
+                    $(control).addClass('bg-success').removeClass('bg-light');
+                },
+                error: (xhr, status, error) => console.error(xhr.responseText)
+            });
+        };
+
+        const categoryPriceItem = (categoryPriceItemV, control) => {
+            $('#categoryPriceItem').val(categoryPriceItemV);
+            $('.category-service').removeClass('bg-success');
+            $(control).addClass('bg-success');
+            selectedOperation = categoryPriceItemV;
+            console.log('selected Operation>>>>>',selectedOperation);
+            const itemCatId = selectedOperation.split('|');
+            $('#categoryItem').val(itemCatId[3]);
+        };
+
+        $(document).ready(() => {
+            $('.increase').click(function() {
+                const input = $(this).closest('.input-group').find('.piece-count');
+                const value = parseInt(input.val()) + 1;
+                input.val(value);
+            });
+
+            $('.decrease').click(function() {
+                const input = $(this).closest('.input-group').find('.piece-count');
+                const value = Math.max(parseInt(input.val()) - 1, 0);
+                input.val(value);
+            });
+
+            $('#yesButton').on('click', () => $('#UpdateOrder').modal('hide'));
+
+            $('#number').on("input", function() {
+                const val = $(this).val().replace(/\D/g, '');
+                $(this).val(val.slice(0, 10));
+            });
+
+            $('#name').on("input", function() {
+                const val = $(this).val();
+                $(this).val(val.slice(0, 50));
+            });
+
+            // $.validator.addMethod("minBookingDate", function(value) {
+            //     const selectedDate = new Date(value);
+            //     const currentDate = new Date();
+            //     currentDate.setHours(0, 0, 0, 0);
+            //     return selectedDate >= currentDate;
+            // }, "Booking date cannot be earlier than today.");
+
+            $.validator.addMethod("minDeliveryDate", function(value) {
+                const selectedDate = new Date(value);
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0);
+                return selectedDate >= currentDate;
+            }, "Delivery date cannot be earlier than today.");
+
+            $("#addOrderFormValidation").validate({
+                rules: {
+                    client_name: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 50
+                    },
+                    client_num: {
+                        required: true,
+                        number: true,
+                        minlength: 10,
+                        maxlength: 10
+                    },
+                    // booking_date: {
+                    //     required: true,
+                    //     date: true,
+                    //     minBookingDate: true
+                    // },
+                    booking_time: {
+                        required: true
+                    },
+                    delivery_date: {
+                        required: true,
+                        date: true,
+                        minDeliveryDate: true
+                    },
+                    delivery_time: {
+                        required: true
+                    }
+                },
+                messages: {
+                    client_name: {
+                        required: "Please enter client name",
+                        minlength: "Please enter at least 2 characters",
+                        maxlength: "Please enter no more than 50 characters"
+                    },
+                    client_num: {
+                        required: "Please enter client mobile number",
+                        number: "Please enter a valid number",
+                        minlength: "Mobile number must be 10 digits",
+                        maxlength: "Mobile number must be 10 digits"
+                    },
+                    // booking_date: {
+                    //     required: "Please enter booking date",
+                    //     date: "Please enter a valid date",
+                    //     minBookingDate: "Booking date cannot be earlier than today"
+                    // },
+                    booking_time: {
+                        required: "Please enter booking time"
+                    },
+                    delivery_date: {
+                        required: "Please enter delivery date",
+                        date: "Please enter a valid date",
+                        minDeliveryDate: "Delivery date cannot be earlier than today"
+                    },
+                    delivery_time: {
+                        required: "Please enter delivery time",
+                        date: "Please enter a valid time"
+                    }
+                },
+                submitHandler: function(form) {
+                    console.log('handler>>>',items);
+                    // Append item details to form before submission
+                    Object.keys(items).forEach(key => {
+
+                        const item = items[key];
+                        if (item.qty > 0) {
+                            $('#addOrderFormValidation').append(`<input type="hidden" name="items[${item.productName}][${item.category}][${item.service}][qty]" value="${item.qty}">`);
+                            $('#addOrderFormValidation').append(`<input type="hidden" name="items[${item.productName}][${item.category}][${item.service}][unit_price]" value="${item.unitPrice}">`);
+                        }
+                    });
+                    form.submit();
+                }
+            });
+
+            $('#number').on("keyup", function() {
+                const clientNum = $(this).val();
+                if (clientNum.length === 10) {
+                    $.ajax({
+                        url: "/fetch-client-name",
+                        method: "GET",
+                        data: {
+                            client_num: clientNum
+                        },
+                        success: response => {
+                            if (response.success) {
+                                $("#client_name").val(response.client_name);
+                            } else {
+                                console.error(response.message);
+                            }
+                        },
+                        error: (xhr, status, error) => console.error("Error fetching client name:", error)
+                    });
+                }
+            });
+
+            $('#discount').on('change', function() {
+                selectedDiscount = parseFloat(this.value);
+                updateGrossTotal();
+            });
+
+            $('#addRightOdrbtn').on('click', function() {
+                const qty = parseInt($('#qtyPlsMns').val());
+                const itemData = selectedOperation.split('|');
+                const productName = $('#categoryPreviewItemName').text();
+                const category = $('#categoryPreviewCategName').text();
+                const service = $('#categoryPreviewServiceName').text();
+                const unitPrice = parseFloat(itemData[2]);
+                console.log('selectedPrice IDM',{
+                            itemId:itemData[5],
+                            productName:itemData[4],
+                            category:itemData[3],
+                            service:itemData[0],
+                            qty: qty,
+                            unitPrice
+                        });
+                if (+qty > 0) {
+                    // const itemId = `${itemData[4]}-${itemData[3]}-${itemData[0]}`;
+                    const itemId = `${itemData[4]}`;
+                    console.log('ddloitem before dl',items[itemId]);
+                    delete items[itemId];
+
+                    console.log('itemv1',items);
+                    if (!items[itemId]) {
+                        items[itemId] = {
+                            itemId:itemData[5],
+                            productName:itemData[4],
+                            category:itemData[3],
+                            service:itemData[0],
+                            qty: +qty,
+                            unitPrice
+                        };
+                    }
+                    items[itemId].qty = qty;
+                    console.log('itemv2',items);
+                    // console.log(`qty====`,items[itemId].qty);
+                    updateGrossTotal();
+                }
+
+                $('#offcanvasRight').removeClass('show');
+                $(".offcanvas-backdrop").remove();
+                $('#qtyPlsMns').val(0); // Reset quantity input
+            });
+        });
+
+        function toggleCheckbox() {
+            const checkbox = document.getElementById("flexSwitchCheckDefault");
+            checkbox.value = checkbox.checked ? 1 : 0;
+        }
+
+        function updateGrossTotal() {
+            let grossTotal = 0;
+            let totalQty = 0;
+
+            Object.keys(items).forEach(key => {
+                const item = items[key];
+                console.log('updateGrossTotal item>>',item);
+                if (item.qty > 0) {
+                    grossTotal += item.qty * parseFloat(item.unitPrice);
+                    totalQty += item.qty;
+                }
+            });
+
+            const discountAmount = (grossTotal * selectedDiscount) / 100;
+            const totalAmount = grossTotal - discountAmount;
+
+            document.getElementById('grossTotal').innerText = grossTotal.toFixed(2);
+            document.getElementById('gross_total').value = grossTotal.toFixed(2);
+            document.getElementById('discountAmount').innerText = discountAmount.toFixed(2);
+            document.getElementById('totalAmount').innerText = totalAmount.toFixed(2);
+            document.getElementById('totalQty').innerText = totalQty + ' pc';
+            document.getElementById('total_qty').value = totalQty;
+        }
+    </script>
