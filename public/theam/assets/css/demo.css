@@ -506,3 +506,7 @@ input::-webkit-inner-spin-button {
   background: #eeeeee;
 
 }
+.alphabetical-index {
+  display: flex;
+  flex-wrap: wrap;
+}
