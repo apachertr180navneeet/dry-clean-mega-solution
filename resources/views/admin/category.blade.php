@@ -21,7 +21,7 @@
                                     <div class="row mb-2">
                                         <div class="col-md-4 ">
 
-                                            <select name="category[]" id="" class="form-select cat-select check-error">
+                                            <select name="category[]" id="" class="form-select cat-select check-error mb-2">
                                                 <option value="" selected disabled> Select Category</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -30,7 +30,7 @@
                                             <span class="category-error text-danger" style="display:none;">Item name is
                                                 required and must be less than 50 characters.</span>
                                         </div>
-                                        <div class="col-md-4 "> <button type="button"
+                                        <div class="col-md-4 mb-2"> <button type="button"
                                                 class="btn btn_1F446E_hp
                                             addsection">Add
                                                 Item</button></div>

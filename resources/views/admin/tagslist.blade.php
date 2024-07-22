@@ -16,7 +16,7 @@
                                     type="button"><i class="fa-solid fa-print me-2"></i></a>
                             </div>
                         </div>
-                        @include('admin.downloadTagslist')
+                        @include('admin.downloadTagslist');
 
                     </div>
                 </div>

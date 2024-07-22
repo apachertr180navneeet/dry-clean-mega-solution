@@ -24,7 +24,7 @@
                     fill="#7367F0" />
                 </svg>
             </span> -->
-            <img src="{{ url('theam/Images/white_logo.png') }}"  class="mt-0">
+            <img src="{{ url('public/theam/Images/white_logo.png') }}"  class="mt-0">
         </a>
 
         <!-- <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -164,21 +164,21 @@
                 {{-- @dd(Auth::user()->image); --}}
                 @if(Auth::user()->image != "")
                 <div class="avatar avatar-online">
-                    <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                    <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                 </div>
             @else
                 <div class="avatar avatar-online">
-                    <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                    <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                 </div>
             @endif
                 @else
                     @if(Auth::user()->image != "")
                         <div class="avatar avatar-online">
-                            <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                            <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                         </div>
                     @else
                         <div class="avatar avatar-online">
-                            <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                            <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                         </div>
                     @endif
 
@@ -193,21 +193,21 @@
                                     {{-- @dd(Auth::user()->image); --}}
                                     @if(Auth::user()->image != "")
                                     <div class="avatar avatar-online">
-                                        <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                        <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                     </div>
                                      @else
                                     <div class="avatar avatar-online">
-                                        <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                                        <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                                     </div>
                                     @endif
                                     @else
                                         @if(Auth::user()->image != "")
                                             <div class="avatar avatar-online">
-                                                <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                                <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @else
                                             <div class="avatar avatar-online">
-                                                <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                                                <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @endif
                     

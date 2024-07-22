@@ -98,8 +98,8 @@
             $.validator.addMethod("notSamePasswords", function(value, element) {
             let oldPassword = $('#password').val();
             let newPassword = $('#newpassword').val();
-            // let confirmPassword = $('#confirmpassword').val();
-            return oldPassword !== newPassword;
+            let confirmPassword = $('#confirmpassword').val();
+            return !(oldPassword === newPassword && newPassword === confirmPassword);
             }, "Old password, new password should not be the same");
 
 
@@ -108,7 +108,7 @@
                     password: {
                         required: true,
                         minlength: 6,
-                    // notSamePasswords: true,
+                    // notSamePasswords: true
                     notEqualTo: "#newpassword"
                     },
                     new_password: {
@@ -126,7 +126,7 @@
                 messages: {
                     password: {
                         required: "Please provide your old password",
-                        minlength: "Password must be at least 6 characters long",
+                        minlength: "Password must be at least 6 characters long", 
                         notEqualTo:'New password and confirm password should not match'
                     },
                     new_password: {

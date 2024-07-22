@@ -4,11 +4,9 @@
         .disabled {
             pointer-events: none;
         }
-
-        .check-error {
+        .check-error{
             color: #6f6b7d !important;
         }
-
         .active-alphabet {
             background-color: #C6F7D0;
             /* green background */
@@ -140,21 +138,20 @@
                                                             value="{{ $discount->amount }}">{{ $discount->name }}</option>
                                                     @endforeach
                                                 </select>
-                                                <span class="error-message text-danger" id="discountError"
-                                                    style="display:none;">Please select a discount offer.</span>
+                                                <span class="error-message text-danger" id="discountError" style="display:none;">Please select a discount offer.</span>
                                             </div>
                                         </div>
                                         <hr />
                                         <div class="col-lg-12 col-md-12 mb-2">
                                             <!-- Product Items Section -->
                                             <!-- <div class="client_list_area_hp">
-                                                <div class="client_list_heading_area w-100">
-                                                    <div class="client_list_heading_search_area w-100">
-                                                        <i class="menu-icon tf-icons ti ti-search"></i>
-                                                        <input type="search" class="form-control" placeholder="Searching ...">
-                                                    </div>
+                                            <div class="client_list_heading_area w-100">
+                                                <div class="client_list_heading_search_area w-100">
+                                                    <i class="menu-icon tf-icons ti ti-search"></i>
+                                                    <input type="search" class="form-control" placeholder="Searching ...">
                                                 </div>
-                                            </div> -->
+                                            </div>
+                                        </div> -->
 
                                             <input type="hidden" value="" name="categoryPriceItem"
                                                 id="categoryPriceItem">
@@ -221,9 +218,6 @@
                                                                     data-alphabet="Z">Z</a>
                                                             </div>
                                                             Select Order Item
-                                                            <span class="all-error text-danger" style="display:none;">Item
-                                                                name is required and must be
-                                                                less than 20 characters.</span>
                                                             <span class="category-error text-danger"
                                                                 style="display:none;">Item name is required and must be
                                                                 less than 20 characters.</span>
@@ -243,14 +237,11 @@
                                                                                 <th>Action</th>
                                                                             </tr>
                                                                         </thead>
-                                                                        <tbody class="empty-row-template"
-                                                                            style="display: none;">
+                                                                        <tbody class="empty-row-template" style="display: none;">
                                                                             <tr>
                                                                                 <td colspan="6" class="text-center">
-                                                                                    <button type="button"
-                                                                                        class="btn p-0 me-2 addnewrow">
-                                                                                        <i
-                                                                                            class="fa-solid fa-circle-plus fs-3"></i>
+                                                                                    <button type="button" class="btn p-0 me-2 addnewrow">
+                                                                                        <i class="fa-solid fa-circle-plus fs-3"></i>
                                                                                     </button>
                                                                                     <span>Add items</span>
                                                                                 </td>
@@ -259,7 +250,7 @@
                                                                         <tbody class="addtbody">
                                                                             {{-- @dd($productItems); --}}
                                                                             @foreach ($orderItems as $index => $orderItem)
-                                                                                {{-- @dd($orderItems); --}}
+                                                                            {{-- @dd($orderItems); --}}
                                                                                 <tr>
                                                                                     <td>
                                                                                         <select name="category[]"
@@ -267,8 +258,7 @@
                                                                                             @foreach (collect($productItems)->sortBy('name') as $product)
                                                                                                 <option
                                                                                                     value="{{ $product->id }}"
-                                                                                                    {{ $orderItem->product_item_id == $product->id ? 'selected' : '' }}
-                                                                                                    data-alphabet="{{ strtoupper(substr($product->name, 0, 1)) }}">
+                                                                                                    {{ $orderItem->product_item_id == $product->id ? 'selected' : '' }} data-alphabet="{{ strtoupper(substr($product->name, 0, 1)) }}">
                                                                                                     {{ $product->name }}
                                                                                                 </option>
                                                                                             @endforeach
@@ -278,14 +268,14 @@
                                                                                         <select name="type[]"
                                                                                             class="form-select type-select check-error">
                                                                                             @foreach ($productItems as $product)
-                                                                                                @if ($orderItem->product_item_id == $product->id)
-                                                                                                    @foreach ($product->categories as $category)
-                                                                                                        <option
-                                                                                                            value="{{ $category->id }}"
-                                                                                                            {{ $orderItem->product_category_id == $category->id ? 'selected' : '' }}>
-                                                                                                            {{ $category->name }}
-                                                                                                        </option>
-                                                                                                    @endforeach
+                                                                                            @if ($orderItem->product_item_id == $product->id)
+                                                                                                @foreach ($product->categories as $category)
+                                                                                                    <option
+                                                                                                        value="{{ $category->id }}"
+                                                                                                        {{ $orderItem->product_category_id == $category->id ? 'selected' : '' }}>
+                                                                                                        {{ $category->name }}
+                                                                                                    </option>
+                                                                                                @endforeach
                                                                                                 @endif
                                                                                             @endforeach
                                                                                         </select>
@@ -323,9 +313,7 @@
                                                                                             <button type="button"
                                                                                                 class="btn p-0 me-2 addnewrow"><i
                                                                                                     class="fa-solid fa-circle-plus fs-3"></i></button>
-                                                                                            <button type="button"
-                                                                                                class="btn p-0 me-2 remove"><i
-                                                                                                    class="fa-solid fa-circle-minus text-danger fs-3"></i></button>
+                                                                                                    <button type="button" class="btn p-0 me-2 remove"><i class="fa-solid fa-circle-minus text-danger fs-3"></i></button>
                                                                                         </div>
                                                                                     </td>
                                                                                     <!-- Add more fields as needed -->
@@ -435,7 +423,7 @@
                                                     <h6>{{ $order->total_qty }} pc</h6>
                                                 </div>
                                             </div>
-                                            <div class="row justify-content-between">
+                                            <div class="row justify-content- mb-3">
                                                 <div class="col-xl-4 col-lg-4 col-md-4 col-12">
                                                     <h6>Total Amount:</h6>
                                                 </div>

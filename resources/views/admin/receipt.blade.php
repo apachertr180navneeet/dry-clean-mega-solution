@@ -5,21 +5,23 @@
         <div class="client_list_area_hp Add_order_page_section">
             <div class="card">
                 <div class="card-body">
-                    <div class="row justify-content-between mb-3">
-                        <div class="col-lg-3">
-                            <a type="button" class="text-primary" id="backButton">
+                    <div class="row justify-content-between mb-3 align-items-center">
+                        <div class="col-3 mb-2">
+                            <a type="button" class="text-primary d-flex align-items-center" id="backButton">
                                 <i class="fa-solid fa-arrow-left me-2"></i> Back
                             </a>
                         </div> 
-                        <div class="col-lg-2">
+                        <div class="col-lg-3 mb-2 text-end">
                             {{-- <a type="button" class="btn btn-success" id="sendWhatsAppMessage" href="{{ url('/send-wh-message/' . $order->id) }}">
                                 <i class="fab fa-whatsapp me-2"></i>
                             </a> --}}
                             <a class="btn btn-primary"  href="{{ url('/download-receipt/' . $order->id) }}" type="button"><i class="fa-solid fa-download"></i></a>
-                        </div>
+                                               <a class="btn btn-primary" href="{{ url('/receipt-print/' . $order->id) }}"
+                                type="button"><i class="fa-solid fa-print me-2"></i></a> 
+                        </div> 
                     </div>
 
-
+                    <img src="{{ url('public/theam/Images/logo.png') }}" class="mt-0 mb-3" style="width: 200px;">
                      @include('admin.pdf');
                      <input type="hidden" id="referrerUrl" value="">
                 </div>

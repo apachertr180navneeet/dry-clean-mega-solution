@@ -11,15 +11,18 @@
                                 <i class="fa-solid fa-arrow-left me-2"></i> Back
                             </a>
                         </div> 
-                        <div class="col-lg-2">
+                        <div class="col-lg-3 mb-2 text-end"> 
                             {{-- <a type="button" class="btn btn-success" id="sendWhatsAppMessage" href="{{ url('/send-wh-message/' . $order->id) }}">
                                 <i class="fab fa-whatsapp me-2"></i>
                             </a> --}}
                             <a class="btn btn-primary"  href="{{ url('/download-invoice/' . $order->id) }}" type="button"><i class="fa-solid fa-download"></i></a>
-                        </div>
+                       
+                            <a class="btn btn-primary" href="{{ url('/invoice-print/' . $order->id) }}"
+                                type="button"><i class="fa-solid fa-print me-2"></i></a> 
+                        </div> 
                     </div>
 
-
+<img src="{{ url('public/theam/Images/logo.png') }}" class="mt-0 mb-3" style="width: 200px;">
                      @include('admin.invoiceDetail');
                      <input type="hidden" id="referrerUrl" value="">
                 </div>

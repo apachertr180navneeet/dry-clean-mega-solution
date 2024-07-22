@@ -148,7 +148,6 @@
     document.addEventListener("DOMContentLoaded", function() {
         $(document).ready(function() {
             // $('#service_name').focus();
-            // Focus on the input field when the modal is shown
             $('#Service').on('shown.bs.modal', function () {
                 $('#service_name').focus();
             });

@@ -855,6 +855,47 @@ class OrderController extends Controller
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
+
+    public function RecieptPrint(Request $request, $orderId)
+    {
+        try {
+            // Fetch the latest order with related order items, user, and discounts
+            // $order = Order::with([
+            //     'orderItems.productCategory',
+            //     'orderItems.productItem',
+            //     'orderItems.opertions',
+            //     'user',
+            //     'discounts'
+            // ])->latest()->firstOrFail();
+            $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
+                ->findOrFail($orderId);
+
+            // Calculate the subtotal amount
+            $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
+                return $orderItem->quantity * $orderItem->operation_price;
+            });
+
+            // Calculate the discount amount
+            $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
+            $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
+
+            // Calculate the total amount
+            $totalAmount = $subTotalAmount - $discountAmount;
+
+            // Pass data to the view
+            $pdf = PDF::loadView('admin.pdf', [
+                'order' => $order,
+                'subTotalAmount' => $subTotalAmount,
+                'discountAmount' => $discountAmount,
+                'totalAmount' => $totalAmount,
+                'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
+            ]);
+            return $pdf->stream("invoice-{$order->id}.receipt.pdf");
+        } catch (Throwable $throwable) {
+            // Handle the exception and redirect with an error message
+            return redirect()->back()->with('error', $throwable->getMessage());
+        }
+    }
     public function PrintInvoice(Request $request, $orderId)
     {
         try {
@@ -882,6 +923,48 @@ class OrderController extends Controller
                 'totalAmount' => $totalAmount,
                 'discountPercentage'=> $discountPercentage
             ]);
+        } catch (Throwable $throwable) {
+            // Handle the exception and redirect with an error message
+            return redirect()->back()->with('error', $throwable->getMessage());
+        }
+    }
+
+    public function InvoicePrint(Request $request, $orderId)
+    {
+        try {
+            // Fetch the latest order with related order items, user, and discounts
+            // $order = Order::with([
+            //     'orderItems.productCategory',
+            //     'orderItems.productItem',
+            //     'orderItems.opertions',
+            //     'user',
+            //     'discounts'
+            // ])->latest()->firstOrFail();
+            $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
+                ->findOrFail($orderId);
+
+            // Calculate the subtotal amount
+            $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
+                return $orderItem->quantity * $orderItem->operation_price;
+            });
+
+            // Calculate the discount amount
+            $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
+            $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
+
+            // Calculate the total amount
+            $totalAmount = $subTotalAmount - $discountAmount;
+
+            // Pass data to the view
+            $pdf = PDF::loadView('admin.invoiceDetail', [
+                'order' => $order,
+                'subTotalAmount' => $subTotalAmount,
+                'discountAmount' => $discountAmount,
+                'totalAmount' => $totalAmount,
+                'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
+            ]);
+
+             return $pdf->stream("invoice-{$order->id}.invoice.pdf");
         } catch (Throwable $throwable) {
             // Handle the exception and redirect with an error message
             return redirect()->back()->with('error', $throwable->getMessage());
@@ -937,7 +1020,7 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = array(0,0,200.00,283.80);
+            $customPaper = array(0,0,230.00,283.80);
 
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [

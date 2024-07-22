@@ -1,9 +1,9 @@
 <div class="row justify-content-between mb-3"
     style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
     {{-- <img src="{{ url('theam/Images/logo.png') }}" class="mt-0 mb-3" style="width: 200px;"> --}}
-    <img src="https://fastly.picsum.photos/id/142/200/200.jpg?hmac=L8yY8tFPavTj32ZpuPiqsLsfWgDvW1jvoJ0ETDOUMGg"
-        class="mt-0 mb-3" style="width: 200px;border-radius: 15px; ">
-    {{-- <img src="{{ public_path() . '\theam\Images\logo.png' }}" class="mt-0 mb-3" style="width: 200px;"> --}}
+    {{-- <img src="https://fastly.picsum.photos/id/142/200/200.jpg?hmac=L8yY8tFPavTj32ZpuPiqsLsfWgDvW1jvoJ0ETDOUMGg"
+        class="mt-0 mb-3" style="width: 200px;border-radius: 15px; "> --}}
+    <img src="{{ public_path() . '\theam\Images\logo.png' }}" class="mt-0 mb-3 d-none" style="width: 200px;">
     {{-- <img src="/theam/Images/logo.png" class="mt-0 mb-3" style="width: 200px;"> --}}
     <h6 class="mb-0" style="color: #5d596c; font-weight: 600; margin-bottom:0; font-size:18px;margin-top:10px;">Tax Invoice
     </h6>
@@ -256,7 +256,7 @@
             <li style="color: #5d596c;">The customer should show the invoice number received on mobile when reporting the discrepancy to the store manager.
             </li>
             <li style="color: #5d596c;">The company will not entertain any discrepancy of any article after 24 hrs of delivery made .</li>
-            <li style="color: #5d596c;"> The company is not responsible for any expensive things( ornaments , jewellery, currency ) is lost when giving clothe to store for processing .
+            <li style="color: #5d596c;"> The company is not responsible for any expensive things( ornaments , jewellery, currency ) is lost when giving cloth to store for processing .
             </li>
             <li style="color: #5d596c;">The company will not be responsible for any cloth color damage / cloth shrinkage . It’s the basic nature of fabric for shrinkage and of color fade.
             </li>
@@ -264,7 +264,7 @@
             </li>
             <li style="color: #5d596c;">Some article need special care ,the company held no responsibility to pay special attention to particular garments.
             </li>
-            <li style="color: #5d596c;"> The company will not be responsible for the clothe which are leftover for more then 10 days at store.
+            <li style="color: #5d596c;"> The company will not be responsible for the cloth which are leftover for more then 10 days at store.
             </li>
             <li style="color: #5d596c;"> The company holds the right to deny any operations to any clothes which the store manager thinks will got damage in process.
             </li>

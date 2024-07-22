@@ -36,7 +36,6 @@
                                     $serialNumber = 1; // Initialize serial number counter
                                 @endphp
                                 @foreach ($orders as $order)
-                                {{-- @dd($orders); --}}
                                                                 <tr>
                                                                     <td>{{ $serialNumber++ }}</td>
                                                                     <td>

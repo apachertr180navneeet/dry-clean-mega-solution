@@ -70,7 +70,7 @@
                                             </div>
                                             <input type="text" id="newdateRange" class="form-control mb-2"
                                                 placeholder="Select Date Range" />
-                                            <button class="btn btn-primary w-100 ms-2 mb-2" id="filterButton"
+                                            <button class="btn btn-primary w-100 ms-md--2 mb-2" id="filterButton"
                                                 type="submit">Load
                                                 Invoices</button>
                                         </div>

@@ -84,10 +84,10 @@
                           <tr>
                               <td>{{ $serialNumber++ }}</td>
                               <td>
-                                  @php
-                                      // Format the order ID
-                                      $bookingId = 'ORD-' . date('Y') . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
-                                  @endphp
+                                @php
+                                $invoicenumber = $order->invoice_number;
+                                $bookingId = 'ORD-' .$invoicenumber;
+                            @endphp
                                   {{ $bookingId }}
                               </td>
                               <td>{{ $order->name }}</td>
@@ -158,10 +158,10 @@
                               <tr>
                                   <td>{{ $serialNumber++ }}</td>
                                   <td>
-                                      @php
-                                          $invoicenumber = $order->invoice_number;
-                                          $bookingId = 'ORD-' .$invoicenumber;
-                                      @endphp
+                                    @php
+                                    $invoicenumber = $order->invoice_number;
+                                    $bookingId = 'ORD-' .$invoicenumber;
+                                @endphp
                                       {{ $bookingId }}
                                   </td>
                                   <td>{{ $order->name }}</td>

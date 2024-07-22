@@ -160,14 +160,14 @@
                                         <div class="col-lg-12 col-md-12 mb-2">
                                             <!-- Product Items Section -->
                                             <!-- <div class="client_list_area_hp">
-                                                                <div class="client_list_heading_area w-100">
-                                                                    <div class="client_list_heading_search_area w-100">
-                                                                        <i class="menu-icon tf-icons ti ti-search"></i>
-                                                                        <input type="search" class="form-control"
-                                                                            placeholder="Searching ...">
-                                                                    </div>
+                                                            <div class="client_list_heading_area w-100">
+                                                                <div class="client_list_heading_search_area w-100">
+                                                                    <i class="menu-icon tf-icons ti ti-search"></i>
+                                                                    <input type="search" class="form-control"
+                                                                        placeholder="Searching ...">
                                                                 </div>
-                                                            </div> -->
+                                                            </div>
+                                                        </div> -->
                                             <div id="productItemError" class="text-danger" style="display:none;">Please
                                                 select at least one item.</div>
 
@@ -237,9 +237,6 @@
                                                                     data-alphabet="Z">Z</a>
                                                             </div>
                                                             Select Order Item
-                                                            <span class="all-error text-danger" style="display:none;">Item
-                                                                name is required and must be
-                                                                less than 20 characters.</span>
                                                             <span class="category-error text-danger"
                                                                 style="display:none;">Item name is required and must be
                                                                 less than 20 characters.</span>
@@ -1547,10 +1544,3 @@
 
         });
     </script>
-    {{-- <script>
-        document.addEventListener("DOMContentLoaded", function() {
-         
-
-
-        });
-    </script> --}}

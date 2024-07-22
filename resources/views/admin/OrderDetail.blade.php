@@ -8,7 +8,7 @@
                     <a href="{{ route('viewOrder') }}" class="Back_btn_hp me-3"><i class="fa-solid fa-arrow-left-long"></i></a>
                     {{-- <h4 class="mb-0">Order Detail</h4> --}}
                 </div>
-                <div class="OrderDetail_page_heading_action_icons my-1">
+                {{-- <div class="OrderDetail_page_heading_action_icons my-1">
                     {{-- <a class="btn mx-1"  href="{{ route('order.edit',$orders->id) }}"><i class="fa-solid fa-pen-to-square me-2"></i> Edit</a> --}}
                     {{-- @if($orders->paymentDetail->status !== 'Paid' || $orders->status !== 'delivered')
                     <button class="btn mx-1" onclick="window.location='{{ route('order.edit', $orders->id) }}'">
@@ -17,7 +17,7 @@
                 @endif --}}
                     {{-- <button class="btn mx-1"><i class="fa-solid fa-print me-2"></i> Print</button>
                     <button class="btn mx-1"><i class="fa-regular fa-file-pdf me-2"></i> PDF</button> --}}
-                </div>
+                {{-- </div>  --}}
             </div>
 
             <div class="OrderDetail_page_section">
