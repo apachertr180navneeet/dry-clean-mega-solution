@@ -49,7 +49,6 @@
 
     @include('backend.layouts.include.footer')
     @include('backend.layouts.include.js')
-    @include('backend.layouts.include.myjs')
     @yield('extrascript')
 
     <!-- Page JS -->
