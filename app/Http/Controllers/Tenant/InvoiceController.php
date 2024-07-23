@@ -202,7 +202,9 @@ public function indexfilter(Request $request)
         // If a date range is provided, filter orders accordingly
         if ($dateRange) {
             [$startDate, $endDate] = explode(' - ', $dateRange);
-            $orders = Order::with('paymentDetail')->whereBetween('updated_at', [date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate))])->get();
+            $orders = Order::with('paymentDetail')->whereBetween('updated_at', [date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate)) . ' 23:59:59' // Add time to include today's orders
+            ])->where('is_deleted', 0)
+            ->where('status', 'delivered')->get();
         } else {
             // Otherwise, fetch all orders
             $orders = Order::all();

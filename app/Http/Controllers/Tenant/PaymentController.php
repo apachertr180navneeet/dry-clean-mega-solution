@@ -115,7 +115,7 @@ class PaymentController extends Controller
     private function generateInvoiceNumber()
 {
     // Get the last inserted invoice number
-    $lastOrder = Order::whereNotNull('invoice_number')->orderBy('id', 'desc')->first();
+    $lastOrder = Order::where('invoice_number', '!=', '')->orderBy('id', 'desc')->first();
     
     if (!$lastOrder) {
         // If no invoice number exists, start with INV-001

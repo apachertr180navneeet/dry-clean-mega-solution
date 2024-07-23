@@ -133,9 +133,19 @@
                                         <div class="col-xl-3 col-lg-4 col-md-6 col-12 mb-3">
                                             <div class="form-group">
                                                 <label for="delivery_time" class="form-label">Delivery Time</label>
-                                                <input type="time" id="delivery_time"
-                                                    value="{{ old('delivery_time', $order->delivery_time ?? '') }}"
-                                                    name="delivery_time" class="form-control">
+                                                <div class="input-group">
+                                                    <select id="delivery_time" name="delivery_time" class="form-control">
+                                                        @foreach ($timeSlots as $time)
+                                                            <option value="{{ $time }}" {{ old('delivery_time', $order->delivery_time ?? '') == $time ? 'selected' : '' }}>
+                                                                {{ $time }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <select id="period" name="period" class="form-control">
+                                                        <option value="AM" {{ old('period', $order->period ?? '') == 'AM' ? 'selected' : '' }}>AM</option>
+                                                        <option value="PM" {{ old('period', $order->period ?? '') == 'PM' ? 'selected' : '' }}>PM</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <!-- Discount Offer -->
@@ -160,14 +170,14 @@
                                         <div class="col-lg-12 col-md-12 mb-2">
                                             <!-- Product Items Section -->
                                             <!-- <div class="client_list_area_hp">
-                                                                <div class="client_list_heading_area w-100">
-                                                                    <div class="client_list_heading_search_area w-100">
-                                                                        <i class="menu-icon tf-icons ti ti-search"></i>
-                                                                        <input type="search" class="form-control"
-                                                                            placeholder="Searching ...">
-                                                                    </div>
+                                                            <div class="client_list_heading_area w-100">
+                                                                <div class="client_list_heading_search_area w-100">
+                                                                    <i class="menu-icon tf-icons ti ti-search"></i>
+                                                                    <input type="search" class="form-control"
+                                                                        placeholder="Searching ...">
                                                                 </div>
-                                                            </div> -->
+                                                            </div>
+                                                        </div> -->
                                             <div id="productItemError" class="text-danger" style="display:none;">Please
                                                 select at least one item.</div>
 
@@ -237,9 +247,6 @@
                                                                     data-alphabet="Z">Z</a>
                                                             </div>
                                                             Select Order Item
-                                                            <span class="all-error text-danger" style="display:none;">Item
-                                                                name is required and must be
-                                                                less than 20 characters.</span>
                                                             <span class="category-error text-danger"
                                                                 style="display:none;">Item name is required and must be
                                                                 less than 20 characters.</span>
@@ -479,20 +486,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-// //            function roundToHour(input) {
-//         // Get the current time value
-//         let value = input.value;
-        
-//         // If the value is not empty
-//         if (value) {
-//             // Split the value into hours and minutes
-//             let parts = value.split(':');
-//             let hours = parseInt(parts[0]);
-            
-//             // Round minutes to 00
-//             input.value = (hours < 10 ? '0' : '') + hours + ':00';
-//         }
-//     }
             const discountSelect = document.getElementById('discount');
             discountSelect.addEventListener('change', captureTableData);
             // Function to initialize event listeners and data capture
@@ -1561,10 +1554,3 @@
 
         });
     </script>
-    {{-- <script>
-        document.addEventListener("DOMContentLoaded", function() {
-         
-
-
-        });
-    </script> --}}

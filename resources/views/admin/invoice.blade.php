@@ -124,7 +124,7 @@
                                              
                     
                                             $orderId = $order->id ?? null; // Ensure $order->id is set
-                                            $bookingId = 'ORD-' . $order->order_number;
+                                            $bookingId =  $order->order_number;
                                             $incoiceid =  $order->invoice_number;
                                             ?>
                                             <td class="px-6 py-4">{{ $incoiceid }}</td>
@@ -195,7 +195,7 @@
 
                         orders.forEach((order, index) => {
                             const bookingId =
-                                `ORD-${order.order_number}`;
+                            order.order_number;
                             const taxableAmount =  order.total_price /
                                 1.18;
 

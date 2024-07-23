@@ -85,7 +85,8 @@ class OrdersExport implements FromCollection, WithHeadings
         $totalTaxAmount = $totalamount1 / 1.18;
         $finaltaxAmount = $totalamount1 - $totalTaxAmount;
         return [
-            'invoice_number' => 'INV-' .$order->invoice_number,
+            'invoice_number' =>  $order->invoice_number,
+            'order_number' =>  $order->order_number,
             'customer_name' => $order->user->name, // Assuming there is a relation customer with a name attribute
             'payment_type' => $order->paymentDetail->payment_type,
             'updated_at' => $order->updated_at->format('Y-m-d'),
@@ -102,6 +103,7 @@ public function headings(): array
 {
     return [
         'Invoice Number',
+        'Order Number',
         'Customer Name',
         'Payment Type',
         'PaidAt (Date: yyyy-mm-dd)',

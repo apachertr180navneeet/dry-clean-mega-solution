@@ -50,13 +50,13 @@ class DashboardController extends Controller
         ->where('created_at', '>=', $today)
         ->count();
 
-        $orders = Order::select('orders.id', 'users.name','orders.invoice_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status as payment_status', DB::raw('MAX(order_items.status) as item_status'))
+        $orders = Order::select('orders.id', 'users.name','orders.order_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status as payment_status', DB::raw('MAX(order_items.status) as item_status'))
         ->join('users', 'users.id', '=', 'orders.user_id')
         ->leftJoin('payment_details', 'payment_details.order_id', '=', 'orders.id')
         ->leftJoin('order_items', 'order_items.order_id', '=', 'orders.id')
         ->where('orders.is_deleted', 0)
         ->whereDate('orders.created_at', $today)
-        ->groupBy('orders.id', 'users.name','orders.invoice_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status')
+        ->groupBy('orders.id', 'users.name','orders.order_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status')
         ->orderBy('orders.created_at', 'desc')
         // ->get();
         ->paginate(10);
@@ -69,14 +69,14 @@ class DashboardController extends Controller
             ->count();
 
         // Get pending orders from the last 10 days
-    $pendingOrders = Order::select('orders.id', 'users.name','orders.invoice_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status as payment_status', DB::raw('MAX(order_items.status) as item_status'))
+    $pendingOrders = Order::select('orders.id', 'users.name','orders.order_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status as payment_status', DB::raw('MAX(order_items.status) as item_status'))
     ->join('users', 'users.id', '=', 'orders.user_id')
     ->leftJoin('payment_details', 'payment_details.order_id', '=', 'orders.id')
     ->leftJoin('order_items', 'order_items.order_id', '=', 'orders.id')
     ->where('orders.is_deleted', 0)
     ->where('orders.status', 'pending') // Replace 'pending' with the actual status value for pending orders
     ->where('orders.created_at', '>=', $tenDaysAgo)
-    ->groupBy('orders.id', 'users.name','orders.invoice_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status')
+    ->groupBy('orders.id', 'users.name','orders.order_number', 'orders.total_price', 'orders.total_qty', 'payment_details.status')
     ->orderBy('orders.created_at', 'desc')
     ->paginate(10);
 

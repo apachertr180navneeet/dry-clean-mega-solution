@@ -1,9 +1,9 @@
 <div class="row justify-content-between mb-3"
     style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-    <!-- <img src="{{ url('theam/Images/logo.png') }}"  class="mt-0 mb-3" style="width: 200px;">      -->
+    {{-- <!-- <img src="{{ url('theam/Images/logo.png') }}"  class="mt-0 mb-3" style="width: 200px;">      --> --}}
     {{-- <img src="https://fastly.picsum.photos/id/142/200/200.jpg?hmac=L8yY8tFPavTj32ZpuPiqsLsfWgDvW1jvoJ0ETDOUMGg"
         class="mt-0 mb-3" style="width: 200px;"> --}}
-    {{-- <img src="{{ public_path() . '\theam\Images\logo.png' }}" class="mt-0 mb-3" style="width: 200px;"> --}}
+    <img src="{{ public_path() . '\theam\Images\logo.png' }}" class="mt-0 mb-3 d-none" style="width: 200px;">
     {{-- <img src="/theam/Images/logo.png" class="mt-0 mb-3" style="width: 200px;"> --}}
     <h6 class="mb-0" style="color: #5d596c; font-weight: 600; margin-bottom:0; font-size:18px;margin-top:0;">RECEIPT
     </h6>
@@ -13,7 +13,7 @@
     </p>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:16px;margin-top:0;">GST: 22AAAAA0000A1Z5</p>
     <hr style="margin-bottom:10px;margin-top:10px;"/>
-    <h6 class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:18px;margin-top:0;">Order Id: {{ $order->id }}</h6>
+    <h6 class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:18px;margin-top:0;">Order Id: {{ $order->order_number }}</h6>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Date & Time: {{ $order->order_date }}
         {{ $order->order_time }}
     </p>
@@ -122,27 +122,32 @@
     <hr style="margin-bottom:10px;margin-top:10px;"/>
     <h6 style="color: #5d596c; font-weight: 600; font-size:18px;margin-bottom:0;">Terms and Conditions </h6>
     <ul>
-        <li style="color: #5d596c;">Customer shall examine articles for damage at the time of delivery, and notify the same
-            with in 24 hours from the date of delivery
-            and company shall not be responsible for any claims afterwards.</li>
-        <li style="color: #5d596c;">Company assures the warranty of 2 days from the date of delivery for the articles, for
-            any quality related issues with washing or
-            dry-cleaning of articles (only if the article has not been used by the customer after
-            service). Any quality related claim after the
-            stipulated time shall not be entertained</li>
-        <li style="color: #5d596c;">Company is not responsible for any article which is left beyond 15Days from the date of
-            delivery. After the completion of 15 days
-            company will charge 25% of total bill for next 15 days. After 30 days from the date of
-            delivery store will not be liable for loss or
-            damages</li>
-        <li style="color: #5d596c;">Removal of stain is a part of the process but, complete removal of stains can not be
-            guaranteed and will be processed at
-            customer's risk.</li>
-        <li style="color: #5d596c;">We handle all garments, linen, and fabrics with utmost care, but please be aware that
-            due to the condition of the items or unseen
-            material defects, there's a risk of discoloration or shrinkage. These items are cleaned
-            at the owner's risk, and we accept no liability
-            for such occurrences</li>
+        <li style="color: #5d596c;">The customer should always show this invoice or the invoice number at the time of delivery .
+        </li>
+        <li style="color: #5d596c;">The customer should report any discrepancy if found to the store manager within 24 hrs after delivery is made.</li>
+        <li style="color: #5d596c;">The customer should show the invoice number received on mobile when reporting the discrepancy to the store manager.
+        </li>
+        <li style="color: #5d596c;">The company will not entertain any discrepancy of any article after 24 hrs of delivery made .</li>
+        <li style="color: #5d596c;"> The company is not responsible for any expensive things( ornaments , jewellery, currency ) is lost when giving cloth to store for processing .
+        </li>
+        <li style="color: #5d596c;">The company will not be responsible for any cloth color damage / cloth shrinkage . It’s the basic nature of fabric for shrinkage and of color fade.
+        </li>
+        <li style="color: #5d596c;">Our manpower is doing the work by outmost attention , but afterall it’s a human who is doing work ,therefor company will will not take the responsibility of any damage cause to the garment .
+        </li>
+        <li style="color: #5d596c;">Some article need special care ,the company held no responsibility to pay special attention to particular garments.
+        </li>
+        <li style="color: #5d596c;"> The company will not be responsible for the cloth which are leftover for more then 10 days at store.
+        </li>
+        <li style="color: #5d596c;"> The company holds the right to deny any operations to any clothes which the store manager thinks will got damage in process.
+        </li>
+        <li style="color: #5d596c;">The customer are requested to count the article at delivery time . The company will not be responsible after the delivery is accepted by the customer.
+        </li>
+        <li style="color: #5d596c;">The company does not give the guarantee for removing the spots/stains from the garment . Therefore no deductions will be there from the invoice.
+        </li>
+        <li style="color: #5d596c;">If any dispute occur . The dispute jurisdiction place will be Jodhpur .
+        </li>
+        <li style="color: #5d596c;"> In case of any force process requested by the customer , the company will not be responsible for any damage of the cloth .
+        </li>
     </ul>
 </div>
 </div>

@@ -36,14 +36,13 @@
                                     $serialNumber = 1; // Initialize serial number counter
                                 @endphp
                                 @foreach ($orders as $order)
-                                {{-- @dd($orders); --}}
                                                                 <tr>
                                                                     <td>{{ $serialNumber++ }}</td>
                                                                     <td>
                                                                         <?php
                                     // Format the order ID
                                     // $bookingId = 'ORD-' . date('Y') . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
-                                    $bookingId = 'ORD-' . $order->order_number;
+                                    $bookingId =  $order->order_number;
                                                                                                                 ?>
                                                                         {{ $bookingId }}
                                                                     </td>

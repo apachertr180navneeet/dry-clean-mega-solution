@@ -21,7 +21,7 @@
                         </div> 
                     </div>
 
-
+                    <img src="{{ url('public/theam/Images/logo.png') }}" class="mt-0 mb-3" style="width: 200px;">
                      @include('admin.pdf');
                      <input type="hidden" id="referrerUrl" value="">
                 </div>

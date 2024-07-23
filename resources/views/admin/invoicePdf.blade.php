@@ -19,10 +19,10 @@
                        
                             <a class="btn btn-primary" href="{{ url('/invoice-print/' . $order->id) }}"
                                 type="button"><i class="fa-solid fa-print me-2"></i></a> 
-                        </div>  
+                        </div> 
                     </div>
 
-
+<img src="{{ url('public/theam/Images/logo.png') }}" class="mt-0 mb-3" style="width: 200px;">
                      @include('admin.invoiceDetail');
                      <input type="hidden" id="referrerUrl" value="">
                 </div>
