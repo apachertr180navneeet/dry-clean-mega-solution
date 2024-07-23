@@ -15,12 +15,12 @@
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/quill/typography.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/quill/katex.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/quill/editor.css')}}" />
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
- <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap2-toggle.min.css">
+ <link rel="stylesheet" href="{{url('package/toastr.min.css')}}">
+ <link rel="stylesheet" href="{{url('package/bootstrap2-toggle.min.css')}}">
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/select2/select2.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/tagify/tagify.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />
- <link href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"/>
  <link rel="stylesheet" href="{{url('summernote/summernote-bs5.css')}}" />
  <link rel="stylesheet" href="{{url('summernote/summernote-bs4.css')}}" />
  <link rel="stylesheet" href="{{url('summernote/summernote.css')}}" />
@@ -30,9 +30,6 @@
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/jquery-timepicker/jquery-timepicker.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/pickr/pickr-themes.css')}}" />
- <!-- <script src="{{url('theam/assets/vendor/js/helpers.js')}}"></script>
- <script src="{{url('theam/assets/vendor/js/template-customizer.js')}}"></script>
- <script src="{{url('theam/assets/js/config.js')}}"></script> -->
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/apex-charts/apex-charts.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/swiper/swiper.css')}}" />
  <link rel="stylesheet" href="{{url('theam/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}" />
