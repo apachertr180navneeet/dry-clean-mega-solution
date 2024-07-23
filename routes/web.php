@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TenantController;
-use App\Http\Controllers\backends\DashboardController;
-use App\Http\Controllers\backends\HomeController;
-use App\Http\Controllers\backends\AuthController;
+use App\Http\Controllers\backends\{
+    DashboardController,
+    HomeController,
+    AuthController
+};
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
-use App\Models\Tenant;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,23 +19,32 @@ use App\Models\Tenant;
 |
 */
 
-
 Route::middleware('auth')->group(function () {
+    // Route for the dashboard
+    Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+        ->name('dashboard'); // Name for route reference
 
-    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    // Profile routes
-    Route::get('/myProfile', [HomeController::class, 'myprofile'])->name('myProfile');
-    Route::get('/edit/profile/{id}', [HomeController::class, 'editprofile'])->name('edit.profile');
-    Route::post('/profile/update/{id}', [HomeController::class, 'updateprofilepost'])->name('profile.update');
 
-    // Password routes
-    Route::get('/change/password', [AuthController::class, 'changePassword'])->name('change.password');
-    Route::post('/change/password/post', [AuthController::class, 'changePasswordPost'])->name('change.password.post');
+    // Profile management routes
+    Route::controller(HomeController::class)->group(function () {
+        Route::get('/myProfile', 'myprofile')->name('myProfile');
+        Route::get('/edit/profile/{id}', 'editprofile')->name('edit.profile');
+        Route::post('/profile/update/{id}', 'updateprofilepost')->name('profile.update');
+    });
 
-    // Tenant routes
+    // Password management routes
+    Route::controller(AuthController::class)->group(function () {
+        Route::get('/change/password', 'changePassword')->name('change.password');
+        Route::post('/change/password/post', 'changePasswordPost')->name('change.password.post');
+    });
+
+    // Resource routes for managing tenants
     Route::resource('tenants', TenantController::class);
-    Route::post('/admin/delete-tenant/{id}', [TenantController::class, 'deleteTenant']);
+
+    // Custom route for deleting a tenant, typically used for AJAX requests
+    Route::post('/admin/delete-tenant/{id}', [TenantController::class, 'deleteTenant'])
+        ->name('tenant.delete');
 });
 
-require __DIR__ . '/auth.php';
 
+require __DIR__ . '/auth.php';

@@ -188,7 +188,7 @@
                     <li>
                         <a class="dropdown-item" href="#">
                             <div class="d-flex">
-                                <div class="flex-shrink-0 me-3"> 
+                                <div class="flex-shrink-0 me-3">
                                     @if (Auth::user()->is_admin == '1')
                                     {{-- @dd(Auth::user()->image); --}}
                                     @if(Auth::user()->image != "")
@@ -210,7 +210,7 @@
                                                 <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @endif
-                    
+
                                     @endif
 
                                 </div>
