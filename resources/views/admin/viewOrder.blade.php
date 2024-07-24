@@ -36,6 +36,8 @@
                                     $serialNumber = 1; // Initialize serial number counter
                                 @endphp
                                 @foreach ($orders as $order)
+
+
                                                                 <tr>
                                                                     <td>{{ $serialNumber++ }}</td>
                                                                     <td>
@@ -326,7 +328,7 @@
                     modal.modal('hide');
                     // location
                     //     .reload(); // Optional: Reload the page to update the order status
-                    window.location.href = '{{ route("invoice") }}'; 
+                    window.location.href = '{{ route("invoice") }}';
                 },
                 error: function (xhr) {
                     // Handle error

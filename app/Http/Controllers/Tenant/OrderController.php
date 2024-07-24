@@ -706,17 +706,23 @@ class OrderController extends Controller
     public function viewOrder(Request $request)
     {
         try {
-            $orders = Order::select('orders.id', 'users.name','orders.invoice_number','orders.order_number', 'users.mobile', 'orders.total_qty', 'payment_details.status as payment_status', DB::raw('MAX(order_items.status) as item_status'))
-                ->join('users', 'users.id', '=', 'orders.user_id')
-                ->leftJoin('payment_details', 'payment_details.order_id', '=', 'orders.id')
-                ->leftJoin('order_items', 'order_items.order_id', '=', 'orders.id')
-                ->where('orders.is_deleted', 0)
-                ->groupBy('orders.id', 'users.name','orders.invoice_number','orders.order_number', 'users.mobile', 'orders.total_qty', 'payment_details.status')
-                ->orderBy('orders.created_at', 'desc')
-                // ->get();
-                ->paginate(10);
 
-            return view('admin.viewOrder', ['orders' => $orders]);
+            $orders = Order::select(
+                        'orders.id',
+                        'orders.order_number',
+                        'orders.total_qty',
+                        'payment_details.status as payment_status',
+                        DB::raw('users.name as name'),
+                        DB::raw('users.mobile as mobile'),
+                        DB::raw('(SELECT MAX(order_items.status) FROM order_items WHERE order_items.order_id = orders.id) as item_status')
+                    )
+                    ->leftJoin('users', 'orders.user_id', '=', 'users.id')
+                    ->join('payment_details', 'payment_details.order_id', '=', 'orders.id')
+                    ->distinct()
+                    ->paginate(10);
+
+
+                return view('admin.viewOrder', ['orders' => $orders]);
         } catch (Throwable $throwable) {
             dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
         }

@@ -113,78 +113,79 @@ class PaymentController extends Controller
     //     }
     // }
     private function generateInvoiceNumber()
-{
-    // Get the last inserted invoice number
-    $lastOrder = Order::where('invoice_number', '!=', '')->orderBy('id', 'desc')->first();
-    
-    if (!$lastOrder) {
-        // If no invoice number exists, start with INV-001
-        return '001';
+    {
+        // Get the last inserted invoice number
+        $lastOrder = Order::where('invoice_number', '!=', '')->orderBy('id', 'desc')->first();
+        
+        if (!$lastOrder) {
+            // If no invoice number exists, start with INV-001
+            return '001';
+        }
+        
+        // Extract the numeric part of the last invoice number
+        $lastInvoiceNumber = $lastOrder->invoice_number;
+        
+        $lastNumber = intval($lastInvoiceNumber);
+        
+        // Increment the number by 1
+        $nextNumber = $lastNumber + 1;
+        
+        // Format the new invoice number
+        return str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
-    
-    // Extract the numeric part of the last invoice number
-    $lastInvoiceNumber = $lastOrder->invoice_number;
-    $lastNumber = intval($lastInvoiceNumber);
-    
-    // Increment the number by 1
-    $nextNumber = $lastNumber + 1;
-    
-    // Format the new invoice number
-    return str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-}
 
     public function settleAndDeliverOrder(Request $request, $orderId)
-{
-    try {
-        // Start a transaction
-        DB::beginTransaction();
-
-        // Settle the order
-        $payment = PaymentDetail::where('order_id', $orderId)->first();
-        if ($payment) {
-            $payment->status = 'Paid';
-            $payment->payment_type = $request->paymentType;
-            $payment->save();
-        } else {
-            return response()->json(['error' => 'Payment not found.'], 404);
-        }
-
-        // Deliver the order
-        $order = Order::findOrFail($orderId);
-        $order->status = 'delivered';
-        $order->invoice_number = $this->generateInvoiceNumber();
-        $order->save();
-        $order->orderItems()->update(['status' => 'delivered']);
-
-        // Commit the transaction
-        DB::commit();
-
-        // Prepare SMS message
-        $client = User::findOrFail($order->user_id);
-        $message = sprintf(
-            "Dear %s, your order (ID: %s) of %s is Delivered. Do visit us again. Regards - Mega Solutions Dry cleaning",
-            $client->name,
-            $order->id,
-            $order->total_price
-        );
-
-        // Format the client's phone number
-        $clientPhoneNumber = '+91' . $client->mobile;
-
-        // Attempt to send SMS and handle any exceptions
+    {
         try {
-            $this->smsService->sendSms($clientPhoneNumber, $message);
-        } catch (\Exception $e) {
-            // Log the SMS error and continue
-            Log::error('Error sending SMS: ' . $e->getMessage());
-        }
+            // Start a transaction
+            DB::beginTransaction();
 
-        return response()->json(['success' => 'Order settled and delivered successfully.']);
-        // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');
-    } catch (\Throwable $throwable) {
-        // Rollback the transaction in case of an error
-        DB::rollBack();
-        return response()->json(['error' => $throwable->getMessage()], 500);
+            // Settle the order
+            $payment = PaymentDetail::where('order_id', $orderId)->first();
+            if ($payment) {
+                $payment->status = 'Paid';
+                $payment->payment_type = $request->paymentType;
+                $payment->save();
+            } else {
+                return response()->json(['error' => 'Payment not found.'], 404);
+            }
+
+            // Deliver the order
+            $order = Order::findOrFail($orderId);
+            $order->status = 'delivered';
+            $order->invoice_number = $this->generateInvoiceNumber();
+            $order->save();
+            $order->orderItems()->update(['status' => 'delivered']);
+
+            // Commit the transaction
+            DB::commit();
+
+            // Prepare SMS message
+            $client = User::findOrFail($order->user_id);
+            $message = sprintf(
+                "Dear %s, your order (ID: %s) of %s is Delivered. Do visit us again. Regards - Mega Solutions Dry cleaning",
+                $client->name,
+                $order->id,
+                $order->total_price
+            );
+
+            // Format the client's phone number
+            $clientPhoneNumber = '+91' . $client->mobile;
+
+            // Attempt to send SMS and handle any exceptions
+            try {
+                $this->smsService->sendSms($clientPhoneNumber, $message);
+            } catch (\Exception $e) {
+                // Log the SMS error and continue
+                Log::error('Error sending SMS: ' . $e->getMessage());
+            }
+
+            return response()->json(['success' => 'Order settled and delivered successfully.']);
+            // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');
+        } catch (\Throwable $throwable) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+            return response()->json(['error' => $throwable->getMessage()], 500);
+        }
     }
-}
 }
