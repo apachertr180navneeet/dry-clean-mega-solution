@@ -264,7 +264,7 @@ class OrderController extends Controller
                 $orderId = $order->id;
                 // $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($orderId, 3, '0', STR_PAD_LEFT);
                 $randomString = $this->generateRandomString();
-    
+
                 // Concatenate "ORD-" with the random string to form the order number
                 $orderNumber = 'ORD-' . $randomString;
                 $order->order_number = $orderNumber;
@@ -1056,7 +1056,7 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = array(0,0,230.00,283.80);
+            $customPaper = array(0,0,144,288);
 
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [
