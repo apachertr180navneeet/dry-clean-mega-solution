@@ -102,7 +102,7 @@
                                                     <div class="client_list_heading_search_area me-2 mb-2">
                                                         <i class="menu-icon tf-icons ti ti-search"></i>
                                                         <input type="search" class="form-control"
-                                                            placeholder="Searching ..." id="invoiceSearch">
+                                                            placeholder="Searching ..." id="customerSearch">
                                                     </div>
                                                 </div>
                                             </div>
@@ -138,36 +138,28 @@
                                                 $totalprice += $totalOrderByCustomer->total_price;
                                             @endphp
                                             <tr>
-                                                <td>{{ $serialNumber }}</td>
+                                                <td>{{ $serialNumber++ }}</td>
                                                 <td><a href=""> {{ $totalOrderByCustomer->order_number }} </a></td>
                                                 <td>{{ $totalOrderByCustomer->name }}</td>
                                                 <td>{{ $totalOrderByCustomer->order_date }}</td>
                                                 <td>
                                                     @if($totalOrderByCustomer->status == "pending")
-                                                        <div class="badge rounded bg-label-warning py-1">
-                                                            Pending
-                                                        </div>
+                                                        <div class="badge rounded bg-label-warning py-1">Pending</div>
                                                     @else
-                                                        <div class="badge rounded bg-label-success py-1">
-                                                            Completed
-                                                        </div>
+                                                        <div class="badge rounded bg-label-success py-1">Completed</div>
                                                     @endif
                                                 </td>
                                                 <td>₹ {{ $totalOrderByCustomer->total_price }}</td>
                                             </tr>
                                         @endforeach
                                         <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>
-                                                Total
-                                            </td>
+                                            <td colspan="4"></td>
+                                            <td>Total</td>
                                             <td>₹ {{ $totalprice }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
+
                             </div>
                         </div>
                     </div>
@@ -182,4 +174,32 @@
 </div>
 <!-- Content wrapper -->
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $(document).ready(function () {
+            // Function to filter table rows based on search input
+            $('#customerSearch').keyup(function () {
+                var searchText = $(this).val().toLowerCase();
+
+                $('tbody tr').each(function () {
+                    // Retrieve text from relevant columns
+                    var orderId = $(this).find('td:nth-child(2)').text().toLowerCase();
+                    var clientName = $(this).find('td:nth-child(3)').text().toLowerCase();
+                    var orderDate = $(this).find('td:nth-child(4)').text().toLowerCase();
+
+                    // Check if any of the columns contain the search text
+                    if (orderId.indexOf(searchText) === -1 &&
+                        clientName.indexOf(searchText) === -1 &&
+                        orderDate.indexOf(searchText) === -1) {
+                        $(this).hide(); // Hide row if no match
+                    } else {
+                        $(this).show(); // Show row if match found
+                    }
+                });
+            });
+        });
+    });
+
+</script>
 @endsection

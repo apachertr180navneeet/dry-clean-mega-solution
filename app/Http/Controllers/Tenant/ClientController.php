@@ -7,8 +7,8 @@ use App\Models\User;
 use App\Models\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class ClientController extends Controller
@@ -43,54 +43,53 @@ class ClientController extends Controller
     }
 
     public function addClient(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|min:4|max:20',
-                'mobile' => [
-                    'required',
-                    'regex:/^[0-9()+-]+$/',
-                    'min:4',
-                    'max:15',
-                    Rule::unique('users')->where(function ($query) {
-                        return $query->where('is_deleted', 0);
-                    })
-                ]
-            ]);
-    
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator->errors())->withInput();
-            }
-    
-            // Check if a user with the same mobile number and is_deleted = 1 exists
-            $existingUser = User::where('mobile', $request->mobile)->where('is_deleted', 1)->first();
-    
-            if ($existingUser) {
-                // Update the existing user with the new data
-                $existingUser->update([
-                    'name' => $request->name,
-                    'email' => $request->email ?? null,
-                    'password' => bcrypt($request->password) ?? $existingUser->password,
-                    'is_deleted' => 0,
-                    'role_id' => 2,
-                ]);
-            } else {
-                // Create a new user
-                User::create([
-                    'name' => $request->name,
-                    'email' => $request->email ?? null,
-                    'mobile' => $request->mobile,
-                    'password' => bcrypt($request->password) ?? null,
-                    'role_id' => 2,
-                ]);
-            }
-    
-            return redirect()->route('clientpage')->with('success', 'Client added successfully');
-        } catch (\Throwable $throwable) {
-            \Log::error($throwable->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while adding the client.');
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|min:4|max:20',
+            'mobile' => [
+                'required',
+                'regex:/^[0-9()+-]+$/',
+                'min:4',
+                'max:15',
+                Rule::unique('users')->where(function ($query) {
+                    return $query->where('is_deleted', 0);
+                }),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator->errors())->withInput();
         }
+        // Check if a user with the same mobile number and is_deleted = 1 exists
+        $existingUser = User::where('mobile', $request->mobile)->where('is_deleted', 1)->first();
+
+        if ($existingUser) {
+            // Update the existing user with the new data
+            $existingUser->update([
+                'name' => $request->name,
+                'email' => $request->email ?? null,
+                'password' => bcrypt($request->password) ?? $existingUser->password,
+                'is_deleted' => 0,
+                'role_id' => 2,
+            ]);
+        } else {
+            // Create a new user
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email ?? null,
+                'mobile' => $request->mobile,
+                'password' => bcrypt($request->password) ?? null,
+                'role_id' => 2,
+            ]);
+        }
+
+        return redirect()->route('clientpage')->with('success', 'Client added successfully');
+    } catch (\Throwable $throwable) {
+        \Log::error($throwable->getMessage());
+        return redirect()->back()->with('error', 'An error occurred while adding the client.');
     }
+}
 
     public function editClient(Request $request, $id)
     {
@@ -98,7 +97,15 @@ class ClientController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:20',
-                'mobile' => 'required|numeric|min:4'
+                'mobile' => [
+                    'required',
+                    'regex:/^[0-9()+-]+$/',
+                    'min:4',
+                    'max:15',
+                    Rule::unique('users')->where(function ($query) {
+                        return $query->where('is_deleted', 0);
+                    }),
+                ],
             ]);
 
             if ($validator->fails()) {

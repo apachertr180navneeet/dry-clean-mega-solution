@@ -315,7 +315,7 @@
             }
 
             $.ajax({
-                url: '/settle-and-deliver-order/' + orderId,
+                url: '/admin/settle-and-deliver-order/' + orderId,
                 method: 'POST',
                 data: {
                     paymentType: paymentOption,

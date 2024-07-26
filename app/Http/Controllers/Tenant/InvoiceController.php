@@ -170,30 +170,37 @@ class InvoiceController extends Controller
 
     public function analitices(){
 
-        $ordersDataCount = Order::select(
-            DB::raw('COUNT(*) as totalOrders'),
-            DB::raw('COUNT(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pendingOrders'),
-            DB::raw('COUNT(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as deliveredOrders'),
-            DB::raw('SUM(total_price) as totalOrdersAmount')
-        )
-        ->where('is_deleted', '!=', 1)
+        // Retrieve order statistics
+        $ordersDataCount = Order::select([
+            DB::raw('COUNT(*) as totalOrders'), // Total number of orders
+            DB::raw('COUNT(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pendingOrders'), // Total pending orders
+            DB::raw('COUNT(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as deliveredOrders'), // Total delivered orders
+            DB::raw('SUM(total_price) as totalOrdersAmount') // Total amount of all orders
+        ])
+        ->where('is_deleted', '!=', 1) // Exclude deleted orders
         ->first();
 
+        // Retrieve detailed orders data along with customer names
+        $totalOrderByCustomers = Order::select([
+            'orders.invoice_number', // Invoice number of the order
+            'orders.order_number', // Order number
+            'orders.user_id', // ID of the user who placed the order
+            'orders.order_date', // Date of the order
+            'orders.status', // Current status of the order
+            'orders.total_price', // Total price of the order
+            'users.name' // Name of the user who placed the order
+        ])
+        ->where('orders.is_deleted', '!=', 1) // Exclude deleted orders
+        ->join('users', 'orders.user_id', '=', 'users.id') // Join with users table to get user details
+        ->get();
 
-        $totalOrderByCustomers = Order::select('orders.invoice_number', 'orders.order_number', 'orders.user_id', 'orders.order_date', 'orders.status', 'orders.total_price', 'users.name')
-                                        ->where('orders.is_deleted', '!=', 1)
-                                        ->join('users', 'orders.user_id', '=', 'users.id')
-                                        ->get();
-
-
-        //dd($totalOrderByCustomers);
-
+        // Return the view with the retrieved data
         return view('admin.detail', [
-            'totalOrders' => $ordersDataCount->totalOrders,
-            'pendingOrders' => $ordersDataCount->pendingOrders,
-            'deliveredOrders' => $ordersDataCount->deliveredOrders,
-            'totalOrdersAmount' => $ordersDataCount->totalOrdersAmount,
-            'totalOrderByCustomers' => $totalOrderByCustomers,
+            'totalOrders' => $ordersDataCount->totalOrders, // Pass total orders count to the view
+            'pendingOrders' => $ordersDataCount->pendingOrders, // Pass pending orders count to the view
+            'deliveredOrders' => $ordersDataCount->deliveredOrders, // Pass delivered orders count to the view
+            'totalOrdersAmount' => $ordersDataCount->totalOrdersAmount, // Pass total orders amount to the view
+            'totalOrderByCustomers' => $totalOrderByCustomers, // Pass detailed order data to the view
         ]);
     }
 }

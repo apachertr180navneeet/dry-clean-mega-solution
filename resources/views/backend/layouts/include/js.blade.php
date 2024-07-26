@@ -17,8 +17,8 @@
 <script src="{{url('theam/assets/vendor/js/helpers.js')}}"></script>
 <script src="{{url('theam/assets/js/config.js')}}"></script>
 <script src="{{url('theam/assets/js/forms-editors.js')}}"></script>
-{{--  <script src="{{url('theam/assets/vendor/libs/quill/katex.js')}}"></script>
-<script src="{{url('theam/assets/vendor/libs/quill/quill.js')}}"></script>  --}}
+<script src="{{url('theam/assets/vendor/libs/quill/katex.js')}}"></script>
+<script src="{{url('theam/assets/vendor/libs/quill/quill.js')}}"></script>
 <script src="{{url('package/toastr.min.js')}}"></script>
 <script src="{{url('package/bootstrap2-toggle.min.js')}}"></script>
 <script src="{{url('theam/assets/vendor/libs/tagify/tagify.js')}}"></script>
@@ -30,12 +30,12 @@
 <script src="{{url('theam/assets/js/forms-tagify.js')}}"></script>
 <script src="{{url('theam/assets/js/forms-typeahead.js')}}"></script>
 <script src="{{url('package/dropify.min.js')}}"></script>
-{{--  <script src="{{url('summernote/jquery.min.js')}}"></script>  --}}
-{{--  <script src="{{url('summernote/summernote-bs5.js')}}"></script>
+<script src="{{url('summernote/jquery.min.js')}}"></script>
+<script src="{{url('summernote/summernote-bs5.js')}}"></script>
 <script src="{{url('summernote/summernote-bs4.js')}}"></script>
 <script src="{{url('summernote/summernote.js')}}"></script>
 <script src="{{url('summernote/summernote-lite.js')}}"></script>
-<script src="{{url('summernote/summernote-es-ES.js')}}"></script>  --}}
+<script src="{{url('summernote/summernote-es-ES.js')}}"></script>
 <script src="{{url('theam/assets/vendor/libs/i18n/i18n.js')}}"></script>
 <script src="{{url('theam/assets/vendor/libs/moment/moment.js')}}"></script>
 <script src="{{url('theam/assets/vendor/libs/flatpickr/flatpickr.js')}}"></script>
@@ -53,7 +53,7 @@
 <script src="{{url('theam/assets/js/main.js')}}"></script>
 <!-- Page JS -->
 <script src="{{url('theam/assets/js/dashboards-analytics.js')}}"></script>
-{{--  <script>
+<script>
     $('.summernote').summernote({
         toolbar: [
             ['style', ['style']],
@@ -94,7 +94,7 @@
             new: newButton
         }
     });
-</script>  --}}
+</script>
 <script src="{{url('theam/assets/js/form-validation.js')}}"></script>
 
 <script src="{{url('theam/assets/vendor/libs/formvalidation/dist/js/FormValidation.min.js')}}"></script>
