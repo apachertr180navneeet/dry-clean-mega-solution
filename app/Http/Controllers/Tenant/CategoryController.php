@@ -153,7 +153,7 @@ class CategoryController extends Controller
         $id = $request->cloth_id;
         // dd($id);
         try {
-            DB::table('product_categories')->where('id', $id)->delete();
+            ProductCategory::where('id', $id)->delete();
             return response()->json(['message' => 'Items deleted successfully']);
         } catch (\Throwable $throwable) {
             return response()->json(['error' => $throwable->getMessage()], 500);
@@ -237,7 +237,7 @@ class CategoryController extends Controller
             $items = $request->item_name[$cat_key];
             // $category = $request->category[$i];
             foreach ($items as $key=>$item) {
-                $available_data = DB::table('product_items')->where('name', $request->item_name[$cat_key][$key])->first();
+                $available_data = ProductItem::where('name', $request->item_name[$cat_key][$key])->first();
                 // dd($request->hasFile('image.'.$cat_key.'.'.$key));
                 if($available_data){
                     $id = $available_data->id;
@@ -253,7 +253,7 @@ class CategoryController extends Controller
                     $data['name'] = $request->item_name[$cat_key][$key];
                     $data['created_at'] = $currentTimestamp;
                     $data['updated_at'] = $currentTimestamp;
-                    $id = DB::table('product_items')->insertGetId($data);
+                    $id = ProductItem::insertGetId($data);
                 }
 
                 $datas = [];
@@ -264,7 +264,7 @@ class CategoryController extends Controller
                 $datas['created_at'] = $currentTimestamp;
                 $datas['updated_at'] = $currentTimestamp;
 
-                DB::table('product_categories')->insert($datas);
+                ProductCategory::insert($datas);
             }
         }
         // return redirect()->back();

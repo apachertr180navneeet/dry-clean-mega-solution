@@ -149,7 +149,7 @@ class TenantController extends Controller
     {
         try {
             // Mark tenant as deleted by updating the is_deleted flag
-            DB::table('tenants')->where('id', '=', $id)->update(['is_deleted' => 1]);
+            Tenant::where('id', '=', $id)->update(['is_deleted' => 1]);
 
             // Return success response
             return response()->json(['message' => 'Resource deleted successfully']);

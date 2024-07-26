@@ -523,31 +523,13 @@
                         captureTableData();
                     });
 
-                    // row.find('select[name="category[]"], select[name="type[]"], select[name="service[]"], input[name="quantity[]"], input[name="price[]"]').each(function() {
-                    //     $(this).rules("add", {
-                    //         required: true,
-                    //         messages: {
-                    //             required: "This field is required"
-                    //         }
-                    //     });
-                    // });
-
-                    //     row.find('select[name="category[]"], select[name="type[]"], select[name="service[]"], input[name="quantity[]"], input[name="price[]"]').each(function() {
-                    //     $(this).rules("add", {
-                    //         required: true,
-                    //         messages: {
-                    //             required: "This field is required"
-                    //         }
-                    //     });
-                    // });
-
                     row.find('.type-select').on('change', function() {
                         let item = row.find('.cat-select').val();
                         let type = row.find('.type-select').val();
 
                         if (item && type) {
                             $.ajax({
-                                url: '/get-services',
+                                url: '/admin/get-services',
                                 method: 'GET',
                                 data: {
                                     item: item,
@@ -596,7 +578,7 @@
 
                         if (item && type && service) {
                             $.ajax({
-                                url: '/get-price',
+                                url: '/admin/get-price',
                                 method: 'GET',
                                 data: {
                                     item: item,
@@ -959,7 +941,7 @@
                 currentlySelectedService = control;
 
 
-                // $('#categoryPriceItem').val($('#categoryPriceItem').val() + categoryPriceItemV); 
+                // $('#categoryPriceItem').val($('#categoryPriceItem').val() + categoryPriceItemV);
                 // let data = categoryPriceItemV;
                 // let productItem = {
                 //     name: data[0],
@@ -975,7 +957,7 @@
                 // newarray = JSON.stringify(newarray);
 
                 // $('#categoryPriceItem').empty();
-                // $('#categoryPriceItem').val(JSON.stringify(array)); 
+                // $('#categoryPriceItem').val(JSON.stringify(array));
                 // updateCategoryPriceItemInput();
                 // newarray = JSON.parse(newarray);
                 selectedOperation = categoryPriceItemV;
@@ -1145,7 +1127,7 @@
                         },
                         "quantity[]": {
                             required: true,
-                            digits: true, // Ensure quantity is a digit 
+                            digits: true, // Ensure quantity is a digit
                             maxlength: 10,
                             min: 1,
                         },
@@ -1276,43 +1258,12 @@
                         }
                     }
                 });
-                // }
-                // applyValidation();
-                // let formIsValid = true;
-
-                // $('.addtbody tr').each(function() {
-                //     $(this).find('select[name^="category"], select[name^="type"], select[name^="service"], input[name^="quantity"], input[name^="price"]').each(function() {
-                //         $(this).rules("add", {
-                //             required: true,
-                //             messages: {
-                //                 required: "This field is required"
-                //             }
-                //         });
-                //     });
-
-                //     $(this).find('select[name^="category"], select[name^="type"], select[name^="service"], input[name^="quantity"], input[name^="price"]').valid(function(valid) {
-                //         if (!valid) {
-                //             formIsValid = false;
-                //         }
-                //     });
-                // });
-
-                // $("#addOrderFormValidation").validate({
-                //     // ... other options ...
-                //     submitHandler: function(form) {
-                //         if (!formIsValid) {
-                //             return false; // Prevent form submission if there are validation errors
-                //         }
-
-                //         // Rest of the submitHandler function code
-                //     }
-                // });
 
                 $('#number').on("keyup", function() {
                     const clientNum = $(this).val();
                     if (clientNum.length === 10) {
                         $.ajax({
-                            url: "/fetch-client-name",
+                            url: "/admin/fetch-client-name",
                             method: "GET",
                             data: {
                                 client_num: clientNum

@@ -32,69 +32,69 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    $serialNumber = 1; // Initialize serial number counter
-                                @endphp
-                                @foreach ($orders as $order)
-
-
-                                                                <tr>
-                                                                    <td>{{ $serialNumber++ }}</td>
-                                                                    <td>
-                                                                        <?php
-                                    // Format the order ID
-                                    // $bookingId = 'ORD-' . date('Y') . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
-                                    $bookingId =  $order->order_number;
-                                                                                                                ?>
-                                                                        {{ $bookingId }}
-                                                                    </td>
-                                                                    <td>{{ $order->name }}</td>
-                                                                    <td>{{ $order->mobile }}</td>
-                                                                    <td>{{ $order->total_qty }}</td>
-                                                                    <td>
-                                                                        <div class="Client_table_action_area">
-                                                                            <a href="{{ url('/admin/show-order/' . $order->id) }}"
-                                                                                class="btn Client_table_action_icon px-2"><i
-                                                                                    class="tf-icons ti ti-eye"></i></a>
-                                                                            @if ($order->payment_status !== 'Paid' || $order->item_status !== 'delivered')
-                                                                                <button class="btn Client_table_action_icon px-2"
-                                                                                    onclick="window.location='{{ route('order.edit', $order->id) }}'"><i
-                                                                                        class="tf-icons ti ti-pencil"></i></button>
-                                                                                <div class="btn-group dropstart order_list_action_menu_dropmenu">
-                                                                                    <button type="button"
-                                                                                        class="btn Client_table_action_icon dropdown-toggle px-2"
-                                                                                        data-bs-toggle="dropdown" aria-expanded="false"
-                                                                                        data-order_id="{{ $order->id }}">
-                                                                                        <i class="tf-icons ti ti-layout-grid"></i>
-                                                                                    </button>
-                                                                                    <ul class="dropdown-menu">
-                                                                                        @if ($order->payment_status !== 'Paid')
-                                                                                            <li><a class="dropdown-item set_ord_btn" data-bs-toggle="modal"
-                                                                                                    data-bs-target="#SettleOrder"
-                                                                                                    data-order_id="{{ $order->id }}">Settle
-                                                                                                    Order</a>
-                                                                                            </li>
-                                                                                        @endif
-                                                                                        {{-- <li> <button type="button" class="btn mark-as-delivered-btn">
-                                                                                                Deliver</button></li> --}}
-                                                                                    </ul>
-                                                                                </div>
-                                                                            @endif
-                                                                            <button type="button" class="btn Client_table_action_icon px-2 rcp_btn"
-                                                                                data-order_id="{{ $order->id }}">
-                                                                                <i class="fas fa-list"></i>
-                                                                            </button>
-
-                                                                            <button class="btn Client_table_action_icon px-2 delete_order_btn"
-                                                                                data-id="{{ $order->id }}" data-bs-toggle="modal"
-                                                                                data-bs-target="#delete_order"><i
-                                                                                    class="tf-icons ti ti-trash"></i></button>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                @endforeach
+                                @if ($orders->isEmpty())
+                                    <tr>
+                                        <td colspan="6" class="text-center">No records found</td>
+                                    </tr>
+                                @else
+                                    @php
+                                        $serialNumber = 1; // Initialize serial number counter
+                                    @endphp
+                                    @foreach ($orders as $order)
+                                        <tr>
+                                            <td>{{ $serialNumber++ }}</td>
+                                            <td>
+                                                <?php
+                                                    // Format the order ID
+                                                    // $bookingId = 'ORD-' . date('Y') . '-' . str_pad($order->id, 3, '0', STR_PAD_LEFT);
+                                                    $bookingId =  $order->order_number;
+                                                ?>
+                                                {{ $bookingId }}
+                                            </td>
+                                            <td>{{ $order->name }}</td>
+                                            <td>{{ $order->mobile }}</td>
+                                            <td>{{ $order->total_qty }}</td>
+                                            <td>
+                                                <div class="Client_table_action_area">
+                                                    <a href="{{ url('/admin/show-order/' . $order->id) }}" class="btn Client_table_action_icon px-2">
+                                                        <i class="tf-icons ti ti-eye"></i>
+                                                    </a>
+                                                    @if ($order->payment_status !== 'Paid' || $order->item_status !== 'delivered')
+                                                        <button class="btn Client_table_action_icon px-2"
+                                                            onclick="window.location='{{ route('order.edit', $order->id) }}'">
+                                                            <i class="tf-icons ti ti-pencil"></i>
+                                                        </button>
+                                                        <div class="btn-group dropstart order_list_action_menu_dropmenu">
+                                                            <button type="button" class="btn Client_table_action_icon dropdown-toggle px-2"
+                                                                data-bs-toggle="dropdown" aria-expanded="false" data-order_id="{{ $order->id }}">
+                                                                <i class="tf-icons ti ti-layout-grid"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                @if ($order->payment_status !== 'Paid')
+                                                                    <li>
+                                                                        <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="{{ $order->id }}">
+                                                                            Settle Order
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
+                                                                {{-- <li> <button type="button" class="btn mark-as-delivered-btn">Deliver</button></li> --}}
+                                                            </ul>
+                                                        </div>
+                                                    @endif
+                                                    <button type="button" class="btn Client_table_action_icon px-2 rcp_btn" data-order_id="{{ $order->id }}">
+                                                        <i class="fas fa-list"></i>
+                                                    </button>
+                                                    <button class="btn Client_table_action_icon px-2 delete_order_btn" data-id="{{ $order->id }}" data-bs-toggle="modal" data-bs-target="#delete_order">
+                                                        <i class="tf-icons ti ti-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
+
                     </div>
 
                     <!-- Settle Order -->

@@ -111,6 +111,12 @@
                     <div data-i18n="Layouts">Service </div>
                 </a>
             </li>
+            <li class="menu-item">
+                <a href="{{ route('orders.analitices') }}" class="menu-link">
+                    <i class="menu-icon ti ti-server"></i>
+                    <div data-i18n="Layouts">Analytics Dashboard </div>
+                </a>
+            </li>
             {{-- @if ($userData->hasAnyPermission(['user-create', 'user-list', 'user-edit', 'user-delete'])) --}}
             {{-- <li class="menu-item">
 <a href="javascript:void(0);" class="menu-link menu-toggle">

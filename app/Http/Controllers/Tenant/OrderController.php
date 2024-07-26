@@ -2,27 +2,36 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\User;
-use App\Models\ProductItem;
-use App\Models\ProductCategory;
-use App\Models\PaymentDetail;
-use App\Models\Discount;
-use App\Models\OrderItem;
-use App\Models\Service;
-use App\Models\Tenant;
-use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Services\WhatsAppService;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-use Throwable;
-use App\Services\SmsService;
+// Importing necessary classes and models
+use App\Http\Controllers\Controller; // Base controller
+use App\Models\{ // Grouped imports for models
+    Order,
+    User,
+    ProductItem,
+    ProductCategory,
+    PaymentDetail,
+    Discount,
+    OrderItem,
+    Service,
+    Tenant,
+    Operations
+};
+
+// Importing necessary services and facades
+use Illuminate\Http\Request; // Handling HTTP requests
+use Barryvdh\DomPDF\Facade\Pdf; // PDF generation using DomPDF
+use App\Services\WhatsAppService; // Custom WhatsApp service
+use Illuminate\Support\Facades\{ // Grouped imports for facades
+    Session,
+    DB,
+    Log,
+    Validator,
+    Auth
+};
+use Carbon\Carbon; // Date and time manipulation
+use Throwable; // Exception handling
+use App\Services\SmsService; // Custom SMS service
+
 
 class OrderController extends Controller
 {
@@ -33,6 +42,12 @@ class OrderController extends Controller
         $this->smsService = $smsService;
     }
 
+    /**
+     * Generates a random string of the specified length.
+     *
+     * @param int $length Length of the random string to generate. Default is 6.
+     * @return string
+     */
     function generateRandomString($length = 6) {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -42,11 +57,17 @@ class OrderController extends Controller
         }
         return $randomString;
     }
+
+    /**
+     * Generates an array of time slots for appointment scheduling.
+     *
+     * @return array
+     */
     private function generateTimeSlots()
     {
         $times = [];
-        $hours = range(9, 12); // Hours from 9 to 12
-        $afternoonHours = range(1, 8); // Hours from 1 to 8 for PM
+        $hours = range(9, 12); // Morning hours from 9 to 12
+        $afternoonHours = range(1, 8); // Afternoon hours from 1 to 8
 
         foreach ($hours as $hour) {
             $times[] = sprintf('%d:00', $hour);
@@ -58,81 +79,76 @@ class OrderController extends Controller
 
         return $times;
     }
+
+    /**
+     * Displays the Edit Order page with relevant data.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $tenantId = tenant('id');
 
+        // Retrieve tenant and subscription details
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
                         ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
                         ->first();
 
-        if (!$tenant) {
+        // Check if tenant exists and is active
+        if (!$tenant || $tenant->is_active == 0 || !(Carbon::now()->between($tenant->starting_date, $tenant->end_date))) {
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
 
-        $date = Carbon::now()->format("Y-m-d");
-
-        if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        }
-        // $productItems = ProductItem::with('categories')->get();
+        // Retrieve all product items with their categories and services
         $productItems = ProductItem::with(['categories', 'categories.service'])->get();
-        // dd($productItems);
         $groupedProductItems = [];
 
+        // Group product items with unique categories and related details
         foreach ($productItems as $productItem) {
-            $uniqueCategories = [];
+            $uniqueCategories = $productItem->categories->pluck('name')->unique();
 
-            foreach ($productItem->categories as $category) {
-                $uniqueCategories[] = $category->name;
-            }
-
-            // Assuming you want to get the first operation ID and price related to the product item
-            $operationId = $productItem->categories->first()->operation_id ?? null;
-            $price = $productItem->categories->first()->price ?? null;
+            $firstCategory = $productItem->categories->first();
+            $operationId = $firstCategory->operation_id ?? null;
+            $price = $firstCategory->price ?? null;
 
             $groupedProductItems[] = [
                 'product_item' => $productItem,
                 'unique_categories' => $uniqueCategories,
                 'operation_id' => $operationId,
                 'price' => $price,
-                // 'services' => $this->getServices($productItem), // Fetch services for each product item
             ];
         }
-        // dd($groupedProductItems);
-        $discounts = Discount::all();
 
+        // Retrieve all discounts and services
+        $discounts = Discount::all();
         $services = Service::all();
         $timeSlots = $this->generateTimeSlots();
 
-        return view('admin.EditOrder', compact('groupedProductItems', 'discounts','services','productItems','timeSlots'));
+        // Return the view with the gathered data
+        return view('admin.EditOrder', compact('groupedProductItems', 'discounts', 'services', 'productItems', 'timeSlots'));
     }
 
     public function getOperationData($pid, $pname, $others = [])
     {
+        // Get the current tenant ID
         $tenantId = tenant('id');
 
+        // Retrieve the tenant and subscription details
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
                         ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
                         ->first();
 
-        if (!$tenant) {
+        // Check if tenant exists and is active
+        if (!$tenant || $tenant->is_active == 0 || !($tenant->starting_date <= Carbon::now()->format("Y-m-d") && $tenant->end_date >= Carbon::now()->format("Y-m-d"))) {
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
 
-        $date = Carbon::now()->format("Y-m-d");
-
-        if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        }
-        $data = DB::table('operations')
-            ->select('operations.id as op_id', 'operations.name as op_name', 'pc.price', 'pc.id as item_cat_id', 'pc.product_item_id as pid')
+        // Retrieve operation data based on provided product ID and name
+        $data = Operations::select('operations.id as op_id', 'operations.name as op_name', 'pc.price', 'pc.id as item_cat_id', 'pc.product_item_id as pid')
             ->where([
                 'pc.product_item_id' => $pid,
                 'pc.name' => $pname,
@@ -140,31 +156,25 @@ class OrderController extends Controller
             ->join('product_categories as pc', 'operations.id', '=', 'pc.operation_id')
             ->get();
 
-        // Return the operation view with data and others
-        // dd($data);
+        // Return the operation view with data and additional parameters
         return view('admin.operation.operationview', ['data' => $data, "others" => $others])->render();
     }
 
     public function getServiceData(Request $request)
     {
+        // Retrieve and validate tenant information
         $tenantId = tenant('id');
-
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
                         ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
                         ->first();
 
-        if (!$tenant) {
+        if (!$tenant || $tenant->is_active == 0 || !($tenant->starting_date <= Carbon::now()->format("Y-m-d") && $tenant->end_date >= Carbon::now()->format("Y-m-d"))) {
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
 
-        $date = Carbon::now()->format("Y-m-d");
-
-        if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        }
+        // Retrieve parameters from request and call getOperationData
         $pId = $request->id;
         $pname = $request->name;
         $others = $request->others ?? [];
@@ -174,9 +184,12 @@ class OrderController extends Controller
     public function fetchClientName(Request $request)
     {
         try {
+            // Validate request input
             $request->validate([
                 'client_num' => 'required|numeric|digits:10',
             ]);
+
+            // Find the user by mobile number
             $user = User::where('mobile', $request->client_num)->where('is_deleted', 0)->first();
             if ($user) {
                 return response()->json([
@@ -190,17 +203,15 @@ class OrderController extends Controller
                 ]);
             }
         } catch (\Throwable $throwable) {
+            // Handle and log exception
             return response()->json('error', 'Something Went Wrong.');
         }
     }
 
-    //add order function
     public function addOrder(Request $request)
     {
         try {
-            $data = $request->all();
-            $AddorderItemsData = json_decode($request->input('order_items_add_data'), true);
-
+            // Validate and retrieve request data
             $validatedData = $request->validate([
                 'client_num' => 'required|numeric',
                 'client_name' => 'required|min:2|max:20',
@@ -212,87 +223,59 @@ class OrderController extends Controller
                 'discount' => 'required',
                 'total_qty' => 'required',
             ]);
-            // dd($AddorderItemsData);
-             // Combine delivery time and period
-        $combinedDeliveryTime = $validatedData['delivery_time'] . ' ' . $validatedData['period'];
 
-        // Convert to 24-hour format using Carbon
-        $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
+            // Combine delivery time and period, then convert to 24-hour format
+            $combinedDeliveryTime = $validatedData['delivery_time'] . ' ' . $validatedData['period'];
+            $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
 
-
-            // Retrieve client or create new one
-            $client = DB::table('users')->where('mobile', $validatedData['client_num'])->first();
-            if ($client) {
-                $user_id = $client->id;
-            } else {
-                $user = User::create([
-                    'name' => $validatedData['client_name'],
-                    'mobile' => $validatedData['client_num'],
-                    'role_id' => 2
-                ]);
-                $user_id = $user->id;
-            }
+            // Retrieve or create client
+            $client = User::where('mobile', $validatedData['client_num'])->first();
+            $user_id = $client ? $client->id : User::create([
+                'name' => $validatedData['client_name'],
+                'mobile' => $validatedData['client_num'],
+                'role_id' => 2
+            ])->id;
 
             // Determine discount ID
             $discountId = $this->getDiscountId($request->discount);
 
-             // Check if discountId is valid, otherwise set to null
-            if (!DB::table('discounts')->where('id', $discountId)->exists()) {
-                $discountId = null;
-            }
-
             // Calculate total price with discount and optional express charge
             list($totalPriceDis, $totalDiscount) = $this->calculateTotalPrice($request);
 
-            // Create the order and save in db
+            // Create the order and save in database
             $order = Order::create([
                 'invoice_number' => '',
                 'user_id' => $user_id,
                 'order_date' => $validatedData['booking_date'],
                 'order_time' => $validatedData['booking_time'],
                 'delivery_date' => $validatedData['delivery_date'],
-                'delivery_time' => $deliveryTime24Hour, // Save in 24-hour format
+                'delivery_time' => $deliveryTime24Hour,
                 'discount_id' => $discountId,
-                'service_id' => null, // Will be assigned later
+                'service_id' => null,
                 'status' => 'pending',
                 'total_qty' => $validatedData['total_qty'],
                 'total_price' => $totalPriceDis,
             ]);
 
-            // Generate and save invoice number
+            // Generate and save order number
             if ($order) {
-                $orderId = $order->id;
-                // $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($orderId, 3, '0', STR_PAD_LEFT);
-                $randomString = $this->generateRandomString();
-
-                // Concatenate "ORD-" with the random string to form the order number
-                $orderNumber = 'ORD-' . $randomString;
+                $orderNumber = 'ORD-' . $this->generateRandomString();
                 $order->order_number = $orderNumber;
                 $order->save();
             }
-            // dd($invoiceNumber);
 
             // Insert order items
-            foreach ($AddorderItemsData as $categoryData) {
-                $categoryId = $categoryData['category'];
-
+            foreach (json_decode($request->input('order_items_add_data'), true) as $categoryData) {
                 foreach ($categoryData['types'] as $typeData) {
-                    $typeId = $typeData['type'];
-
                     foreach ($typeData['services'] as $serviceData) {
-                        $serviceId = $serviceData['service'];
-                        $quantity = $serviceData['quantity'];
-                        $price = $serviceData['price'];
-
-                        // Create and save the order item
                         $order->orderItems()->create([
                             'order_id' => $order->id,
-                            'product_item_id' => $categoryId, // Assuming product_item_id refers to typeId
-                            'product_category_id' => $typeId,
-                            'operation_id' => $serviceId,
-                            'quantity' => $quantity,
-                            'operation_price' => $price,
-                            'price' => $quantity * $price,
+                            'product_item_id' => $categoryData['category'],
+                            'product_category_id' => $typeData['type'],
+                            'operation_id' => $serviceData['service'],
+                            'quantity' => $serviceData['quantity'],
+                            'operation_price' => $serviceData['price'],
+                            'price' => $serviceData['quantity'] * $serviceData['price'],
                             'status' => 'pending'
                         ]);
                     }
@@ -306,12 +289,12 @@ class OrderController extends Controller
                 'total_amount' => $totalPriceDis,
                 'discount_amount' => $totalDiscount,
                 'service_charge' => $request->express_charge == '1' ? ($totalPriceDis * 50) / 100 : 0,
-                'paid_amount' => 0, // Initially no amount paid
+                'paid_amount' => 0,
                 'status' => 'Due',
-                'payment_type' => null // Payment type is null initially
+                'payment_type' => null
             ]);
 
-            // Prepare SMS message
+            // Prepare and send SMS notification
             $message = sprintf(
                 "Dear %s, your order (ID: %s) of %s is Received. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
                 $validatedData['client_name'],
@@ -319,65 +302,49 @@ class OrderController extends Controller
                 $order->total_price,
                 $validatedData['delivery_date']
             );
+            $clientPhoneNumber = '+91' . $validatedData['client_num'];
+            $templateId = '1207172128968254925';
+            $variables = ['ordernumber' => $orderNumber, 'name' => $validatedData['client_name']];
 
-              // Format the client's phone number
-                $clientPhoneNumber = '+91' . $validatedData['client_num'];
-                $templateId = '1207172128968254925'; // Replace with your template ID
-                $variables = array(
-                    'ordernumber' => $orderNumber,
-                    'name' => $validatedData['client_name']
-                );
-
-                
-
-                 // Attempt to send SMS and handle any exceptions
-                try {
-                    $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-                } catch (\Exception $e) {
-                    // Log the SMS error and continue with order creation
-                    echo "sms not send";
-                    Log::error('Error sending SMS: ' . $e->getMessage());
-                }
+            try {
+                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+                Log::error('Error sending SMS: ' . $e->getMessage());
+            }
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
-            dd([
-                            'message' => $exception->getMessage(),
-                            'line' => $exception->getLine(),
-                        ]);
-            // return back()->withErrors($exception->getMessage())->withInput();
+            // Log exception and provide feedback
+            Log::error('Order creation failed: ' . $exception->getMessage());
+            return back()->withErrors($exception->getMessage())->withInput();
         }
     }
 
-
     private function getDiscountId($discount)
     {
-        switch ($discount) {
-            case '5':
-                return 1;
-            case '10':
-                return 2;
-            case '15':
-                return 3;
-            case '20':
-                return 4;
-            default:
-                return 0; // Default or no discount
-        }
+        // Map discount values to discount IDs
+        $discountMapping = [
+            '5' => 1,
+            '10' => 2,
+            '15' => 3,
+            '20' => 4
+        ];
+        return $discountMapping[$discount] ?? null;
     }
 
     private function calculateTotalPrice(Request $request)
     {
         $grossPrice = $request->gross_total;
         $totalDiscount = ($grossPrice * ($request->discount ? $request->discount : 0)) / 100;
+        $totalPrice = $grossPrice - $totalDiscount;
+
         if ($request->express_charge == '1') {
-            $totalPrice = $grossPrice - $totalDiscount;
-            $totalPriceDis = $totalPrice + ($totalPrice * 50) / 100;
-        } else {
-            $totalPriceDis = $grossPrice - $totalDiscount;
+            $totalPrice += ($totalPrice * 50) / 100; // Add express charge
         }
 
-        return [$totalPriceDis, $totalDiscount];
+        return [$totalPrice, $totalDiscount];
     }
+
 
     public function getServices(Request $request)
     {
@@ -500,8 +467,7 @@ class OrderController extends Controller
 
     public function getAllOperationData($pid, $pname, $others = [])
     {
-        $data = DB::table('operations')
-            ->select('operations.id as op_id', 'operations.name as op_name', 'pc.price', 'pc.id as item_cat_id', 'pc.product_item_id as pid')
+        $data = Operations::select('operations.id as op_id', 'operations.name as op_name', 'pc.price', 'pc.id as item_cat_id', 'pc.product_item_id as pid')
             ->where([
                 'pc.product_item_id' => $pid,
                 'pc.name' => $pname,
@@ -597,7 +563,7 @@ class OrderController extends Controller
             }
 
             // Handle client user creation or updating
-            $client = DB::table('users')->where('mobile', $request->client_num)->first();
+            $client = User::where('mobile', $request->client_num)->first();
             // dd($client);
             if ($client) {
                 $user = User::where('id', $client->id)->update([
@@ -625,7 +591,7 @@ class OrderController extends Controller
             };
 
             // Check if discountId is valid, otherwise set to null
-            if (!DB::table('discounts')->where('id', $discountId)->exists()) {
+            if (!Discount::where('id', $discountId)->exists()) {
                 $discountId = null;
             }
 
@@ -665,11 +631,17 @@ class OrderController extends Controller
             // Format the client's phone number
             $clientPhoneNumber = '+91' . $request->client_num;
 
-            // Attempt to send SMS and handle any exceptions
+            $templateId = '1207172128242783587'; // Replace with your template ID
+            $variables = array(
+                'ordernumber' => $orderNumber,
+                'name' => $request->client_name
+            );
+                // Attempt to send SMS and handle any exceptions
             try {
-                $this->smsService->sendSms($clientPhoneNumber, $message);
+                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
             } catch (\Exception $e) {
-                // Log the SMS error and continue with order update
+                // Log the SMS error and continue with order creation
+                echo "sms not send";
                 Log::error('Error sending SMS: ' . $e->getMessage());
             }
 
@@ -723,6 +695,7 @@ class OrderController extends Controller
                         DB::raw('users.mobile as mobile'),
                         DB::raw('(SELECT MAX(order_items.status) FROM order_items WHERE order_items.order_id = orders.id) as item_status')
                     )
+                    ->where('orders.is_deleted', '!=', 1)
                     ->leftJoin('users', 'orders.user_id', '=', 'users.id')
                     ->join('payment_details', 'payment_details.order_id', '=', 'orders.id')
                     ->distinct()
@@ -741,7 +714,7 @@ class OrderController extends Controller
     public function deleteOrder($id)
     {
         try {
-            DB::table('orders')->where('id', '=', $id)->update(['is_deleted' => 1]);
+            Order::where('id', '=', $id)->update(['is_deleted' => 1]);
             return response()->json(['message' => 'Order deleted successfully']);
         } catch (\Throwable $throwable) {
             return response()->json(['error' => $throwable->getMessage()], 500);
@@ -908,14 +881,6 @@ class OrderController extends Controller
     public function RecieptPrint(Request $request, $orderId)
     {
         try {
-            // Fetch the latest order with related order items, user, and discounts
-            // $order = Order::with([
-            //     'orderItems.productCategory',
-            //     'orderItems.productItem',
-            //     'orderItems.opertions',
-            //     'user',
-            //     'discounts'
-            // ])->latest()->firstOrFail();
             $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
                 ->findOrFail($orderId);
 
@@ -982,13 +947,6 @@ class OrderController extends Controller
     {
         try {
             // Fetch the latest order with related order items, user, and discounts
-            // $order = Order::with([
-            //     'orderItems.productCategory',
-            //     'orderItems.productItem',
-            //     'orderItems.opertions',
-            //     'user',
-            //     'discounts'
-            // ])->latest()->firstOrFail();
             $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
                 ->findOrFail($orderId);
 
