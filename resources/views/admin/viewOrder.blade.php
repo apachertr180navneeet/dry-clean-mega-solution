@@ -1,10 +1,24 @@
 @extends('backend.layouts.app')
 @section('content')
 <style>
-    .pagination-container {
+   .pagination-container{
         display: flex;
         justify-content: end;
         margin-top: 20px;
+    }
+    .pagination-container svg{
+        width: 30px;
+    }
+
+    .pagination-container nav .justify-between{
+        display: none;
+    }
+    .no-records-found {
+        text-align: center;
+        color: red;
+        margin-top: 20px;
+        font-size: 18px;
+        display: none; /* Hidden by default */
     }
 </style>
 <div class="content-wrapper page_content_section_hp">
@@ -96,6 +110,12 @@
                         </table>
 
                     </div>
+                    <div class="no-records-found">No records found related to your search.</div>
+                    @if ($orders->count() > 0)
+                        <div class="pagination-container">
+                            {{ $orders->links() }}
+                        </div>
+                    @endif
 
                     <!-- Settle Order -->
                     <div class="modal fade" id="SettleOrder" tabindex="-1" aria-labelledby="SettleOrderLabel"
@@ -198,9 +218,7 @@
                     </div>
 
                     {{-- end --}}
-                    <div class="pagination-container">
-                        {{ $orders->links('pagination::bootstrap-4') }}
-                    </div>
+
                 </div>
 
             </div>
@@ -213,6 +231,7 @@
         $(document).ready(function () {
             $('#orderSearch').keyup(function () {
                 var searchText = $(this).val().toLowerCase();
+                var noRecord = true;
                 $('tbody tr').each(function () {
                     var bookingId = $(this).find('td:nth-child(2)').text()
                         .toLowerCase();
@@ -226,8 +245,16 @@
                         $(this).hide();
                     } else {
                         $(this).show();
+                        noRecord = false;
                     }
                 });
+                if (noRecord) {
+                    $('.no-records-found').show();
+                    $('.pagination-container').hide(); // Hide pagination
+                } else {
+                    $('.no-records-found').hide();
+                    $('.pagination-container').show(); // Show pagination
+                }
             });
 
             // for delete service
@@ -332,7 +359,7 @@
                 },
                 error: function (xhr) {
                     // Handle error
-                    alert('Error: ' + xhr.responseText);
+                    alert('Error: ' + xhr.responseText + 'hh');
                 }
             });
         });

@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
@@ -7,8 +8,8 @@ use App\Models\User;
 use App\Models\Tenant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class ClientController extends Controller
@@ -126,7 +127,8 @@ class ClientController extends Controller
                 return redirect()->route('clientpage')->with('success', 'Client updated successfully');
             }
         } catch (\Throwable $throwable) {
-            dd($throwable->getMessage());
+            \Log::error($throwable->getMessage());
+            // dd($throwable->getMessage());
         }
     }
 

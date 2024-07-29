@@ -31,7 +31,7 @@
                         <h4>Payment</h4>
                         <div class="client_list_heading_search_area">
                             <form action="{{ route('payment') }}" method="GET" class="d-flex">
-                                <i class="menu-icon tf-icons ti ti-search"></i>
+                                <i class="menu-icon tf-icons ti ti-search" id="resetSearch"></i>
                                 <input type="search" name="search" class="form-control" placeholder="Searching ..." id="paymentSearch" value="{{ request()->input('search') }}">
                                 <button type="submit" class="btn btn-primary ms-2">Search</button>
                             </form>
@@ -82,9 +82,11 @@
                         </table>
                     </div>
                     <div class="no-records-found">No records found related to your search.</div>
-                    <div class="pagination-container">
-                        {{ $payments->links() }}
-                    </div>
+                    @if ($payments->count() > 0)
+                        <div class="pagination-container">
+                            {{ $payments->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -114,9 +116,18 @@
                 });
                 if (noRecord) {
                     $('.no-records-found').show();
+                    $('.pagination-container').hide(); // Hide pagination
                 } else {
                     $('.no-records-found').hide();
+                    $('.pagination-container').show(); // Show pagination
                 }
+            });
+
+            $('#resetSearch').click(function () {
+                $('#paymentSearch').val(''); // Clear search input
+                $('tbody tr').show(); // Show all rows
+                $('.no-records-found').hide(); // Hide "no records found" message
+                $('.pagination-container').show(); // Show pagination
             });
         });
     });

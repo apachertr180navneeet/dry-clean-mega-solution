@@ -38,7 +38,7 @@ class ServiceController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-        $services = Service::all();
+        $services = Service::paginate(10); 
         return view('admin.service', ['services' => $services]);
     }
 

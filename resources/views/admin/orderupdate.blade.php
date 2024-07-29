@@ -1091,7 +1091,7 @@
                 });
             });
 
-            //cpature data function
+            //cpature data function 
             function captureTableData() {
                 let orderItems = [];
                 let rows = document.querySelectorAll('.addtbody tr');

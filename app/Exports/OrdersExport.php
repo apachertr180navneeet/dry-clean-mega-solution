@@ -90,11 +90,11 @@ class OrdersExport implements FromCollection, WithHeadings
             'customer_name' => $order->user->name, // Assuming there is a relation customer with a name attribute
             'payment_type' => $order->paymentDetail->payment_type,
             'updated_at' => $order->updated_at->format('Y-m-d'),
-            'cgst' => $finaltaxAmount / 2,
-            'sgst' => $finaltaxAmount / 2,
-            'taxable_amount' => $totalTaxAmount,
-            'tax_amount' => $finaltaxAmount,
-            'total_amount' => $order->paymentDetail->total_amount,
+            'cgst' => number_format($finaltaxAmount / 2, 2),
+                'sgst' => number_format($finaltaxAmount / 2, 2),
+                'taxable_amount' => number_format($totalTaxAmount, 2),
+                'tax_amount' => number_format($finaltaxAmount, 2),
+                'total_amount' => number_format($order->paymentDetail->total_amount, 2),
         ];
     });
 }

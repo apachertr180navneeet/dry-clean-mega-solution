@@ -170,16 +170,16 @@ class PaymentController extends Controller
                 $order->total_price
             );
 
-            $clientPhoneNumber = '+91' . $client->mobile;
-            $templateId = '1207172128171262962';
-            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
+            // $clientPhoneNumber = '+91' . $client->mobile;
+            // $templateId = '1207172128171262962';
+            // $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
-            try {
-                $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            } catch (\Exception $e) {
-                dd($e->getMessage());
-                Log::error('Error sending SMS: ' . $e->getMessage());
-            }
+            // try {
+            //     $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
+            // } catch (\Exception $e) {
+            //     dd($e->getMessage());
+            //     Log::error('Error sending SMS: ' . $e->getMessage());
+            // }
 
             return response()->json(['success' => 'Order settled and delivered successfully.']);
             // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');

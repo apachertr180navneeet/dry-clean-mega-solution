@@ -1,5 +1,16 @@
 @extends('backend.layouts.app')
 @section('content')
+<style>
+    #noDataMessage {
+        color: red;
+        font-weight: bold;
+        padding: 10px;
+        border: 1px solid red;
+        border-radius: 5px;
+        background-color: #f8d7da; /* Light red background */
+        display: none; /* Initially hidden */
+    }
+</style>
 <div class="layout-page mt-4">
     <!-- Content wrapper -->
     <div class="content-wrapper">
@@ -22,7 +33,7 @@
                                         <div class="badge badge-kj rounded bg-label-primary p-1">
                                             <i class="fa-solid fa-chart-pie"></i>
                                         </div>
-                                        <h6 class="mb-0">Totel Orders</h6>
+                                        <h6 class="mb-0">Total Orders</h6>
                                     </div>
                                     <h3 class="my-2 pt-1 text-end">{{ $totalOrders }}</h3>
 
@@ -102,13 +113,13 @@
                                                     <div class="client_list_heading_search_area me-2 mb-2">
                                                         <i class="menu-icon tf-icons ti ti-search"></i>
                                                         <input type="search" class="form-control"
-                                                            placeholder="Searching ..." id="customerSearch">
+                                                            placeholder="Searching ..." id="invoiceSearch">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
-                                            <input type="date" class="form-control">
+                                            <input type="date" class="form-control" id="filterDate">
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +128,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive-sm">
-                                <table class="table table-hover table-striped">
+                                <table class="table table-hover table-striped" id="ordersTable">
                                     <thead class="table_head_1f446E">
                                         <tr>
                                             <th>S.No.</th>
@@ -138,28 +149,39 @@
                                                 $totalprice += $totalOrderByCustomer->total_price;
                                             @endphp
                                             <tr>
-                                                <td>{{ $serialNumber++ }}</td>
+                                                <td>{{ $serialNumber }}</td>
                                                 <td><a href=""> {{ $totalOrderByCustomer->order_number }} </a></td>
                                                 <td>{{ $totalOrderByCustomer->name }}</td>
                                                 <td>{{ $totalOrderByCustomer->order_date }}</td>
                                                 <td>
                                                     @if($totalOrderByCustomer->status == "pending")
-                                                        <div class="badge rounded bg-label-warning py-1">Pending</div>
+                                                        <div class="badge rounded bg-label-warning py-1">
+                                                            Pending
+                                                        </div>
                                                     @else
-                                                        <div class="badge rounded bg-label-success py-1">Completed</div>
+                                                        <div class="badge rounded bg-label-success py-1">
+                                                            Completed
+                                                        </div>
                                                     @endif
                                                 </td>
                                                 <td>₹ {{ $totalOrderByCustomer->total_price }}</td>
                                             </tr>
                                         @endforeach
                                         <tr>
-                                            <td colspan="4"></td>
-                                            <td>Total</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                Total
+                                            </td>
                                             <td>₹ {{ $totalprice }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
-
+                                <div id="noDataMessage" class="text-center" style="display: none;">
+                                    No data for the selected filter.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -174,32 +196,58 @@
 </div>
 <!-- Content wrapper -->
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        $(document).ready(function () {
-            // Function to filter table rows based on search input
-            $('#customerSearch').keyup(function () {
-                var searchText = $(this).val().toLowerCase();
+    $(document).ready(function () {
+        $('#invoiceSearch').keyup(function () {
+            console.log("on clicked")
+            var searchText = $(this).val().toLowerCase();
+            var rows = $('#ordersTable tbody tr');
+            var noRecord = true;
+            rows.each(function () {
+                var orderId = $(this).find('td:nth-child(2)').text().toLowerCase();
+                var name = $(this).find('td:nth-child(3)').text().toLowerCase();
+                var date = $(this).find('td:nth-child(4)').text().toLowerCase();
+                var status = $(this).find('td:nth-child(5)').text().toLowerCase();
+                var amount = $(this).find('td:nth-child(6)').text().toLowerCase();
 
-                $('tbody tr').each(function () {
-                    // Retrieve text from relevant columns
-                    var orderId = $(this).find('td:nth-child(2)').text().toLowerCase();
-                    var clientName = $(this).find('td:nth-child(3)').text().toLowerCase();
-                    var orderDate = $(this).find('td:nth-child(4)').text().toLowerCase();
-
-                    // Check if any of the columns contain the search text
-                    if (orderId.indexOf(searchText) === -1 &&
-                        clientName.indexOf(searchText) === -1 &&
-                        orderDate.indexOf(searchText) === -1) {
-                        $(this).hide(); // Hide row if no match
-                    } else {
-                        $(this).show(); // Show row if match found
-                    }
-                });
+                if (orderId.indexOf(searchText) === -1 &&
+                    name.indexOf(searchText) === -1 &&
+                    date.indexOf(searchText) === -1 &&
+                    status.indexOf(searchText) === -1 &&
+                    amount.indexOf(searchText) === -1) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                    noRecord = false;
+                }
             });
+            if (noRecord) {
+                $('#noDataMessage').show(); // Show "no records found" message
+            } else {
+                $('#noDataMessage').hide(); // Hide "no records found" message
+            }
+        });
+
+        $('#filterDate').change(function () {
+            var filterDate = $(this).val();
+            var rows = $('#ordersTable tbody tr');
+            var noRecord = true;
+            rows.each(function () {
+                var date = $(this).find('td:nth-child(4)').text();
+                if (date.indexOf(filterDate) === -1) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                    noRecord = false;
+                }
+            });
+            if (noRecord) {
+                $('#noDataMessage').show(); // Show "no records found" message
+            } else {
+                $('#noDataMessage').hide(); // Hide "no records found" message
+            }
         });
     });
-
 </script>
 @endsection

@@ -1,5 +1,27 @@
 @extends('backend.layouts.app')
 @section('content')
+<style>
+    .pagination-container{
+        display: flex;
+        justify-content: end;
+        margin-top: 20px;
+    }
+    .pagination-container svg{
+        width: 30px;
+    }
+
+    .pagination-container nav .justify-between{
+        display: none;
+    }
+    .no-records-found {
+        text-align: center;
+        color: red;
+        margin-top: 20px;
+        font-size: 18px;
+        display: none; /* Hidden by default */
+    }
+
+</style>
     <div class="content-wrapper page_content_section_hp">
         <div class="container-xxl">
             <div class="client_list_area_hp">
@@ -51,6 +73,12 @@
 
                                 </tbody>
                             </table>
+                            <div class="no-records-found">No records found related to your search.</div>
+                            @if ($services->count() > 0)
+                            <div class="pagination-container">
+                                {{ $services->links() }}
+                            </div>
+                        @endif
                         </div>
                     </div>
                 </div>
@@ -154,6 +182,7 @@
             });
             $('#serviceSearch').keyup(function() {
                 var searchText = $(this).val().toLowerCase();
+                var noRecord = true;  
                 $('tbody tr').each(function() {
                     var serviceName = $(this).find('td:nth-child(2)').text()
                         .toLowerCase();
@@ -161,8 +190,16 @@
                         $(this).hide();
                     } else {
                         $(this).show();
+                        noRecord = false;
                     }
                 });
+                if (noRecord) {
+                    $('.no-records-found').show();
+                    $('.pagination-container').hide(); // Hide pagination
+                } else {
+                    $('.no-records-found').hide();
+                    $('.pagination-container').show(); // Show pagination
+                }
             });
 
             $('.edit_service_btn').click(function() {
