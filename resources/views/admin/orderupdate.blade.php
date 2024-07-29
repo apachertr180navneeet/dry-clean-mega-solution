@@ -75,7 +75,7 @@
                                                 <label for="client_num" class="form-label">Client Number</label>
                                                 <input type="text" value="{{ old('mobile', $order->mobile ?? '') }}"
                                                     id="number" name="client_num" class="form-control"
-                                                    placeholder="Client Number">
+                                                    placeholder="Client Number" readonly>
                                             </div>
                                         </div>
                                         <!-- Client Name -->
@@ -84,7 +84,7 @@
                                                 <label for="client_name" class="form-label">Client Name</label>
                                                 <input type="text" id="client_name"
                                                     value="{{ old('name', $order->name ?? '') }}" name="client_name"
-                                                    class="form-control" placeholder="Client Name">
+                                                    class="form-control" placeholder="Client Name"readonly>
                                             </div>
                                         </div>
                                         <!-- Booking Date -->
@@ -900,7 +900,7 @@
 
                         if (item && type) {
                             $.ajax({
-                                url: '/get-services',
+                                url: '/admin/get-services',
                                 method: 'GET',
                                 data: {
                                     item: item,
@@ -951,7 +951,7 @@
 
                         if (item && type && service) {
                             $.ajax({
-                                url: '/get-price',
+                                url: '/admin/get-price',
                                 method: 'GET',
                                 data: {
                                     item: item,
@@ -1091,7 +1091,7 @@
                 });
             });
 
-            //cpature data function 
+            //cpature data function
             function captureTableData() {
                 let orderItems = [];
                 let rows = document.querySelectorAll('.addtbody tr');

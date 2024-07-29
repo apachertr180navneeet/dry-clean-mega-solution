@@ -15,8 +15,8 @@
                             {{-- <a type="button" class="btn btn-success" id="sendWhatsAppMessage" href="{{ url('/send-wh-message/' . $order->id) }}">
                                 <i class="fab fa-whatsapp me-2"></i>
                             </a> --}}
-                            <a class="btn btn-primary"  href="{{ url('/download-receipt/' . $order->id) }}" type="button"><i class="fa-solid fa-download"></i></a>
-                                               <a class="btn btn-primary" href="{{ url('/receipt-print/' . $order->id) }}"
+                            <a class="btn btn-primary"  href="{{ url('/admin/download-receipt/' . $order->id) }}" type="button"><i class="fa-solid fa-download"></i></a>
+                                               <a class="btn btn-primary" href="{{ url('/admin/receipt-print/' . $order->id) }}"
                                 type="button"><i class="fa-solid fa-print me-2"></i></a> 
                         </div> 
                     </div>

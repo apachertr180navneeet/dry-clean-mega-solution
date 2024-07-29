@@ -115,22 +115,23 @@ class PaymentController extends Controller
     private function generateInvoiceNumber()
     {
         // Get the last inserted invoice number
-        $lastOrder = Order::where('invoice_number', '!=', '')->orderBy('id', 'desc')->first();
-        
-        if (!$lastOrder) {
-            // If no invoice number exists, start with INV-001
+        $lastOrder = Order::where('invoice_number', '!=', '')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$lastOrder || empty($lastOrder->invoice_number)) {
+            // If no invoice number exists or the last one is empty, start with INV-001
             return '001';
         }
-        
-        // Extract the numeric part of the last invoice number
-        $lastInvoiceNumber = $lastOrder->invoice_number;
-        
-        $lastNumber = intval($lastInvoiceNumber);
-        
+
+        // Extract the numeric part of the last invoice number using regular expressions
+        preg_match('/(\d+)$/', $lastOrder->invoice_number, $matches);
+        $lastNumber = intval($matches[0] ?? 0);
+
         // Increment the number by 1
         $nextNumber = $lastNumber + 1;
-        
-        // Format the new invoice number
+
+        // Format the new invoice number with leading zeros
         return str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
@@ -169,14 +170,14 @@ class PaymentController extends Controller
                 $order->total_price
             );
 
-            // Format the client's phone number
             $clientPhoneNumber = '+91' . $client->mobile;
+            $templateId = '1207172128171262962';
+            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
-            // Attempt to send SMS and handle any exceptions
             try {
-                $this->smsService->sendSms($clientPhoneNumber, $message);
+                $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
             } catch (\Exception $e) {
-                // Log the SMS error and continue
+                dd($e->getMessage());
                 Log::error('Error sending SMS: ' . $e->getMessage());
             }
 

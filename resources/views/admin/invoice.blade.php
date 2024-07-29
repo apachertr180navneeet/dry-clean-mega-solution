@@ -39,9 +39,9 @@
                                 <div class="col-md-2">
                                     <h4>Invoice</h4>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-8">
                                     <div>
-                                        <div class="d-block d-lg-flex align-items-center">
+                                        <div class="d-block d-lg-flex align-items-center justify-content-end">
 
                                             <div class="client_list_heading_search_area me-2 mb-2">
                                                 <i class="menu-icon tf-icons ti ti-search"></i>
@@ -63,12 +63,12 @@
                                                 Excel</a>
 
                                         </div>
-                                        <div class="d-block d-lg-flex align-items-center">
-                                            <div class="mx-1 mb-2" id="dateRangeContainer">
+                                        <div class="d-block d-lg-flex align-items-center ">
+                                            <div class="mx-1 mb-2 w-100" id="dateRangeContainer">
                                                 <input type="text" id="dateRange" class="form-control"
                                                     placeholder="Select Date Range" />
                                             </div>
-                                            <input type="text" id="newdateRange" class="form-control mb-2"
+                                            <input type="text" id="newdateRange" class="form-control mb-2 me-1"
                                                 placeholder="Select Date Range" />
                                             <button class="btn btn-primary w-100 ms-md--2 mb-2" id="filterButton"
                                                 type="submit">Load
@@ -153,9 +153,11 @@
                             </table>
                         </div>
                         <div class="no-records-found">No records found related to your search.</div>
+                        @if ($orders->count() > 0)
                         <div class="pagination-container">
                             {{ $orders->links() }}
                         </div>
+                    @endif
                     </div>
                 </div>
             </div>
@@ -293,7 +295,10 @@
                 // Initialize date range picker on document ready
                 $('#dateRange').daterangepicker({
                     opens: 'left',
-                    maxDate: moment()
+                    maxDate: moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
                 });
 
                 // Click event for export button
@@ -337,8 +342,10 @@
                     });
                     if (noRecord) {
                         $('.no-records-found').show();
+                        $('.pagination-container').hide(); // Hide pagination
                     } else {
                         $('.no-records-found').hide();
+                        $('.pagination-container').show(); // Show pagination
                     }
                 });
             });

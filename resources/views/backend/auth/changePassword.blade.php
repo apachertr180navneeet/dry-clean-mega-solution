@@ -98,8 +98,8 @@
             $.validator.addMethod("notSamePasswords", function(value, element) {
             let oldPassword = $('#password').val();
             let newPassword = $('#newpassword').val();
-            // let confirmPassword = $('#confirmpassword').val();
-            return oldPassword !== newPassword;
+            let confirmPassword = $('#confirmpassword').val();
+            return !(oldPassword === newPassword && newPassword === confirmPassword);
             }, "Old password, new password should not be the same");
 
 
@@ -108,13 +108,13 @@
                     password: {
                         required: true,
                         minlength: 6,
-                    // notSamePasswords: true,
-                    notEqualTo: "#newpassword"
+                    notSamePasswords: true
+                    // notEqualTo: "#newpassword"
                     },
                     new_password: {
                         required: true,
                         minlength: 6,
-                        // notSamePasswords: true
+                        notSamePasswords: true
                     },
                     confirm_password: {
                         required: true,
@@ -126,12 +126,14 @@
                 messages: {
                     password: {
                         required: "Please provide your old password",
-                        minlength: "Password must be at least 6 characters long",
-                        notEqualTo:'New password and confirm password should not match'
+                        minlength: "Password must be at least 6 characters long", 
+                        // notEqualTo:'New password and confirm password should not match',
+                        notSamePasswords: "Old password and new password should not be the same"
                     },
                     new_password: {
                         required: "Please provide a new password",
-                        minlength: "New password must be at least 6 characters long"
+                        minlength: "New password must be at least 6 characters long",
+                        notSamePasswords: "Old password and new password should not be the same"
                     },
                     confirm_password: {
                         required: "Please confirm your new password",

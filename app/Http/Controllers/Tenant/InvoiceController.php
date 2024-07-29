@@ -50,7 +50,7 @@ class InvoiceController extends Controller
             $orders = Order::select('orders.id', 'orders.invoice_number','orders.order_number', 'orders.total_price', 'orders.status', 'users.name', 'users.mobile', 'orders.total_qty')
                 ->join('users', 'users.id', '=', 'orders.user_id')
                 ->where('orders.is_deleted', 0)
-                ->orderBy('orders.created_at', 'desc')
+                ->orderBy('orders.invoice_number','desc')
                 ->where('orders.status', 'delivered')
                 ->paginate(10);
 
@@ -149,9 +149,15 @@ class InvoiceController extends Controller
         // If a date range is provided, filter orders accordingly
         if ($dateRange) {
             [$startDate, $endDate] = explode(' - ', $dateRange);
-            $orders = Order::with('paymentDetail')->whereBetween('updated_at', [date('Y-m-d', strtotime($startDate)), date('Y-m-d', strtotime($endDate)) . ' 23:59:59' // Add time to include today's orders
-            ])->where('is_deleted', 0)
-            ->where('status', 'delivered')->get();
+              // Convert the start and end dates from 'DD/MM/YYYY' to 'YYYY-MM-DD'
+        $startDate = Carbon::createFromFormat('d/m/Y', $startDate)->startOfDay();
+        $endDate = Carbon::createFromFormat('d/m/Y', $endDate)->endOfDay();
+
+        $orders = Order::with('paymentDetail')
+            ->whereBetween('updated_at', [$startDate, $endDate])
+            ->where('is_deleted', 0)
+            ->where('status', 'delivered')
+            ->get();
         } else {
             // Otherwise, fetch all orders
             $orders = Order::all();

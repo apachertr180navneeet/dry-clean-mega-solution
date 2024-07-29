@@ -129,7 +129,7 @@
                             <input type="search" id="client_search" class="form-control" placeholder="Searching ...">
                         </div>
                     </div>
-                    <div class="table-responsive">
+                    <div class="">
                         <table class="table table-hover table-striped">
                             <thead class="table_head_1f446E">
                                 <tr>

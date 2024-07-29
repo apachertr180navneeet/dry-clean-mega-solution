@@ -619,31 +619,31 @@ class OrderController extends Controller
                 'status' => 'pending'
             ]);
 
-            // Prepare SMS message
-            $message = sprintf(
-                "Dear %s, your order (ID: %s) of %s is Updated. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
-                $request->client_name,
-                $order->id,
-                $order->total_price,
-                $request->delivery_date
-            );
+            // // Prepare SMS message
+            // $message = sprintf(
+            //     "Dear %s, your order (ID: %s) of %s is Updated. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
+            //     $request->client_name,
+            //     $order->id,
+            //     $order->total_price,
+            //     $request->delivery_date
+            // );
 
-            // Format the client's phone number
-            $clientPhoneNumber = '+91' . $request->client_num;
+            // // Format the client's phone number
+            // $clientPhoneNumber = '+91' . $request->client_num;
 
-            $templateId = '1207172128242783587'; // Replace with your template ID
-            $variables = array(
-                'ordernumber' => $orderNumber,
-                'name' => $request->client_name
-            );
-                // Attempt to send SMS and handle any exceptions
-            try {
-                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            } catch (\Exception $e) {
-                // Log the SMS error and continue with order creation
-                echo "sms not send";
-                Log::error('Error sending SMS: ' . $e->getMessage());
-            }
+            // $templateId = '1207172128242783587'; // Replace with your template ID
+            // $variables = array(
+            //     'ordernumber' => $orderNumber,
+            //     'name' => $request->client_name
+            // );
+            //     // Attempt to send SMS and handle any exceptions
+            // try {
+            //     $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
+            // } catch (\Exception $e) {
+            //     // Log the SMS error and continue with order creation
+            //     echo "sms not send";
+            //     Log::error('Error sending SMS: ' . $e->getMessage());
+            // }
 
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
