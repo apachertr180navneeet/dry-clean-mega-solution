@@ -390,7 +390,7 @@
                         success: function(response) {
                             console.log(response);
                             $('#edit_client').modal('hide');
-                            // window.location.reload();
+                            window.location.reload();
                         },
                         error: function(error) {
                             console.log(error);

@@ -39,7 +39,7 @@ class ClientController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-        $clients = User::where(['is_deleted' => 0, 'role_id' => 2])->paginate(10);
+        $clients = User::where(['is_deleted' => 0, 'role_id' => 2])->orderBy('id', 'desc')->paginate(10);
         return view('admin.client', compact('clients'));
     }
 
@@ -94,7 +94,6 @@ class ClientController extends Controller
 
     public function editClient(Request $request, $id)
     {
-        // dd($request->all());
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:20',
@@ -103,9 +102,6 @@ class ClientController extends Controller
                     'regex:/^[0-9()+-]+$/',
                     'min:4',
                     'max:15',
-                    Rule::unique('users')->where(function ($query) {
-                        return $query->where('is_deleted', 0);
-                    }),
                 ],
             ]);
 

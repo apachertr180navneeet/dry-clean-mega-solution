@@ -699,6 +699,7 @@ class OrderController extends Controller
                     ->leftJoin('users', 'orders.user_id', '=', 'users.id')
                     ->join('payment_details', 'payment_details.order_id', '=', 'orders.id')
                     ->distinct()
+                    ->orderBy('orders.id', 'desc')
                     ->paginate(10);
 
 

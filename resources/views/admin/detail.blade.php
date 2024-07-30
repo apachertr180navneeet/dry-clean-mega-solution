@@ -149,7 +149,7 @@
                                                 $totalprice += $totalOrderByCustomer->total_price;
                                             @endphp
                                             <tr>
-                                                <td>{{ $serialNumber }}</td>
+                                                <td>{{ $serialNumber++ }}</td>
                                                 <td><a href=""> {{ $totalOrderByCustomer->order_number }} </a></td>
                                                 <td>{{ $totalOrderByCustomer->name }}</td>
                                                 <td>{{ $totalOrderByCustomer->order_date }}</td>

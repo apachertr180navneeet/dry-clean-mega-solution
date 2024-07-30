@@ -179,8 +179,8 @@ class InvoiceController extends Controller
         // Retrieve order statistics
         $ordersDataCount = Order::select([
             DB::raw('COUNT(*) as totalOrders'), // Total number of orders
-            DB::raw('COUNT(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pendingOrders'), // Total pending orders
-            DB::raw('COUNT(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as deliveredOrders'), // Total delivered orders
+            DB::raw('SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pendingOrders'), // Total pending orders
+            DB::raw('SUM(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as deliveredOrders'), // Total delivered orders
             DB::raw('SUM(total_price) as totalOrdersAmount') // Total amount of all orders
         ])
         ->where('is_deleted', '!=', 1) // Exclude deleted orders
