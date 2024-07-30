@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('invoice_number');
+            $table->string('order_number');
             $table->date('order_date');
             $table->time('order_time');
             $table->date('delivery_date');
