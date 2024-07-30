@@ -118,19 +118,19 @@ class PaymentController extends Controller
         $lastOrder = Order::where('invoice_number', '!=', '')
             ->orderBy('id', 'desc')
             ->first();
-    
+
         if (!$lastOrder || empty($lastOrder->invoice_number)) {
             // If no invoice number exists or the last one is empty, start with INV-001
             return '001';
         }
-    
+
         // Extract the numeric part of the last invoice number using regular expressions
         preg_match('/(\d+)$/', $lastOrder->invoice_number, $matches);
         $lastNumber = intval($matches[1] ?? 0); // Change matches[0] to matches[1]
-    
+
         // Increment the number by 1
         $nextNumber = $lastNumber + 1;
-    
+
         // Format the new invoice number with leading zeros
         return str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
@@ -163,23 +163,17 @@ class PaymentController extends Controller
 
             // Prepare SMS message
             $client = User::findOrFail($order->user_id);
-            $message = sprintf(
-                "Dear %s, your order (ID: %s) of %s is Delivered. Do visit us again. Regards - Mega Solutions Dry cleaning",
-                $client->name,
-                $order->id,
-                $order->total_price
-            );
 
-            // $clientPhoneNumber = '+91' . $client->mobile;
-            // $templateId = '1207172128171262962';
-            // $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
+            $clientPhoneNumber = '+91' . $client->mobile;
+            $templateId = '1207172128171262962';
+            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
-            // try {
-            //     $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            // } catch (\Exception $e) {
-            //     dd($e->getMessage());
-            //     Log::error('Error sending SMS: ' . $e->getMessage());
-            // }
+            try {
+                $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+                Log::error('Error sending SMS: ' . $e->getMessage());
+            }
 
             return response()->json(['success' => 'Order settled and delivered successfully.']);
             // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');

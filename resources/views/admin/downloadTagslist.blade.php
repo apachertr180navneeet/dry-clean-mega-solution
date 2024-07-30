@@ -5,8 +5,6 @@
     <style>
         .table-item-container {
             width: 38mm;
-            margin-right: 10px;
-            margin-bottom: 10px;
             display: inline-block;
         }
 
@@ -21,17 +19,35 @@
         }
 
         .table-item div {
-            background-color: #6c757d;
-            color: white;
+            color: black;
             border-radius: 5px;
-            padding: 5px;
-            margin: 1rem auto;
-            width: 100px;
+        }
+
+        .print-button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin: 20px 0; /* Margin for the print button */
+        }
+
+        .print-button button {
+            color: black;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
         }
     </style>
+    <script>
+        function printLabels() {
+            window.print();
+        }
+    </script>
 </head>
 
 <body>
+
+
     <div class="table-container">
         @php
             $counter = 0;
@@ -64,7 +80,6 @@
             </div>
         @endif
     </div>
-
 </body>
 
 </html>

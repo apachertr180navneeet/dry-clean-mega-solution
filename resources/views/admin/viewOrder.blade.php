@@ -204,9 +204,9 @@
                                 <div class="modal-body text-center">
                                     <h5>Please Select from the Following Options</h5>
                                     <!-- Add your modal content here -->
-                                    <a type="button" class="btn btn-success mb-2" id="sendWhatsAppMessage">
+                                    {{-- <a type="button" class="btn btn-success mb-2" id="sendWhatsAppMessage">
                                         <i class="fab fa-whatsapp me-2"></i> Send On WhatsApp
-                                    </a>
+                                    </a> --}}
                                     <a type="button" class="btn btn-primary mb-2" id="printReceipt">
                                         <i class="fa-solid fa-file-invoice me-2"></i> Print Receipt
                                     </a>
@@ -218,7 +218,7 @@
                     </div>
 
                     {{-- end --}}
-
+                    
                 </div>
 
             </div>
@@ -290,7 +290,7 @@
             // alert("Hello Shaktiman");
             var id = $(this).data('order_id');
             // alert(id);
-            $('#sendWhatsAppMessage').attr('href', '/send-wh-message/' + id);
+            // $('#sendWhatsAppMessage').attr('href', '/send-wh-message/' + id);
             $('#printReceipt').attr('href', '/admin/receipt/' + id);
             $('#printTags').attr('href', '/admin/tagslist/' + id);
             $('#yes').modal('show');
@@ -359,7 +359,7 @@
                 },
                 error: function (xhr) {
                     // Handle error
-                    alert('Error: ' + xhr.responseText + 'hh');
+                    alert('Error: ' + xhr.responseText);
                 }
             });
         });

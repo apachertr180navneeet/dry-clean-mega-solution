@@ -12,7 +12,7 @@
                                 </a>
                             </div>
                             <div class="col-lg-1">
-                                <a class="btn btn-primary" href="{{ url('/print-taglist/' . $order->id) }}"
+                                <a class="btn btn-primary" href="{{ url('/admin/print-taglist/' . $order->id) }}"
                                     type="button"><i class="fa-solid fa-print me-2"></i></a>
                             </div>
                         </div>

@@ -295,23 +295,45 @@ class OrderController extends Controller
             ]);
 
             // Prepare and send SMS notification
-            $message = sprintf(
-                "Dear %s, your order (ID: %s) of %s is Received. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
-                $validatedData['client_name'],
-                $order->id,
-                $order->total_price,
-                $validatedData['delivery_date']
-            );
-            $clientPhoneNumber = '+91' . $validatedData['client_num'];
-            $templateId = '1207172128968254925';
+            $clientPhoneNumber = '91' . $validatedData['client_num'];
+            $templateId = '669e364ad6fc052bf21c7312';
             $variables = ['ordernumber' => $orderNumber, 'name' => $validatedData['client_name']];
+            $curl = curl_init();
 
-            try {
-                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            } catch (\Exception $e) {
-                dd($e->getMessage());
-                Log::error('Error sending SMS: ' . $e->getMessage());
-            }
+            $payload = json_encode([
+                "template_id" => "669e364ad6fc052bf21c7312",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $orderNumber,
+                    ]
+                ]
+            ]);
+
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
+                    'authkey: 426794Akjeezy8u669e32f2P1',
+                    'content-type: application/json',
+                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+                ],
+            ]);
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            echo $response;
+
+
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
             // Log exception and provide feedback
@@ -631,19 +653,19 @@ class OrderController extends Controller
             // Format the client's phone number
             // $clientPhoneNumber = '+91' . $request->client_num;
 
-            // $templateId = '1207172128242783587'; // Replace with your template ID
-            // $variables = array(
-            //     'ordernumber' => $orderNumber,
-            //     'name' => $request->client_name
-            // );
-            //     // Attempt to send SMS and handle any exceptions
-            // try {
-            //     $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            // } catch (\Exception $e) {
-            //     // Log the SMS error and continue with order creation
-            //     echo "sms not send";
-            //     Log::error('Error sending SMS: ' . $e->getMessage());
-            // }
+            $templateId = '669e3596d6fc0569d040c232'; // Replace with your template ID
+            $variables = array(
+                'ordernumber' => $orderNumber,
+                'name' => $request->client_name
+            );
+                // Attempt to send SMS and handle any exceptions
+            try {
+                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
+            } catch (\Exception $e) {
+                // Log the SMS error and continue with order creation
+                echo "sms not send";
+                Log::error('Error sending SMS: ' . $e->getMessage());
+            }
 
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
