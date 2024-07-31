@@ -1034,15 +1034,60 @@
                     applyEventListeners(newRow);
                     captureTableData();
                 });
-                $(document).on('click', '.remove', function() {
-                    let tbody = $(this).closest('tbody');
-                    $(this).closest('tr').remove();
-                    if (tbody.find('tr').length === 0) {
-                        let emptyRow = $('.empty-row-template').html();
-                        tbody.append(emptyRow);
-                    }
-                    captureTableData();
-                });
+
+                //dynamic code here
+                let dynamicRowHTML = `
+                    <tr>
+                        <td>
+                            <select name="category[]" class="form-select cat-select check-error">
+                                <option value="" selected disabled>Select Item</option>
+                               @foreach (collect($productItems)->sortBy(function ($product) {
+                                    return $product->name;
+                                }) as $product)
+                                    <option value="{{ $product->id }}" data-alphabet="{{ strtoupper(substr($product->name, 0, 1)) }}">
+                                        {{ $product->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="error-message text-danger"></span>
+                        </td>
+                        <td>
+                            <select name="type[]" class="form-select type-select check-error">
+                                <option value="" selected disabled>Select Type</option>
+                            </select>
+                            <span class="error-message text-danger"></span>
+                        </td>
+                        <td>
+                            <select name="service[]" class="form-select service-select check-error">
+                                <option value="" selected disabled>Select Service</option>
+                            </select>
+                            <span class="error-message text-danger"></span>
+                        </td>
+                        <td style="min-width: 100px !important;">
+                            <input type="number" name="quantity[]" class="form-control" value="1">
+                            <span class="error-message text-danger"></span>
+                        </td>
+                        <td style="min-width: 100px !important;"><input type="text" name="price[]" class="form-control price" placeholder="Price" readonly><span class="error-message text-danger"></span></td>
+                        <td>
+                            <div class="d-flex">
+                                <button type="button" class="btn p-0 me-2 addnewrow"><i class="fa-solid fa-circle-plus fs-3"></i></button>
+                                <button type="button" class="btn p-0 me-2 remove"><i class="fa-solid fa-circle-minus text-danger fs-3"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+
+                    $(document).on('click', '.remove', function() {
+                        let tbody = $(this).closest('tbody');
+                        $(this).closest('tr').remove();
+                        if (tbody.find('tr').length === 0) {
+                            tbody.append(dynamicRowHTML);
+                            let newRow = tbody.find('tr').last();
+                            applyValidation(newRow);
+                            filterOptions(newRow);
+                            applyEventListeners(newRow);
+                        }
+                        captureTableData();
+                    });
                 function applyValidation(row) {
                     row.find('select[name="category[]"]').rules("add", {
                         required: true,
