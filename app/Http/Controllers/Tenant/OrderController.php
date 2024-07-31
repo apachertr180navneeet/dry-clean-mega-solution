@@ -651,7 +651,7 @@ class OrderController extends Controller
 
             // Prepare SMS message
             $curl = curl_init();
-            $message = $orderNumber.' '.'of amount'.' '.$totalPriceDis;
+            $message = $order->order_number.' '.'of amount'.' '.$totalPriceDis;
             $payload = json_encode([
                 "template_id" => "669e3596d6fc0569d040c232",
                 "recipients" => [
