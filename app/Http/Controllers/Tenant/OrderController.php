@@ -170,6 +170,7 @@ class OrderController extends Controller
                 'status' => 'pending',
                 'total_qty' => $validatedData['total_qty'],
                 'total_price' => $totalPriceDis,
+                'express_charge' => $request->express_charge
             ]);
 
             // Generate and save order number

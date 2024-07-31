@@ -21,7 +21,8 @@ class Order extends Model
         'status',
         'total_qty',
         'total_price',
-        'is_deleted'
+        'is_deleted',
+        'express_charge'
     ];
 
     public function user()

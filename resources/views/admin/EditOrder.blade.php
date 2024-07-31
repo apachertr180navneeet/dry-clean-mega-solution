@@ -421,7 +421,7 @@
                                                     <div class="form-check form-switch float-end">
                                                         <input class="form-check-input" type="checkbox"
                                                             id="flexSwitchCheckDefault" name="express_charge"
-                                                            value="0" onchange="toggleCheckbox()">
+                                                            value="1" onchange="toggleCheckbox()">
                                                     </div>
                                                 </div>
                                             </div>
