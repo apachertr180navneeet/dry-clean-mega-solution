@@ -199,54 +199,48 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#invoiceSearch').keyup(function () {
-            console.log("on clicked")
-            var searchText = $(this).val().toLowerCase();
+        function filterTable() {
+            var searchText = $('#invoiceSearch').val().toLowerCase();
+            var filterDate = $('#filterDate').val();
             var rows = $('#ordersTable tbody tr');
             var noRecord = true;
+
             rows.each(function () {
                 var orderId = $(this).find('td:nth-child(2)').text().toLowerCase();
                 var name = $(this).find('td:nth-child(3)').text().toLowerCase();
-                var date = $(this).find('td:nth-child(4)').text().toLowerCase();
+                var date = $(this).find('td:nth-child(4)').text();
                 var status = $(this).find('td:nth-child(5)').text().toLowerCase();
                 var amount = $(this).find('td:nth-child(6)').text().toLowerCase();
 
-                if (orderId.indexOf(searchText) === -1 &&
-                    name.indexOf(searchText) === -1 &&
-                    date.indexOf(searchText) === -1 &&
-                    status.indexOf(searchText) === -1 &&
-                    amount.indexOf(searchText) === -1) {
-                    $(this).hide();
-                } else {
+                var matchesSearch = orderId.indexOf(searchText) !== -1 ||
+                                    name.indexOf(searchText) !== -1 ||
+                                    date.toLowerCase().indexOf(searchText) !== -1 ||
+                                    status.indexOf(searchText) !== -1 ||
+                                    amount.indexOf(searchText) !== -1;
+
+                var matchesDate = filterDate === '' || date.indexOf(filterDate) !== -1;
+
+                if (matchesSearch && matchesDate) {
                     $(this).show();
                     noRecord = false;
+                } else {
+                    $(this).hide();
                 }
             });
+
             if (noRecord) {
                 $('#noDataMessage').show(); // Show "no records found" message
             } else {
                 $('#noDataMessage').hide(); // Hide "no records found" message
             }
+        }
+
+        $('#invoiceSearch').keyup(function () {
+            filterTable();
         });
 
         $('#filterDate').change(function () {
-            var filterDate = $(this).val();
-            var rows = $('#ordersTable tbody tr');
-            var noRecord = true;
-            rows.each(function () {
-                var date = $(this).find('td:nth-child(4)').text();
-                if (date.indexOf(filterDate) === -1) {
-                    $(this).hide();
-                } else {
-                    $(this).show();
-                    noRecord = false;
-                }
-            });
-            if (noRecord) {
-                $('#noDataMessage').show(); // Show "no records found" message
-            } else {
-                $('#noDataMessage').hide(); // Hide "no records found" message
-            }
+            filterTable();
         });
     });
 </script>

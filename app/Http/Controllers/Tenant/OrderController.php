@@ -306,6 +306,7 @@ class OrderController extends Controller
                     [
                         "mobiles" => $clientPhoneNumber,
                         "ordernumber" => $orderNumber,
+                        "name" => $validatedData['client_name'],
                     ]
                 ]
             ]);
@@ -326,14 +327,20 @@ class OrderController extends Controller
                     'content-type: application/json',
                     'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
                 ],
+                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
             ]);
 
             $response = curl_exec($curl);
 
+            if (curl_errno($curl)) {
+                'Error:' . curl_error($curl);
+            } else {
+                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                "HTTP Status Code: $http_code\n";
+                "Response: $response\n";
+            }
+
             curl_close($curl);
-            echo $response;
-
-
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
             // Log exception and provide feedback
@@ -640,33 +647,51 @@ class OrderController extends Controller
                 'total_price' => $totalPriceDis,
                 'status' => 'pending'
             ]);
+            $clientPhoneNumber = '+91' . $request->client_num;
 
             // Prepare SMS message
-            $message = sprintf(
-                "Dear %s, your order (ID: %s) of %s is Updated. Estimated delivery: %s. Thank you. Mega Solutions Dry cleaning",
-                $request->client_name,
-                $order->id,
-                $order->total_price,
-                $request->delivery_date
-            );
+            $curl = curl_init();
 
-            // Format the client's phone number
-            // $clientPhoneNumber = '+91' . $request->client_num;
+            $payload = json_encode([
+                "template_id" => "669e3596d6fc0569d040c232",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $order->order_number,
+                        "name" => $request->client_name,
+                    ]
+                ]
+            ]);
 
-            $templateId = '669e3596d6fc0569d040c232'; // Replace with your template ID
-            $variables = array(
-                'ordernumber' => $orderNumber,
-                'name' => $request->client_name
-            );
-                // Attempt to send SMS and handle any exceptions
-            try {
-                $sms = $this->smsService->sendSms($clientPhoneNumber, $templateId, $variables);
-            } catch (\Exception $e) {
-                // Log the SMS error and continue with order creation
-                echo "sms not send";
-                Log::error('Error sending SMS: ' . $e->getMessage());
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
+                    'authkey: 426794Akjeezy8u669e32f2P1',
+                    'content-type: application/json',
+                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+                ],
+                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+            ]);
+
+            $response = curl_exec($curl);
+
+            if (curl_errno($curl)) {
+                'Error:' . curl_error($curl);
+            } else {
+                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                "HTTP Status Code: $http_code\n";
+                "Response: $response\n";
             }
-
+            curl_close($curl);
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
             dd([
