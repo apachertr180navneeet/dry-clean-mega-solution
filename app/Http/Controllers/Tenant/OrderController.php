@@ -35,6 +35,7 @@ use App\Services\SmsService; // Custom SMS service
 
 class OrderController extends Controller
 {
+
     protected $smsService;
 
     public function __construct(SmsService $smsService)
@@ -48,8 +49,8 @@ class OrderController extends Controller
      * @param int $length Length of the random string to generate. Default is 6.
      * @return string
      */
-    function generateRandomString($length = 6) {
-        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private function generateRandomString($length = 6) {
+        $characters = '0123456789';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
@@ -66,18 +67,289 @@ class OrderController extends Controller
     private function generateTimeSlots()
     {
         $times = [];
-        $hours = range(9, 12); // Morning hours from 9 to 12
-        $afternoonHours = range(1, 8); // Afternoon hours from 1 to 8
+        $hours = array_merge(range(9, 12), range(1, 8)); // Merge morning and afternoon hours
 
         foreach ($hours as $hour) {
             $times[] = sprintf('%d:00', $hour);
         }
 
-        foreach ($afternoonHours as $hour) {
-            $times[] = sprintf('%d:00', $hour);
+        return $times;
+    }
+
+    /**
+     * Sends an SMS notification using the provided payload.
+     *
+     * @param string $payload JSON-encoded payload for the SMS API
+     * @return void
+     */
+    private function sendSmsNotification($payload)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => [
+                'accept: application/json',
+                'authkey: 426794Akjeezy8u669e32f2P1',
+                'content-type: application/json',
+                'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+            ],
+            CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+        ]);
+
+        $response = curl_exec($curl);
+
+        if (curl_errno($curl)) {
+            Log::error('SMS sending failed: ' . curl_error($curl));
+        } else {
+            $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            Log::info("SMS sent successfully. HTTP Status Code: $http_code. Response: $response");
         }
 
-        return $times;
+        curl_close($curl);
+    }
+
+    /**
+     * Handles adding a new order.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function addOrder(Request $request)
+    {
+        try {
+            // Validate and retrieve request data
+            $validatedData = $request->validate([
+                'client_num' => 'required|numeric',
+                'client_name' => 'required|min:2|max:20',
+                'booking_date' => 'required|date',
+                'booking_time' => 'required|date_format:H:i',
+                'delivery_date' => 'required|date',
+                'delivery_time' => 'required',
+                'period' => 'required|in:AM,PM',
+                'discount' => 'required',
+                'total_qty' => 'required',
+            ]);
+
+            // Combine delivery time and period, then convert to 24-hour format
+            $combinedDeliveryTime = $validatedData['delivery_time'] . ' ' . $validatedData['period'];
+            $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
+
+            // Retrieve or create client
+            $client = User::where('mobile', $validatedData['client_num'])->first();
+            $user_id = $client ? $client->id : User::create([
+                'name' => $validatedData['client_name'],
+                'mobile' => $validatedData['client_num'],
+                'role_id' => 2
+            ])->id;
+
+            // Determine discount ID
+            $discountId = $this->getDiscountId($request->discount);
+
+            // Calculate total price with discount and optional express charge
+            list($totalPriceDis, $totalDiscount) = $this->calculateTotalPrice($request);
+
+            // Create the order and save in database
+            $order = Order::create([
+                'invoice_number' => '',
+                'user_id' => $user_id,
+                'order_date' => $validatedData['booking_date'],
+                'order_time' => $validatedData['booking_time'],
+                'delivery_date' => $validatedData['delivery_date'],
+                'delivery_time' => $deliveryTime24Hour,
+                'discount_id' => $discountId,
+                'service_id' => null,
+                'status' => 'pending',
+                'total_qty' => $validatedData['total_qty'],
+                'total_price' => $totalPriceDis,
+            ]);
+
+            // Generate and save order number
+            if ($order) {
+                $orderNumber = 'ORD-' . $this->generateRandomString();
+                $order->order_number = $orderNumber;
+                $order->save();
+            }
+
+            // Insert order items
+            $orderItemsData = json_decode($request->input('order_items_add_data'), true);
+            foreach ($orderItemsData as $categoryData) {
+                foreach ($categoryData['types'] as $typeData) {
+                    foreach ($typeData['services'] as $serviceData) {
+                        $order->orderItems()->create([
+                            'order_id' => $order->id,
+                            'product_item_id' => $categoryData['category'],
+                            'product_category_id' => $typeData['type'],
+                            'operation_id' => $serviceData['service'],
+                            'quantity' => $serviceData['quantity'],
+                            'operation_price' => $serviceData['price'],
+                            'price' => $serviceData['quantity'] * $serviceData['price'],
+                            'status' => 'pending'
+                        ]);
+                    }
+                }
+            }
+
+            // Create payment details
+            PaymentDetail::create([
+                'order_id' => $order->id,
+                'total_quantity' => $validatedData['total_qty'],
+                'total_amount' => $totalPriceDis,
+                'discount_amount' => $totalDiscount,
+                'service_charge' => $request->express_charge == '1' ? ($totalPriceDis * 50) / 100 : 0,
+                'paid_amount' => 0,
+                'status' => 'Due',
+                'payment_type' => null
+            ]);
+
+            // Prepare and send SMS notification
+            $clientPhoneNumber = '91' . $validatedData['client_num'];
+            $message = $orderNumber . ' of amount ' . $totalPriceDis;
+            $payload = json_encode([
+                "template_id" => "669e364ad6fc052bf21c7312",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $message,
+                        "name" => $validatedData['client_name'],
+                    ]
+                ]
+            ]);
+
+            //$this->sendSmsNotification($payload);
+
+            return redirect()->route('viewOrder');
+        } catch (\Exception $exception) {
+            // Log exception and provide feedback
+            Log::error('Order creation failed: ' . $exception->getMessage());
+            return back()->withErrors($exception->getMessage())->withInput();
+        }
+    }
+
+
+    /**
+     * Handles updating an existing order.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id Order ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateOrder(Request $request, $id)
+    {
+        try {
+            // Fetch the order and its items
+            $order = Order::findOrFail($id);
+            $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
+                return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
+            });
+
+            $formattedItems = json_decode($request->input('order_items_data'), true);
+            $updatedItemIds = [];
+
+            // Iterate through the incoming request data and process items
+            foreach ($formattedItems as $category) {
+                $categoryId = $category['category'];
+
+                foreach ($category['types'] as $type) {
+                    $typeId = $type['type'];
+
+                    foreach ($type['services'] as $service) {
+                        $serviceId = $service['service'];
+                        $qty = $service['quantity'];
+                        $unitPrice = $service['price'];
+
+                        $key = $categoryId . '-' . $typeId . '-' . $serviceId;
+                        $existingItem = $existingOrderItems[$key] ?? null;
+
+                        if ($existingItem) {
+                            // Update existing item
+                            $existingItem->update([
+                                'quantity' => $qty,
+                                'operation_price' => $unitPrice,
+                                'price' => $qty * $unitPrice,
+                            ]);
+                            $updatedItemIds[] = $existingItem->id;
+                        } else {
+                            // Create new item
+                            $newItem = $order->orderItems()->create([
+                                'product_item_id' => $categoryId,
+                                'product_category_id' => $typeId,
+                                'operation_id' => $serviceId,
+                                'quantity' => $qty,
+                                'operation_price' => $unitPrice,
+                                'price' => $qty * $unitPrice,
+                                'status' => 'pending'
+                            ]);
+                            $updatedItemIds[] = $newItem->id;
+                        }
+                    }
+                }
+            }
+
+            // Delete items that are no longer in the order
+            foreach ($existingOrderItems as $existItem) {
+                if (!in_array($existItem->id, $updatedItemIds)) {
+                    $existItem->delete();
+                }
+            }
+
+            // Calculate discount and total price
+            $discountId = $this->getDiscountId($request->discount);
+
+            $grossPrice = $request->gross_total;
+            $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
+            $totalPriceDis = $grossPrice - $totalDiscount;
+            if ($request->express_charge == '1') {
+                $totalPriceDis += ($totalPriceDis * 50) / 100;
+            }
+
+            // Combine delivery time and period, then convert to 24-hour format
+            $combinedDeliveryTime = $request->delivery_time . ' ' . $request->period;
+            $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
+
+            // Update the order details
+            $order->update([
+                'order_date' => $request->booking_date,
+                'order_time' => $request->booking_time,
+                'delivery_date' => $request->delivery_date,
+                'delivery_time' => $deliveryTime24Hour,
+                'discount_id' => $discountId,
+                'total_qty' => $request->total_qty,
+                'total_price' => $totalPriceDis,
+                'status' => 'pending'
+            ]);
+
+            // Prepare and send SMS notification
+            $clientPhoneNumber = '+91' . $request->client_num;
+            $message = $order->order_number . ' of amount ' . $totalPriceDis;
+            $payload = json_encode([
+                "template_id" => "669e3596d6fc0569d040c232",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $message,
+                        "name" => $request->client_name,
+                    ]
+                ]
+            ]);
+
+            //$this->sendSmsNotification($payload);
+
+            return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
+        } catch (\Exception $exception) {
+            // Log and display exception details
+            Log::error('Order update failed: ' . $exception->getMessage());
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
+
     }
 
     /**
@@ -208,146 +480,7 @@ class OrderController extends Controller
         }
     }
 
-    public function addOrder(Request $request)
-    {
-        try {
-            // Validate and retrieve request data
-            $validatedData = $request->validate([
-                'client_num' => 'required|numeric',
-                'client_name' => 'required|min:2|max:20',
-                'booking_date' => 'required|date',
-                'booking_time' => 'required|date_format:H:i',
-                'delivery_date' => 'required|date',
-                'delivery_time' => 'required',
-                'period' => 'required|in:AM,PM',
-                'discount' => 'required',
-                'total_qty' => 'required',
-            ]);
 
-            // Combine delivery time and period, then convert to 24-hour format
-            $combinedDeliveryTime = $validatedData['delivery_time'] . ' ' . $validatedData['period'];
-            $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
-
-            // Retrieve or create client
-            $client = User::where('mobile', $validatedData['client_num'])->first();
-            $user_id = $client ? $client->id : User::create([
-                'name' => $validatedData['client_name'],
-                'mobile' => $validatedData['client_num'],
-                'role_id' => 2
-            ])->id;
-
-            // Determine discount ID
-            $discountId = $this->getDiscountId($request->discount);
-
-            // Calculate total price with discount and optional express charge
-            list($totalPriceDis, $totalDiscount) = $this->calculateTotalPrice($request);
-
-            // Create the order and save in database
-            $order = Order::create([
-                'invoice_number' => '',
-                'user_id' => $user_id,
-                'order_date' => $validatedData['booking_date'],
-                'order_time' => $validatedData['booking_time'],
-                'delivery_date' => $validatedData['delivery_date'],
-                'delivery_time' => $deliveryTime24Hour,
-                'discount_id' => $discountId,
-                'service_id' => null,
-                'status' => 'pending',
-                'total_qty' => $validatedData['total_qty'],
-                'total_price' => $totalPriceDis,
-            ]);
-
-            // Generate and save order number
-            if ($order) {
-                $orderNumber = 'ORD-' . $this->generateRandomString();
-                $order->order_number = $orderNumber;
-                $order->save();
-            }
-
-            // Insert order items
-            foreach (json_decode($request->input('order_items_add_data'), true) as $categoryData) {
-                foreach ($categoryData['types'] as $typeData) {
-                    foreach ($typeData['services'] as $serviceData) {
-                        $order->orderItems()->create([
-                            'order_id' => $order->id,
-                            'product_item_id' => $categoryData['category'],
-                            'product_category_id' => $typeData['type'],
-                            'operation_id' => $serviceData['service'],
-                            'quantity' => $serviceData['quantity'],
-                            'operation_price' => $serviceData['price'],
-                            'price' => $serviceData['quantity'] * $serviceData['price'],
-                            'status' => 'pending'
-                        ]);
-                    }
-                }
-            }
-
-            // Create payment details
-            PaymentDetail::create([
-                'order_id' => $order->id,
-                'total_quantity' => $validatedData['total_qty'],
-                'total_amount' => $totalPriceDis,
-                'discount_amount' => $totalDiscount,
-                'service_charge' => $request->express_charge == '1' ? ($totalPriceDis * 50) / 100 : 0,
-                'paid_amount' => 0,
-                'status' => 'Due',
-                'payment_type' => null
-            ]);
-
-            // Prepare and send SMS notification
-            $clientPhoneNumber = '91' . $validatedData['client_num'];
-            $templateId = '669e364ad6fc052bf21c7312';
-            $variables = ['ordernumber' => $orderNumber, 'name' => $validatedData['client_name']];
-            $curl = curl_init();
-            $message = $orderNumber.' '.'of amount'.' '.$totalPriceDis;
-            $payload = json_encode([
-                "template_id" => "669e364ad6fc052bf21c7312",
-                "recipients" => [
-                    [
-                        "mobiles" => $clientPhoneNumber,
-                        "ordernumber" => $message,
-                        "name" => $validatedData['client_name'],
-                    ]
-                ]
-            ]);
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $payload,
-                CURLOPT_HTTPHEADER => [
-                    'accept: application/json',
-                    'authkey: 426794Akjeezy8u669e32f2P1',
-                    'content-type: application/json',
-                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-                ],
-                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            ]);
-
-            $response = curl_exec($curl);
-
-            if (curl_errno($curl)) {
-                'Error:' . curl_error($curl);
-            } else {
-                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                "HTTP Status Code: $http_code\n";
-                "Response: $response\n";
-            }
-
-            curl_close($curl);
-            return redirect()->route('viewOrder');
-        } catch (\Exception $exception) {
-            // Log exception and provide feedback
-            Log::error('Order creation failed: ' . $exception->getMessage());
-            return back()->withErrors($exception->getMessage())->withInput();
-        }
-    }
 
     private function getDiscountId($discount)
     {
@@ -527,179 +660,6 @@ class OrderController extends Controller
         $others = $request->others ?? [];
         // dd($others);
         return $this->getAllOperationData($pId, $pname, $others);
-    }
-
-    //new code
-    public function updateOrder(Request $request, $id)
-    {
-        try {
-            // Fetch the order and its items
-            $order = Order::findOrFail($id);
-            $existingOrderItems = OrderItem::where('order_id', $id)->get()->keyBy(function ($item) {
-                return $item->product_item_id . '-' . $item->product_category_id . '-' . $item->operation_id;
-            });
-
-            $formattedItems = json_decode($request->input('order_items_data'), true);
-
-            $updatedItemIds = [];
-
-            // Format the incoming request data
-            foreach ($formattedItems as $category) {
-                $categoryId = $category['category'];
-
-                foreach ($category['types'] as $type) {
-                    $typeId = $type['type'];
-
-                    foreach ($type['services'] as $service) {
-                        $serviceId = $service['service'];
-                        $qty = $service['quantity'];
-                        $unitPrice = $service['price'];
-
-                        $key = $categoryId . '-' . $typeId . '-' . $serviceId;
-                        $existingItem = $existingOrderItems[$key] ?? null;
-
-                        if ($existingItem) {
-                            // Update existing item
-                            $existingItem->update([
-                                'quantity' => $qty,
-                                'operation_price' => $unitPrice,
-                                'price' => $qty * $unitPrice,
-                            ]);
-                            $updatedItemIds[] = $existingItem->id;
-                        } else {
-                            // Create new item
-                            $newItem = $order->orderItems()->create([
-                                'product_item_id' => $categoryId,
-                                'product_category_id' => $typeId,
-                                'operation_id' => $serviceId,
-                                'quantity' => $qty,
-                                'operation_price' => $unitPrice,
-                                'price' => $qty * $unitPrice,
-                                'status' => 'pending'
-                            ]);
-                            $updatedItemIds[] = $newItem->id;
-                        }
-                    }
-                }
-            }
-
-            // Delete items that are no longer in the order
-            foreach ($existingOrderItems as $existItem) {
-                $key = $existItem->product_item_id . '-' . $existItem->product_category_id . '-' . $existItem->operation_id;
-                if (!in_array($existItem->id, $updatedItemIds)) {
-                    $existItem->delete();
-                }
-            }
-
-            // Handle client user creation or updating
-            $client = User::where('mobile', $request->client_num)->first();
-            // dd($client);
-            if ($client) {
-                $user = User::where('id', $client->id)->update([
-                    'name' => $request->client_name,
-                    'mobile' => $request->client_num,
-                    'role_id' => 2
-                ]);
-                $user_id = $client->id;
-            } else {
-                $user = User::create([
-                    'name' => $request->client_name,
-                    'mobile' => $request->client_num,
-                    'role_id' => 2
-                ]);
-                $user_id = $user->id;
-            }
-
-            // Calculate discount and total price
-            $discountId = match ($request->discount) {
-                '5' => 1,
-                '10' => 2,
-                '15' => 3,
-                '20' => 4,
-                default => 0
-            };
-
-            // Check if discountId is valid, otherwise set to null
-            if (!Discount::where('id', $discountId)->exists()) {
-                $discountId = null;
-            }
-
-            $grossPrice = $request->gross_total;
-            $totalDiscount = ($grossPrice * ($request->discount ?? 0)) / 100;
-            $totalPriceDis = $grossPrice - $totalDiscount;
-            if ($request->express_charge == '1') {
-                $totalPriceDis += ($totalPriceDis * 50) / 100;
-            }
-
-            $combinedDeliveryTime = $request->delivery_time . ' ' . $request->period;
-
-            // Convert to 24-hour format using Carbon
-            $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
-            // Update the order details
-            $order->update([
-                'user_id' => $user_id,
-                'order_date' => $request->booking_date,
-                'order_time' => $request->booking_time,
-                'delivery_date' => $request->delivery_date,
-                'delivery_time' => $deliveryTime24Hour,
-                'discount_id' => $discountId,
-                'total_qty' => $request->total_qty,
-                'total_price' => $totalPriceDis,
-                'status' => 'pending'
-            ]);
-            $clientPhoneNumber = '+91' . $request->client_num;
-
-            // Prepare SMS message
-            $curl = curl_init();
-            $message = $order->order_number.' '.'of amount'.' '.$totalPriceDis;
-            $payload = json_encode([
-                "template_id" => "669e3596d6fc0569d040c232",
-                "recipients" => [
-                    [
-                        "mobiles" => $clientPhoneNumber,
-                        "ordernumber" => $message,
-                        "name" => $request->client_name,
-                    ]
-                ]
-            ]);
-
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $payload,
-                CURLOPT_HTTPHEADER => [
-                    'accept: application/json',
-                    'authkey: 426794Akjeezy8u669e32f2P1',
-                    'content-type: application/json',
-                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-                ],
-                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            ]);
-
-            $response = curl_exec($curl);
-
-            if (curl_errno($curl)) {
-                'Error:' . curl_error($curl);
-            } else {
-                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                "HTTP Status Code: $http_code\n";
-                "Response: $response\n";
-            }
-            curl_close($curl);
-            return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
-        } catch (\Exception $exception) {
-            dd([
-                'message' => $exception->getMessage(),
-                'line' => $exception->getLine(),
-            ]);
-            return redirect()->back()->with('error', $exception->getMessage());
-        }
     }
     public function OrderDetail(Request $request, $orderId)
     {

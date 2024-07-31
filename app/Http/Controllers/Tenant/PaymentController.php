@@ -107,13 +107,10 @@ class PaymentController extends Controller
 
             // Prepare SMS message
             $client = User::findOrFail($order->user_id);
-
             $clientPhoneNumber = '+91' . $client->mobile;
-            $templateId = '1207172128171262962';
-            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
             $curl = curl_init();
-            $message = $orderNumber.' '.'of amount'.' '.$order->total_price;
+            $message = $order->order_number.' '.'of amount'.' '.$order->total_price;
             $payload = json_encode([
                 "template_id" => "669e3613d6fc050576099402",
                 "recipients" => [
