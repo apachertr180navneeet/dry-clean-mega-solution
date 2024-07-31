@@ -91,7 +91,6 @@ class HomeController extends Controller
         }
 
         $user->name = $request->input('name');
-        $user->email = $request->input('email');
         $user->save();
 
         return redirect()->route('myProfile')->with('success', 'Profile updated successfully');
