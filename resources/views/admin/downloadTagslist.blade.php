@@ -3,19 +3,33 @@
 
 <head>
     <style>
+         body, html {
+            margin: 5px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+        }
         .table-item-container {
-            width: 38mm;
-            display: inline-block;
+            padding: 15px 0;
+            border: 1px solid #dbdade;
+            width: 56mm;
+            height: 310px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+
         }
 
         .table-item {
-            box-sizing: border-box;
-            padding: 10px;
-            background: #ffffffb3;
-            border: 1px solid #dbdade;
-            border-radius: 5px;
+
+           margin: 0;
             text-align: center;
-            vertical-align: top;
+
         }
 
         .table-item div {
@@ -27,7 +41,8 @@
             display: block;
             width: 100%;
             text-align: center;
-            margin: 20px 0; /* Margin for the print button */
+            margin: 20px 0;
+            /* Margin for the print button */
         }
 
         .print-button button {
@@ -38,11 +53,6 @@
             cursor: pointer;
         }
     </style>
-    <script>
-        function printLabels() {
-            window.print();
-        }
-    </script>
 </head>
 
 <body>
@@ -59,13 +69,19 @@
                 @endif
                     <div class="table-item-container">
                         <div class="table-item">
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">Mega Dry Cleaning</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $order->user->name }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</p>
-                            <div><span>T {{ $orderItem->quantity }}</span></div>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->opertions->name }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->productItem->name }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->productCategory->name }}</p>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px; color:#000">Mega Dry Cleaning
+                            </p>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                                {{ $order->order_number }}</p>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                                {{ $order->user->name }}</p>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                                {{ $order->delivery_date }}</p>
+                            <div style="margin-bottom:18px" ><span style="padding:10px 25px; font-weight: 900;font-size: 20px; ">T {{ $orderItem->quantity }}</span></div>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                                {{ $orderItem->opertions->name }}</p>
+                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                                {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}</p>
                         </div>
                     </div>
                     @php
