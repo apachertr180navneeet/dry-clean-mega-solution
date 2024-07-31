@@ -151,21 +151,21 @@
                 {{-- @dd(Auth::user()->image); --}}
                 @if(Auth::user()->image != "")
                 <div class="avatar avatar-online">
-                    <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                    <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                 </div>
             @else
                 <div class="avatar avatar-online">
-                    <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                    <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                 </div>
             @endif
                 @else
                     @if(Auth::user()->image != "")
                         <div class="avatar avatar-online">
-                            <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                            <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                         </div>
                     @else
                         <div class="avatar avatar-online">
-                            <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                            <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                         </div>
                     @endif
 
@@ -180,21 +180,21 @@
                                     {{-- @dd(Auth::user()->image); --}}
                                     @if(Auth::user()->image != "")
                                     <div class="avatar avatar-online">
-                                        <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                        <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                     </div>
                                      @else
                                     <div class="avatar avatar-online">
-                                        <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                                        <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                                     </div>
                                     @endif
                                     @else
                                         @if(Auth::user()->image != "")
                                             <div class="avatar avatar-online">
-                                                <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                                <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @else
                                             <div class="avatar avatar-online">
-                                                <img src="{{ url('public/theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
+                                                <img src="{{ url('theam/assets/img/avatars/1.png') }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @endif
 
