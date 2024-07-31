@@ -295,52 +295,52 @@ class OrderController extends Controller
             ]);
 
             // Prepare and send SMS notification
-            // $clientPhoneNumber = '91' . $validatedData['client_num'];
-            // $templateId = '669e364ad6fc052bf21c7312';
-            // $variables = ['ordernumber' => $orderNumber, 'name' => $validatedData['client_name']];
-            // $curl = curl_init();
+            $clientPhoneNumber = '91' . $validatedData['client_num'];
+            $templateId = '669e364ad6fc052bf21c7312';
+            $variables = ['ordernumber' => $orderNumber, 'name' => $validatedData['client_name']];
+            $curl = curl_init();
+            $message = $orderNumber.' '.'of amount'.' '.$totalPriceDis;
+            $payload = json_encode([
+                "template_id" => "669e364ad6fc052bf21c7312",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $message,
+                        "name" => $validatedData['client_name'],
+                    ]
+                ]
+            ]);
 
-            // $payload = json_encode([
-            //     "template_id" => "669e364ad6fc052bf21c7312",
-            //     "recipients" => [
-            //         [
-            //             "mobiles" => $clientPhoneNumber,
-            //             "ordernumber" => $orderNumber,
-            //             "name" => $validatedData['client_name'],
-            //         ]
-            //     ]
-            // ]);
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
+                    'authkey: 426794Akjeezy8u669e32f2P1',
+                    'content-type: application/json',
+                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+                ],
+                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+            ]);
 
-            // curl_setopt_array($curl, [
-            //     CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $payload,
-            //     CURLOPT_HTTPHEADER => [
-            //         'accept: application/json',
-            //         'authkey: 426794Akjeezy8u669e32f2P1',
-            //         'content-type: application/json',
-            //         'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-            //     ],
-            //     CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            // ]);
+            $response = curl_exec($curl);
 
-            // $response = curl_exec($curl);
+            if (curl_errno($curl)) {
+                'Error:' . curl_error($curl);
+            } else {
+                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                "HTTP Status Code: $http_code\n";
+                "Response: $response\n";
+            }
 
-            // if (curl_errno($curl)) {
-            //     'Error:' . curl_error($curl);
-            // } else {
-            //     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            //     "HTTP Status Code: $http_code\n";
-            //     "Response: $response\n";
-            // }
-
-            // curl_close($curl);
+            curl_close($curl);
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
             // Log exception and provide feedback
@@ -650,48 +650,48 @@ class OrderController extends Controller
             $clientPhoneNumber = '+91' . $request->client_num;
 
             // Prepare SMS message
-            // $curl = curl_init();
+            $curl = curl_init();
+            $message = $orderNumber.' '.'of amount'.' '.$totalPriceDis;
+            $payload = json_encode([
+                "template_id" => "669e3596d6fc0569d040c232",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $message,
+                        "name" => $request->client_name,
+                    ]
+                ]
+            ]);
 
-            // $payload = json_encode([
-            //     "template_id" => "669e3596d6fc0569d040c232",
-            //     "recipients" => [
-            //         [
-            //             "mobiles" => $clientPhoneNumber,
-            //             "ordernumber" => $order->order_number,
-            //             "name" => $request->client_name,
-            //         ]
-            //     ]
-            // ]);
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
+                    'authkey: 426794Akjeezy8u669e32f2P1',
+                    'content-type: application/json',
+                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+                ],
+                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+            ]);
 
-            // curl_setopt_array($curl, [
-            //     CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $payload,
-            //     CURLOPT_HTTPHEADER => [
-            //         'accept: application/json',
-            //         'authkey: 426794Akjeezy8u669e32f2P1',
-            //         'content-type: application/json',
-            //         'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-            //     ],
-            //     CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            // ]);
+            $response = curl_exec($curl);
 
-            // $response = curl_exec($curl);
-
-            // if (curl_errno($curl)) {
-            //     'Error:' . curl_error($curl);
-            // } else {
-            //     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            //     "HTTP Status Code: $http_code\n";
-            //     "Response: $response\n";
-            // }
-            // curl_close($curl);
+            if (curl_errno($curl)) {
+                'Error:' . curl_error($curl);
+            } else {
+                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                "HTTP Status Code: $http_code\n";
+                "Response: $response\n";
+            }
+            curl_close($curl);
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
             dd([
@@ -1075,7 +1075,7 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = array(0, 0, 180, 280);
+            $customPaper = array(0, 0, 134, 280);
 
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [

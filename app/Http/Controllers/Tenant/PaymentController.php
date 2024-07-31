@@ -108,52 +108,52 @@ class PaymentController extends Controller
             // Prepare SMS message
             $client = User::findOrFail($order->user_id);
 
-            // $clientPhoneNumber = '+91' . $client->mobile;
-            // $templateId = '1207172128171262962';
-            // $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
+            $clientPhoneNumber = '+91' . $client->mobile;
+            $templateId = '1207172128171262962';
+            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
-            // $curl = curl_init();
+            $curl = curl_init();
+            $message = $orderNumber.' '.'of amount'.' '.$order->total_price;
+            $payload = json_encode([
+                "template_id" => "669e3613d6fc050576099402",
+                "recipients" => [
+                    [
+                        "mobiles" => $clientPhoneNumber,
+                        "ordernumber" => $message,
+                        "name" => $client->name,
+                    ]
+                ]
+            ]);
 
-            // $payload = json_encode([
-            //     "template_id" => "669e3613d6fc050576099402",
-            //     "recipients" => [
-            //         [
-            //             "mobiles" => $clientPhoneNumber,
-            //             "ordernumber" => $order->order_number,
-            //             "name" => $client->name,
-            //         ]
-            //     ]
-            // ]);
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'accept: application/json',
+                    'authkey: 426794Akjeezy8u669e32f2P1',
+                    'content-type: application/json',
+                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+                ],
+                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+            ]);
 
-            // curl_setopt_array($curl, [
-            //     CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $payload,
-            //     CURLOPT_HTTPHEADER => [
-            //         'accept: application/json',
-            //         'authkey: 426794Akjeezy8u669e32f2P1',
-            //         'content-type: application/json',
-            //         'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-            //     ],
-            //     CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            // ]);
+            $response = curl_exec($curl);
 
-            // $response = curl_exec($curl);
-
-            // if (curl_errno($curl)) {
-            //     'Error:' . curl_error($curl);
-            // } else {
-            //     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            //     "HTTP Status Code: $http_code\n";
-            //     "Response: $response\n";
-            // }
-            // curl_close($curl);
+            if (curl_errno($curl)) {
+                'Error:' . curl_error($curl);
+            } else {
+                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                "HTTP Status Code: $http_code\n";
+                "Response: $response\n";
+            }
+            curl_close($curl);
 
             return response()->json(['success' => 'Order settled and delivered successfully.']);
             // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');

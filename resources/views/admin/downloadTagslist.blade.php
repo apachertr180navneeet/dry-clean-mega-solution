@@ -15,7 +15,7 @@
         .table-item-container {
             padding: 15px 0;
             border: 1px solid #dbdade;
-            width: 56mm;
+            width: 44mm;
             display: flex;
             flex-direction: column;
             justify-content: center;
