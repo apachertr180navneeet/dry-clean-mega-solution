@@ -16,7 +16,6 @@
             padding: 15px 0;
             border: 1px solid #dbdade;
             width: 56mm;
-            height: 310px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -69,18 +68,18 @@
                 @endif
                     <div class="table-item-container">
                         <div class="table-item">
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px; color:#000">Mega Dry Cleaning
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px; color:#000">Mega Dry Cleaning
                             </p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
                                 {{ $order->order_number }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
                                 {{ $order->user->name }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
                                 {{ $order->delivery_date }}</p>
-                            <div style="margin-bottom:18px" ><span style="padding:10px 25px; font-weight: 900;font-size: 20px; ">T {{ $orderItem->quantity }}</span></div>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                            <div style="margin-bottom:5px" ><span style="padding:10px 25px; font-weight: 900;font-size: 12px; ">T {{ $orderItem->quantity }}</span></div>
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
                                 {{ $orderItem->opertions->name }}</p>
-                            <p style="font-weight: bold; font-size: 14px; color: #6c757d; margin-bottom:25px;margin-top: 10px;">
+                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
                                 {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}</p>
                         </div>
                     </div>
