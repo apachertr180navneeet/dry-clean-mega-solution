@@ -22,21 +22,10 @@ class PaymentController extends Controller
     {
         $this->smsService = $smsService;
     }
-    //
-    // public function index()
-    // {
-    //     $payments = PaymentDetail::paginate(10);
-    //     return view('admin.payment', ['payments' => $payments]);
-    // }
 
     public function index(Request $request)
     {
         $tenantId = tenant('id');
-
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
 
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
@@ -67,51 +56,6 @@ class PaymentController extends Controller
 
         return view('admin.payment', ['payments' => $payments, 'search' => $request->input('search')]);
     }
-
-    // public function settleOrder(Request $request, $orderId, $paymentType)
-    // {
-    //     try {
-    //         // Find the payment detail by orderId
-    //         $payment = PaymentDetail::where('order_id', $orderId)->first();
-
-    //         // Check if the payment exists
-    //         if ($payment) {
-    //             // Update the status to 'Paid' and set the payment type
-    //             $payment->status = 'Paid';
-    //             $payment->payment_type = $paymentType;
-    //             $payment->save();
-
-    //             // Optionally, you might want to return a success message or redirect
-    //             return redirect()->route('viewOrder')->with('success', 'Payment status updated to Paid successfully.');
-    //         } else {
-    //             // If payment is not found, return an error message
-    //             return redirect()->route('viewOrder')->with('error', 'Payment not found.');
-    //         }
-    //     } catch (Throwable $throwable) {
-    //         // Handle any errors
-    //         dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
-    //     }
-    // }
-    // public function deliverOrder(Request $request, $orderId)
-    // {
-    //     try {
-    //         // Find the order by orderId
-    //         $order = Order::findOrFail($orderId);
-
-    //         // Update the order status to 'delivered'
-    //         $order->status = 'delivered';
-    //         $order->save();
-
-    //         // Update all associated order items to 'delivered'
-    //         $order->orderItems()->update(['status' => 'delivered']);
-
-    //         // Optionally, you might want to return a success message or redirect
-    //         return redirect()->route('invoice')->with('success', 'Order and order items status updated to delivered successfully.');
-    //     } catch (Throwable $throwable) {
-    //         // Handle any errors
-    //         dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
-    //     }
-    // }
     private function generateInvoiceNumber()
     {
         // Get the last inserted invoice number
@@ -164,52 +108,52 @@ class PaymentController extends Controller
             // Prepare SMS message
             $client = User::findOrFail($order->user_id);
 
-            $clientPhoneNumber = '+91' . $client->mobile;
-            $templateId = '1207172128171262962';
-            $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
+            // $clientPhoneNumber = '+91' . $client->mobile;
+            // $templateId = '1207172128171262962';
+            // $variables = ['ordernumber' => $order->order_number, 'name' => $client->name];
 
-            $curl = curl_init();
+            // $curl = curl_init();
 
-            $payload = json_encode([
-                "template_id" => "669e3613d6fc050576099402",
-                "recipients" => [
-                    [
-                        "mobiles" => $clientPhoneNumber,
-                        "ordernumber" => $order->order_number,
-                        "name" => $client->name,
-                    ]
-                ]
-            ]);
+            // $payload = json_encode([
+            //     "template_id" => "669e3613d6fc050576099402",
+            //     "recipients" => [
+            //         [
+            //             "mobiles" => $clientPhoneNumber,
+            //             "ordernumber" => $order->order_number,
+            //             "name" => $client->name,
+            //         ]
+            //     ]
+            // ]);
 
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $payload,
-                CURLOPT_HTTPHEADER => [
-                    'accept: application/json',
-                    'authkey: 426794Akjeezy8u669e32f2P1',
-                    'content-type: application/json',
-                    'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
-                ],
-                CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
-            ]);
+            // curl_setopt_array($curl, [
+            //     CURLOPT_URL => 'https://control.msg91.com/api/v5/flow',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => $payload,
+            //     CURLOPT_HTTPHEADER => [
+            //         'accept: application/json',
+            //         'authkey: 426794Akjeezy8u669e32f2P1',
+            //         'content-type: application/json',
+            //         'Cookie: PHPSESSID=kgm8ohaofmr3v04i9gruu0kjs6'
+            //     ],
+            //     CURLOPT_SSL_VERIFYPEER => false, // Disable SSL verification
+            // ]);
 
-            $response = curl_exec($curl);
+            // $response = curl_exec($curl);
 
-            if (curl_errno($curl)) {
-                'Error:' . curl_error($curl);
-            } else {
-                $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                "HTTP Status Code: $http_code\n";
-                "Response: $response\n";
-            }
-            curl_close($curl);
+            // if (curl_errno($curl)) {
+            //     'Error:' . curl_error($curl);
+            // } else {
+            //     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            //     "HTTP Status Code: $http_code\n";
+            //     "Response: $response\n";
+            // }
+            // curl_close($curl);
 
             return response()->json(['success' => 'Order settled and delivered successfully.']);
             // return redirect()->route('invoice')->with('success', 'Order settled and delivered successfully.');
