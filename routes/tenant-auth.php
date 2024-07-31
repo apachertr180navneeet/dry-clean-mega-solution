@@ -12,33 +12,23 @@ use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthenticatedSessionController::class, 'create'])
-                ->name('login');
+    Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-                ->name('login');
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-                ->name('password.request');
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-                ->name('password.email');
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
 
-    Route::get('new-password', [PasswordResetLinkController::class, 'newPassword'])
-                ->name('new.password');
+    Route::get('new-password', [PasswordResetLinkController::class, 'newPassword'])->name('new.password');
 
-    Route::post('store-new-password', [PasswordResetLinkController::class, 'storeNewPassword'])
-                ->name('store.new.password');
+    Route::post('store-new-password', [PasswordResetLinkController::class, 'storeNewPassword'])->name('store.new.password');
 
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
 
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-                ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-                ->name('password.update');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {

@@ -73,23 +73,22 @@ class PasswordResetLinkController extends Controller
 
     public function storeNewPassword(Request $request)
     {
-        // dd($request->all());
         if(isset($request->new_password) && isset($request->confirm_password)){
            $newPss = $request->new_password;
            $cnfPss = $request->confirm_password;
            $id = $request->id;
 
-            if($newPss == $cnfPss) {
-                // dd($newPss);
-                $data = User::findOrFail($id);
+           if($newPss == $cnfPss) {
+                $data = User::find($id);
                 $data->password = Hash::make($newPss);
                 $data->save();
-                return redirect('/login')->with('success', 'Password has been successfully updated. Now you can login with new password.');
+                return redirect('login')->with('success', 'Password has been successfully updated. Now you can login with new password.');
             }else{
-                return redirect()->back()->with('error', 'New password and confirm password are not matched');
+                return redirect('login')->with('error', 'New password and confirm password are not matched');
             }
+            die;
         }else{
-            return redirect()->back()->with('error', 'New password and confirm password are required');
+            return redirect('login')->with('error', 'New password and confirm password are required');
         }
     }
 }
