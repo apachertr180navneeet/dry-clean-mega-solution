@@ -26,8 +26,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" value="{{ !empty($user->email) ? $user->email : old('email') }}" readonly />
-                                <span class="email-error text-danger" style="display:none;"></span>
+                                <input type="text" class="form-control" id="" name="email" placeholder="Enter your email" value="{{ !empty($user->email) ? $user->email : old('email') }}" readonly />
+                                {{--  <span class="email-error text-danger" style="display:none;"></span>  --}}
                             </div>
                             @if (empty($user->id))
                             <div class="mb-3 form-password-toggle">
@@ -67,11 +67,6 @@
                     maxlength: 50,
                     noSpecialChars: true
                 },
-                email: {
-                    required: true,
-                    email: true,
-                    maxlength: 50
-                },
                 image: {
                     required: false,
                     extension: "jpg|jpeg|png|bmp",
@@ -90,11 +85,6 @@
                     minlength: "Username must be at least 2 characters long",
                     maxlength: "Username must be less than 50 characters",
                     noSpecialChars: "Username must not contain special characters"
-                },
-                email: {
-                    required: "Please enter your email",
-                    email: "Please enter a valid email address",
-                    maxlength: "Email must be less than 50 characters"
                 },
                 image: {
                     extension: "Please upload only image files (jpg, jpeg, png, bmp)",

@@ -1036,7 +1036,7 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = array(0, 0, 134, 280);
+            $customPaper = array(10, 0, 134, 280);
 
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [

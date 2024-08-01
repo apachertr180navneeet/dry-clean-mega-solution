@@ -69,7 +69,6 @@ class HomeController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
