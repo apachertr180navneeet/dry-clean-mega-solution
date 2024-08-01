@@ -5,6 +5,7 @@ namespace App\Http\Controllers\App\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\ForgetPassword;
 use App\Models\User;
+use App\Models\PasswordResetTokens;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PasswordResetLinkController extends Controller
 {
@@ -40,10 +43,21 @@ class PasswordResetLinkController extends Controller
         // dd($email);
         if($email)
         {
+            $passwordresetemail = PasswordResetTokens::where('email', $request->email)->first();
+            $token = Str::random(64);
+            if ($passwordresetemail) {
+                PasswordResetTokens::where('email', $email->email)->delete();
+            }
+            $dataInsert = [
+                'email' => $email->email,
+                'token' => $token,
+            ];
+            PasswordResetTokens::create($dataInsert);
+
             $data = [
                 'message' => 'This is a test email.',
                 'name' => $email->name,
-                'url' => url('new-password').'?id='.$email->id,
+                'url' => url('new-password').'?id='.$token,
 
             ];
             Mail::to($request->email)->send(new ForgetPassword($data));
@@ -78,8 +92,26 @@ class PasswordResetLinkController extends Controller
            $cnfPss = $request->confirm_password;
            $id = $request->id;
 
+           // Retrieve the password reset token from the database
+           $passwordResetToken = PasswordResetTokens::where('token', $id)->first();
+
+           // If token is not found, return with an error
+           if (!$passwordResetToken) {
+               return back()->withInput()->with('error', 'Invalid token!');
+           }
+
+           // Check if the token is within the valid time frame (5 minutes)
+           $createdAt = Carbon::parse($passwordResetToken->created_at);
+           $now = Carbon::now();
+           if ($createdAt->diffInMinutes($now) > 5) {
+               return redirect()->back()->with('error', 'The token has expired!');
+           }
+
+           // Retrieve user details using email from the token
+           $userDetail = User::where('email', $passwordResetToken->email)->first();
+
            if($newPss == $cnfPss) {
-                $data = User::find($id);
+                $data = User::find($userDetail->id);
                 $data->password = Hash::make($newPss);
                 $data->save();
                 return redirect('login')->with('success', 'Password has been successfully updated. Now you can login with new password.');

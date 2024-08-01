@@ -9,7 +9,7 @@
                     <!-- Logo -->
                     <div class="app-brand justify-content-center mb-4">
                         <a href="javascript:void(0);" class="app-brand-link gap-2">
-                            <img src="{{ url('theam/Images/logo.png') }}" style="width: 130px;">
+                            <img src="{{ url('public/theam/Images/logo.png') }}" style="width: 130px;">
                         </a>
                     </div>
                     <!-- /Logo -->
@@ -21,7 +21,7 @@
                     <form id="formAuthentication" class="mb-3" action="{{ route('store.new.password') }}"
                             method="POST" enctype="multipart/form-data">
                             @csrf
-                            <input type="hidden" name="id" value="{{ $data['id'] }}" /> 
+                            <input type="hidden" name="id" value="{{ $data['id'] }}" />
                             <div class="mb-3 form-password-toggle">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <label class="form-label" for="password">New Password</label>
@@ -47,7 +47,7 @@
                                 </div>
 
                             </div>
-                           
+
                             <button class="btn btn_1F446E_hp w-100">Save</button>
                         </form>
                     <div class="text-center">
