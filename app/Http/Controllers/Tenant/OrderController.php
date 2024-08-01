@@ -64,17 +64,49 @@ class OrderController extends Controller
      *
      * @return array
      */
-    private function generateTimeSlots()
-    {
+    private function generateTimeSlots() {
         $times = [];
-        $hours = array_merge(range(9, 12), range(1, 8)); // Merge morning and afternoon hours
+        $timesingle = [];
+        $hours = range(9, 19); // Hours from 9 AM to 8 PM
 
         foreach ($hours as $hour) {
-            $times[] = sprintf('%d:00', $hour);
+            // Format start time
+            if ($hour < 12) {
+                $start_time = sprintf('%d:00 AM', $hour);
+            } elseif ($hour == 12) {
+                $start_time = '12:00 PM';
+            } else {
+                $start_time = sprintf('%d:00 PM', $hour - 12);
+            }
+
+            // Calculate next hour for end time
+            $next_hour = $hour + 1;
+            if ($next_hour < 12) {
+                $end_time = sprintf('%d:00 AM', $next_hour);
+            } elseif ($next_hour == 12) {
+                $end_time = '12:00 PM';
+            } else {
+                $end_time = sprintf('%d:00 PM', $next_hour - 12);
+            }
+
+            // Add to the times array
+            $times[] = [
+                'start' => $start_time,
+                'end' => $end_time,
+                'range' => sprintf('%s - %s', $start_time, $end_time)
+            ];
+
+            // Add to the timesingle array
+            $timesingle[] = $start_time;
         }
 
-        return $times;
+        return [
+            'time_ranges' => $times,
+            'single_times' => $timesingle
+        ];
     }
+
+
 
     /**
      * Sends an SMS notification using the provided payload.
@@ -134,13 +166,12 @@ class OrderController extends Controller
                 'booking_time' => 'required|date_format:H:i',
                 'delivery_date' => 'required|date',
                 'delivery_time' => 'required',
-                'period' => 'required|in:AM,PM',
                 'discount' => 'required',
                 'total_qty' => 'required',
             ]);
 
             // Combine delivery time and period, then convert to 24-hour format
-            $combinedDeliveryTime = $validatedData['delivery_time'] . ' ' . $validatedData['period'];
+            $combinedDeliveryTime = $validatedData['delivery_time'];
             $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
 
             // Retrieve or create client
@@ -229,6 +260,7 @@ class OrderController extends Controller
 
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
+            dd($exception->getMessage());
             // Log exception and provide feedback
             Log::error('Order creation failed: ' . $exception->getMessage());
             return back()->withErrors($exception->getMessage())->withInput();
@@ -313,7 +345,7 @@ class OrderController extends Controller
             }
 
             // Combine delivery time and period, then convert to 24-hour format
-            $combinedDeliveryTime = $request->delivery_time . ' ' . $request->period;
+            $combinedDeliveryTime = $request->delivery_time;
             $deliveryTime24Hour = Carbon::createFromFormat('g:i A', $combinedDeliveryTime)->format('H:i:s');
 
             // Update the order details
@@ -346,6 +378,7 @@ class OrderController extends Controller
 
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
+            dd($exception->getMessage());
             // Log and display exception details
             Log::error('Order update failed: ' . $exception->getMessage());
             return redirect()->back()->with('error', $exception->getMessage());
@@ -570,8 +603,7 @@ class OrderController extends Controller
             ->findOrFail($id);
             // Convert the delivery time to 12-hour format
         $deliveryTime = Carbon::parse($order->delivery_time);
-        $time = $deliveryTime->format('g:i');
-        $period = $deliveryTime->format('A');
+        $ditime = $deliveryTime->format('g:i A');
 
         $orderItems = OrderItem::where('order_id', $id)
             ->join('product_categories', 'product_categories.id', '=', 'order_items.product_category_id')
@@ -625,7 +657,7 @@ class OrderController extends Controller
         $discounts = Discount::all();
         $timeSlots = $this->generateTimeSlots();
 
-        return view('admin.orderupdate', compact('discounts', 'order', 'orderItems', 'operationsArray', 'productItems', 'services', 'time', 'period','timeSlots'));
+        return view('admin.orderupdate', compact('discounts', 'order', 'orderItems', 'operationsArray', 'productItems', 'services', 'ditime','timeSlots'));
     }
 
     public function getAllOperationData($pid, $pname, $others = [])

@@ -135,15 +135,11 @@
                                                 <label for="delivery_time" class="form-label">Delivery Time</label>
                                                 <div class="input-group">
                                                     <select id="delivery_time" name="delivery_time" class="form-control">
-                                                        @foreach ($timeSlots as $time)
-                                                            <option value="{{ $time }}" {{ old('delivery_time', $order->delivery_time ?? '') == $time ? 'selected' : '' }}>
-                                                                {{ $time }}
+                                                        @foreach ($timeSlots['time_ranges'] as $time)
+                                                            <option value="{{ $time['start'] }}" {{ old('delivery_time', $order->delivery_time ?? '') == $time['start'] ? 'selected' : '' }}>
+                                                                {{ $time['range'] }}
                                                             </option>
                                                         @endforeach
-                                                    </select>
-                                                    <select id="period" name="period" class="form-control">
-                                                        <option value="AM" {{ old('period', $order->period ?? '') == 'AM' ? 'selected' : '' }}>AM</option>
-                                                        <option value="PM" {{ old('period', $order->period ?? '') == 'PM' ? 'selected' : '' }}>PM</option>
                                                     </select>
                                                 </div>
                                             </div>
