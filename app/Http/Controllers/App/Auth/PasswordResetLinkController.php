@@ -80,9 +80,17 @@ class PasswordResetLinkController extends Controller
 
     public function newPassword()
     {
-        $data['id'] = $_GET['id'];
+        $id = $data['id'] = $_GET['id'];
         // dd($id);
-        return view('auth.new-password', compact('data'));
+        // Retrieve the password reset token from the database
+        $passwordResetToken = PasswordResetTokens::where('token', $id)->first();
+
+        // If token is not found, return with an error
+        if (!$passwordResetToken) {
+            return redirect('login')->withInput()->with('error', 'Link Expired!');
+        }else{
+            return view('auth.new-password', compact('data'));
+        }
     }
 
     public function storeNewPassword(Request $request)
@@ -97,14 +105,14 @@ class PasswordResetLinkController extends Controller
 
            // If token is not found, return with an error
            if (!$passwordResetToken) {
-               return back()->withInput()->with('error', 'Invalid token!');
+               return redirect('login')->withInput()->with('error', 'Link Expired!');
            }
 
            // Check if the token is within the valid time frame (5 minutes)
            $createdAt = Carbon::parse($passwordResetToken->created_at);
            $now = Carbon::now();
            if ($createdAt->diffInMinutes($now) > 5) {
-               return redirect()->back()->with('error', 'The token has expired!');
+               return redirect('login')->with('error', 'The token has expired!');
            }
 
            // Retrieve user details using email from the token
@@ -114,13 +122,14 @@ class PasswordResetLinkController extends Controller
                 $data = User::find($userDetail->id);
                 $data->password = Hash::make($newPss);
                 $data->save();
+                // Delete the token after use
+                PasswordResetTokens::where('email', $passwordResetToken->email)->delete();
                 return redirect('login')->with('success', 'Password has been successfully updated. Now you can login with new password.');
             }else{
                 return redirect('login')->with('error', 'New password and confirm password are not matched');
             }
-            die;
         }else{
-            return redirect('login')->with('error', 'New password and confirm password are required');
+            return redirect()->back()->with('error', 'New password and confirm password are required');
         }
     }
 }
