@@ -1049,12 +1049,18 @@ class OrderController extends Controller
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
+
     public function printTaglist(Request $request, $orderId)
     {
         try {
             // Fetch the order with related order items and user (customer) information
-            $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
-                ->findOrFail($orderId);
+            $order = Order::with([
+                'orderItems.productCategory',
+                'orderItems.productItem',
+                'orderItems.opertions',
+                'user',
+                'discounts'
+            ])->findOrFail($orderId);
 
             // Calculate the subtotal amount
             $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
@@ -1068,7 +1074,8 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = array(10, 0, 134, 280);
+            // Define custom paper size (2x4 inches in points)
+            $customPaper = [0, 0, 144, 288]; // 2x4 inches in points
 
             // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [
@@ -1086,4 +1093,5 @@ class OrderController extends Controller
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
+
 }
