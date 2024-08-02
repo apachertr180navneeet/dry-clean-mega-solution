@@ -14,83 +14,91 @@ use Illuminate\Support\Facades\Auth;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = tenant('id');
 
-        // if (!$tenantId) {
-        //     Auth::logout();
-        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-        // }
-
+        // Check tenant's status
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
                         ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
                         ->first();
 
-        if (!$tenant) {
+        if (!$tenant || $tenant->is_active == 0 || !($tenant->starting_date <= Carbon::now()->format("Y-m-d") && $tenant->end_date >= Carbon::now()->format("Y-m-d"))) {
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
 
-        $date = Carbon::now()->format("Y-m-d");
+        $query = User::where(['is_deleted' => 0, 'role_id' => 2]);
 
-        if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+        if ($request->ajax()) {
+            $search = $request->input('search');
+            if (!empty($search)) {
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('mobile', 'like', '%' . $search . '%');
+                });
+            }
+
+            $clients = $query->orderBy('id', 'desc')->paginate(10);
+            return response()->json([
+                'clients' => $clients->items(),
+                'pagination' => (string) $clients->links()
+            ]);
         }
-        $clients = User::where(['is_deleted' => 0, 'role_id' => 2])->orderBy('id', 'desc')->paginate(10);
+
+        $clients = $query->orderBy('id', 'desc')->paginate(10);
         return view('admin.client', compact('clients'));
     }
 
     public function addClient(Request $request)
-{
-    try {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:4|max:20',
-            'mobile' => [
-                'required',
-                'regex:/^[0-9()+-]+$/',
-                'min:4',
-                'max:15',
-                Rule::unique('users')->where(function ($query) {
-                    return $query->where('is_deleted', 0);
-                }),
-            ],
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator->errors())->withInput();
-        }
-        // Check if a user with the same mobile number and is_deleted = 1 exists
-        $existingUser = User::where('mobile', $request->mobile)->where('is_deleted', 1)->first();
-
-        if ($existingUser) {
-            // Update the existing user with the new data
-            $existingUser->update([
-                'name' => $request->name,
-                'email' => $request->email ?? null,
-                'password' => bcrypt($request->password) ?? $existingUser->password,
-                'is_deleted' => 0,
-                'role_id' => 2,
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|min:4|max:20',
+                'mobile' => [
+                    'required',
+                    'regex:/^[0-9()+-]+$/',
+                    'min:4',
+                    'max:15',
+                    Rule::unique('users')->where(function ($query) {
+                        return $query->where('is_deleted', 0);
+                    }),
+                ],
             ]);
-        } else {
-            // Create a new user
-            User::create([
-                'name' => $request->name,
-                'email' => $request->email ?? null,
-                'mobile' => $request->mobile,
-                'password' => bcrypt($request->password) ?? null,
-                'role_id' => 2,
-            ]);
-        }
 
-        return redirect()->route('clientpage')->with('success', 'Client added successfully');
-    } catch (\Throwable $throwable) {
-        \Log::error($throwable->getMessage());
-        return redirect()->back()->with('error', 'An error occurred while adding the client.');
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator->errors())->withInput();
+            }
+            // Check if a user with the same mobile number and is_deleted = 1 exists
+            $existingUser = User::where('mobile', $request->mobile)->where('is_deleted', 1)->first();
+
+            if ($existingUser) {
+                // Update the existing user with the new data
+                $existingUser->update([
+                    'name' => $request->name,
+                    'email' => $request->email ?? null,
+                    'password' => bcrypt($request->password) ?? $existingUser->password,
+                    'is_deleted' => 0,
+                    'role_id' => 2,
+                ]);
+            } else {
+                // Create a new user
+                User::create([
+                    'name' => $request->name,
+                    'email' => $request->email ?? null,
+                    'mobile' => $request->mobile,
+                    'password' => bcrypt($request->password) ?? null,
+                    'role_id' => 2,
+                ]);
+            }
+
+            return redirect()->route('clientpage')->with('success', 'Client added successfully');
+        } catch (\Throwable $throwable) {
+            \Log::error($throwable->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while adding the client.');
+        }
     }
-}
 
     public function editClient(Request $request, $id)
     {
