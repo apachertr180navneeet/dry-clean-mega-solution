@@ -742,6 +742,8 @@ class OrderController extends Controller
                     ->orderBy('orders.id', 'desc')
                     ->paginate(10);
 
+            dd($orders);
+
 
                 return view('admin.viewOrder', ['orders' => $orders]);
         } catch (Throwable $throwable) {
