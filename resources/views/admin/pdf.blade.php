@@ -11,7 +11,7 @@
     <p class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:16px;margin-top:0;"> 373, Block B, C Road, Jodhpur, Jodhpur,
         Rajasthan, 342003
     </p>
-    <p class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:16px;margin-top:0;">GST: 22AAAAA0000A1Z5</p>
+    <p class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:16px;margin-top:0;">GST: 08BQFPA2674G2ZZ</p>
     <hr style="margin-bottom:10px;margin-top:10px;"/>
     <h6 class="mb-0" style="color: #5d596c;margin-bottom:0; font-size:18px;margin-top:0;">Order Id: {{ $order->order_number }}</h6>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Date & Time: {{ $order->order_date }}
