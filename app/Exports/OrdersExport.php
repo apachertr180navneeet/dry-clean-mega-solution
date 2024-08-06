@@ -81,7 +81,7 @@ class OrdersExport implements FromCollection, WithHeadings
     public function collection(): Collection
 {
     return $this->orders->map(function ($order) {
-        $totalamount1 = $order->paymentDetail->total_amount;
+        $totalamount1 = $order->total_price;
         $totalTaxAmount = $totalamount1 / 1.18;
         $finaltaxAmount = $totalamount1 - $totalTaxAmount;
         return [

@@ -107,7 +107,7 @@ class InvoiceController extends Controller
                 $startDate = $request->input('startDate');
                 $endDate = $request->input('endDate');
                 $endDate = Carbon::parse($endDate)->endOfDay();
-                $ordersQuery->whereBetween('orders.created_at', [$startDate, $endDate]);
+                $ordersQuery->whereBetween('orders.updated_at', [$startDate, $endDate]);
             }
 
             $orders = $ordersQuery->orderBy('orders.created_at', 'desc')->get();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\backends;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Register;
 use App\Models\User;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\Hash;
@@ -46,30 +47,30 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         if($user->is_admin == '0'){
-            $tenantId = tenant('id');
+        $tenantId = tenant('id');
 
-            // if (!$tenantId) {
-            //     Auth::logout();
-            //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-            // }
+        // if (!$tenantId) {
+        //     Auth::logout();
+        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+        // }
 
-            $tenant = Tenant::where('tenants.id', $tenantId)
-                            ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
-                            ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
-                            ->first();
+        $tenant = Tenant::where('tenants.id', $tenantId)
+                        ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
+                        ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
+                        ->first();
 
-            if (!$tenant) {
-                Auth::logout();
-                return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-            }
-
-            $date = Carbon::now()->format("Y-m-d");
-
-            if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
-                Auth::logout();
-                return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-            }
+        if (!$tenant) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
+
+        $date = Carbon::now()->format("Y-m-d");
+
+        if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+        }
+    }
         return view('backend.auth.changePassword');
     }
 

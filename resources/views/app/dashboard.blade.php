@@ -1,5 +1,27 @@
 @extends('backend.layouts.app')
 @section('content')
+<style>
+  .pagination-container{
+      display: flex;
+      justify-content: end;
+      margin-top: 20px;
+  }
+  .pagination-container svg{
+      width: 30px;
+  }
+
+  .pagination-container nav .justify-between{
+      display: none;
+  }
+  .no-records-found {
+      text-align: center;
+      color: red;
+      margin-top: 20px;
+      font-size: 18px;
+      display: none; /* Hidden by default */
+  }
+
+</style>
 <div class="layout-page mt-4">
   <!-- Content wrapper -->
   <div class="content-wrapper">
@@ -98,6 +120,13 @@
                       </tbody>
                     </table>
                 </div>
+                {{-- @if ($orders->count() > 0) --}}
+                        <div class="pagination-container">
+                          <a type="button" class="btn btn-primary text-white" id="backButton" href="{{route('viewOrder')}}">
+                            View All 
+                        </a>
+                        </div>
+                    {{-- @endif --}}
                  
                 </div>
               </div>
@@ -172,6 +201,14 @@
                       </tbody>
                     </table>
                 </div>
+                {{-- @if ($pendingOrders->count() > 0) --}}
+                <div class="pagination-container">
+                  {{-- <button type="button" class="btn btn-primary">text-primary d-flex align-items-center View All</button> --}}
+                  <a type="button" class="btn btn-primary text-white" id="backButton" href="{{route('viewOrder')}}">
+                    View All 
+                </a>
+                </div>
+                    {{-- @endif --}}
                  
                 </div>
               </div>

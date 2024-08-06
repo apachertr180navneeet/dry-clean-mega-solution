@@ -3,97 +3,102 @@
 
 <head>
     <style>
-         body, html {
-            margin: 5px;
+        @page {
+            size: 144pt 187pt; /* Ensure this matches your label size */
+            margin: 0; /* Remove all margins */
+        }
+    
+        body {
+            margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-
+            flex-wrap: wrap;
+            width: 144pt; /* Label width */
+            height: 187pt; /* Label height */
         }
+    
         .table-item-container {
-            padding: 15px 0;
+            width: 144pt; /* Match label width */
+            height: 187pt; /* Match label height */
+            box-sizing: border-box;
             border: 1px solid #dbdade;
-            width: 44mm;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 5px;
-
+            padding: 5pt; /* Ensure this is not causing extra space */
+            margin: 0; /* Ensure there is no additional space between tags */
+            border-radius: 5pt; /* Optional: Adjust or remove if necessary */
         }
-
+    
         .table-item {
-
-           margin: 0;
             text-align: center;
-
         }
-
-        .table-item div {
+    
+        .table-item p {
+            margin: 2pt 0; /* Adjust margins as needed */
+            font-size: 10pt; /* Ensure font size fits well within tag */
             color: black;
-            border-radius: 5px;
-        }
-
-        .print-button {
-            display: block;
-            width: 100%;
-            text-align: center;
-            margin: 20px 0;
-            /* Margin for the print button */
-        }
-
-        .print-button button {
-            color: black;
-            border: none;
-            border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
 
-
     <div class="table-container">
         @php
             $counter = 0;
         @endphp
+
         @foreach ($order->orderItems as $orderItem)
             @for ($i = 0; $i < $orderItem->quantity; $i++)
                 @if ($counter % 3 == 0)
+                    @if ($counter > 0)
+                        </div> <!-- Close the previous row div -->
+                    @endif
                     <div class="table-row">
                 @endif
-                    <div class="table-item-container">
-                        <div class="table-item">
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px; color:#000">Mega Dry Cleaning
-                            </p>
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
-                                {{ $order->order_number }}</p>
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
-                                {{ $order->user->name }}</p>
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
-                                {{ $order->delivery_date }}</p>
-                            <div style="margin-bottom:5px" ><span style="padding:10px 25px; font-weight: 900;font-size: 12px; ">T {{ $orderItem->quantity }}</span></div>
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
-                                {{ $orderItem->opertions->name }}</p>
-                            <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:5px;margin-top: 5px;">
-                                {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}</p>
+
+                <div class="table-item-container">
+                    <div class="table-item">
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">Mega Dry Cleaning</p>
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->order_number }}</p>
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->user->name }}</p>
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->delivery_date }}</p>
+                        <div style="margin-bottom:5px">
+                            <span style="padding:10px 25px; font-weight: 900; font-size: 12px;">T {{ $orderItem->quantity }}</span>
                         </div>
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">
+                            @if($orderItem->opertions)
+                                {{ $orderItem->opertions->name }}
+                            @else
+                                Operation data missing
+                            @endif
+                        </p>
+                        <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">
+                            @if($orderItem->productItem && $orderItem->productCategory)
+                                {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}
+                            @else
+                                Product or Category data missing
+                            @endif
+                        </p>
                     </div>
-                    @php
-                        $counter++;
-                    @endphp
-                    @if ($counter % 3 == 0)
-                        </div>
-                    @endif
+                </div>
+
+                @php
+                    $counter++;
+                @endphp
+
+                @if ($counter % 3 == 0)
+                    </div> <!-- Close the current row div -->
+                @endif
             @endfor
         @endforeach
+
         @if ($counter % 3 != 0)
-            </div>
+            </div> <!-- Close the last row div if not already closed -->
         @endif
+
     </div>
 </body>
 

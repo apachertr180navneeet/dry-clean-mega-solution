@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\{ // Grouped imports for facades
 };
 use Carbon\Carbon; // Date and time manipulation
 use Throwable; // Exception handling
+use Exception;
 use App\Services\SmsService; // Custom SMS service
 
 
@@ -256,7 +257,7 @@ class OrderController extends Controller
                 ]
             ]);
 
-            //$this->sendSmsNotification($payload);
+            $this->sendSmsNotification($payload);
 
             return redirect()->route('viewOrder');
         } catch (\Exception $exception) {
@@ -374,7 +375,7 @@ class OrderController extends Controller
                 ]
             ]);
 
-            //$this->sendSmsNotification($payload);
+            $this->sendSmsNotification($payload);
 
             return redirect()->route('viewOrder')->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
@@ -724,31 +725,26 @@ class OrderController extends Controller
 
     public function viewOrder(Request $request)
     {
-        try {
+       try {
+        // Use the query builder to define the query and paginate directly
+        $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
+            ->where('orders.is_deleted', '!=', 1)
+            ->orderBy('orders.id', 'desc')
+            ->paginate(10);
 
-            $orders = Order::select(
-                        'orders.id',
-                        'orders.order_number',
-                        'orders.total_qty',
-                        'payment_details.status as payment_status',
-                        DB::raw('users.name as name'),
-                        DB::raw('users.mobile as mobile'),
-                        DB::raw('(SELECT MAX(order_items.status) FROM order_items WHERE order_items.order_id = orders.id) as item_status')
-                    )
-                    ->where('orders.is_deleted', '!=', 1)
-                    ->leftJoin('users', 'orders.user_id', '=', 'users.id')
-                    ->join('payment_details', 'payment_details.order_id', '=', 'orders.id')
-                    ->distinct()
-                    ->orderBy('orders.id', 'desc')
-                    ->paginate(10);
+        // Map additional data to the orders
+        $orders->each(function ($order) {
+            $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
+            $order->name = $order->user ? $order->user->name : null;
+            $order->mobile = $order->user ? $order->user->mobile : null;
+            $order->item_status = $order->orderItems->max('status');
+        });
+        // dd($orders);
 
-            dd($orders);
-
-
-                return view('admin.viewOrder', ['orders' => $orders]);
-        } catch (Throwable $throwable) {
-            dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
-        }
+        return view('admin.viewOrder', ['orders' => $orders]);
+    } catch (Throwable $throwable) {
+        dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
+    }
     }
 
 
@@ -1025,8 +1021,7 @@ class OrderController extends Controller
         try {
             // Fetch the order with related order items and user (customer) information
             $order = Order::with(['orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'user', 'discounts'])
-                ->findOrFail($orderId);
-
+                ->find($orderId);
             // Calculate the subtotal amount
             $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
                 return $orderItem->quantity * $orderItem->operation_price;
@@ -1055,45 +1050,42 @@ class OrderController extends Controller
     public function printTaglist(Request $request, $orderId)
     {
         try {
-            // Fetch the order with related order items and user (customer) information
             $order = Order::with([
                 'orderItems.productCategory',
                 'orderItems.productItem',
                 'orderItems.opertions',
                 'user',
                 'discounts'
-            ])->findOrFail($orderId);
+            ])->find($orderId);
 
-            // Calculate the subtotal amount
+            
+
+            // Additional data validation if necessary
             $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
                 return $orderItem->quantity * $orderItem->operation_price;
             });
 
-            // Calculate the discount amount
-            $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
+            $discountPercentage = $order->discounts->amount ?? 0;
             $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
-
-            // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            // Define custom paper size (2x4 inches in points)
-            $customPaper = [0, 0, 144, 288]; // 2x4 inches in points
+            $customPaper = [0, 0, 144, 187]; // Ensure this matches your label size
 
-            // Pass data to the view
             $pdf = PDF::loadView('admin.downloadTagslist', [
                 'order' => $order,
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
+                'discountPercentage' => $discountPercentage
             ])->setPaper($customPaper, 'portrait');
 
-            // Return the generated PDF for download
             return $pdf->stream("taglist-{$order->id}.pdf");
-        } catch (Throwable $throwable) {
-            // Handle the exception and redirect with an error message
+        } catch (\Throwable $throwable) {
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
+
+
+
 
 }

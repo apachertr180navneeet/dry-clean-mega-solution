@@ -180,34 +180,81 @@
             $('#Service').on('shown.bs.modal', function () {
                 $('#service_name').focus();
             });
-            $('#serviceSearch').keyup(function() {
+            $('#serviceSearch').on('keyup', function() {
                 var searchText = $(this).val().toLowerCase();
-                var noRecord = true;  
-                $('tbody tr').each(function() {
-                    var serviceName = $(this).find('td:nth-child(2)').text()
-                        .toLowerCase();
-                    if (serviceName.indexOf(searchText) === -1) {
-                        $(this).hide();
-                    } else {
-                        $(this).show();
-                        noRecord = false;
+                $.ajax({
+                    url: '{{ route('service') }}', // Adjust the route as necessary
+                    type: 'GET',
+                    data: {
+                        search: searchText
+                    },
+                    success: function(response) {
+                        var services = response.services;
+                        var pagination = response.pagination;
+                        var tbody = $('tbody');
+                        tbody.empty();
+                        var serialNumber = 1;
+
+                        if (services.length === 0) {
+                            $('.no-records-found').show();
+                            $('.pagination-container').hide();
+                        } else {
+                            $('.no-records-found').hide();
+                            $('.pagination-container').show().html(pagination);
+                        }
+
+                        $.each(services, function(index, service) {
+                            var row = `
+                                <tr>
+                                    <td>${serialNumber++}</td>
+                                    <td>${service.name}</td>
+                                    <td>
+                                        <div class="Client_table_action_area">
+                                            <button class="btn Client_table_action_icon px-2 edit_service_btn"
+                                                data-id="${service.id}" data-name="${service.name}"
+                                                data-bs-toggle="modal" data-bs-target="#edit_service"><i
+                                                    class="tf-icons ti ti-pencil"></i></button>
+                                            <button class="btn Client_table_action_icon px-2 delete_service_btn"
+                                                data-id="${service.id}" data-bs-toggle="modal"
+                                                data-bs-target="#delete_service"><i
+                                                    class="tf-icons ti ti-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+
+                        // Reattach event handlers for edit and delete buttons
+                        attachEventHandlers();
                     }
                 });
-                if (noRecord) {
-                    $('.no-records-found').show();
-                    $('.pagination-container').hide(); // Hide pagination
-                } else {
-                    $('.no-records-found').hide();
-                    $('.pagination-container').show(); // Show pagination
-                }
             });
 
-            $('.edit_service_btn').click(function() {
-                var id = $(this).data('id');
-                var name = $(this).data('name');
-                $('.service_id').val(id);
-                $('.service_name').val(name);
-            });
+            function attachEventHandlers() {
+                $('.edit_service_btn').click(function() {
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+                    $('.service_id').val(id);
+                    $('.service_name').val(name);
+                });
+
+                $('.delete_service_btn').click(function() {
+                    var serviceId = $(this).data('id');
+                    $('#service_del_id').val(serviceId);
+                    $('#delete_service').modal('show');
+                });
+            }
+            attachEventHandlers();
+
+            //,,m,,,,m,,m,,
+
+            // $('.edit_service_btn').click(function() {
+            //     var id = $(this).data('id');
+            //     var name = $(this).data('name');
+            //     $('.service_id').val(id);
+            //     $('.service_name').val(name);
+            // });
 
             $('#editserviceform').submit(function(e) {
                 e.preventDefault();
@@ -231,13 +278,13 @@
                 });
             });
 
-            // for delete service
-            $('.delete_service_btn').click(function() {
-                var serviceId = $(this).data('id');
-                $('#service_del_id').val(
-                    serviceId);  
-                $('#delete_service').modal('show');  
-            });
+            // // for delete service
+            // $('.delete_service_btn').click(function() {
+            //     var serviceId = $(this).data('id');
+            //     $('#service_del_id').val(
+            //         serviceId);  
+            //     $('#delete_service').modal('show');  
+            // });
 
             $('#confirm_delete').click(function() {
                 var formData = $('#deleteServiceForm').serialize();  

@@ -13,7 +13,7 @@ use Carbon\Carbon;
 class ServiceController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = tenant('id');
 
@@ -38,7 +38,23 @@ class ServiceController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-        $services = Service::paginate(10); 
+        $query = Service::query();
+
+        if ($request->ajax()) {
+            $search = $request->input('search');
+            if (!empty($search)) {
+                $query->where('name', 'like', '%' . $search . '%');
+            }
+    
+            $services = $query->orderBy('id', 'desc')->paginate(10);
+    
+            return response()->json([
+                'services' => $services->items(),
+                'pagination' => (string) $services->links()
+            ]);
+        }
+    
+        $services = $query->orderBy('id', 'desc')->paginate(10);
         return view('admin.service', ['services' => $services]);
     }
 

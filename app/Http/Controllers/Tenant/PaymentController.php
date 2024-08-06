@@ -43,18 +43,40 @@ class PaymentController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-        $query = PaymentDetail::select('payment_details.*', 'users.mobile')
-            ->join('orders', 'orders.id', '=', 'payment_details.order_id')
-            ->join('users', 'users.id', '=', 'orders.user_id');
+        $query = PaymentDetail::with('order:id,order_number')
+        ->whereHas('order', function ($q) {
+            $q->where('is_deleted', 0)->where('status', 'delivered');
+        });
+        
 
-        if ($request->has('search') && !empty($request->input('search'))) {
-            $search = $request->input('search');
-            $query->where('users.mobile', 'like', '%' . $search . '%');
-        }
+            if ($request->ajax()) {
+                $search = $request->input('search');
+                if (!empty($search)) {
+                    $query->whereHas('order', function ($q) use ($search) {
+                        $q->where('order_number', 'like', '%' . $search . '%');
+                    });
+                }
+    
+                $payments = $query->orderBy('payment_details.updated_at', 'desc')->paginate(10);
+                $formattedPayments = $payments->map(function($payment) {
+                    $timestamp = strtotime($payment->updated_at);
+                    $payment->updated_at = date('j F, Y', $timestamp);
+                    return $payment;
+                });
+            
+                return response()->json([
+                    'payments' => $formattedPayments->all(),
+                    'pagination' => (string) $payments->links()
+                ]);
+            }
+ 
+        $payments = $query->orderBy('payment_details.updated_at', 'desc')->paginate(10);
+        $payments->each(function ($payment) {
+            $payment->order_number = $payment->order->order_number;
+        });
 
-        $payments = $query->orderBy('payment_details.created_at', 'desc')->paginate(10);
 
-        return view('admin.payment', ['payments' => $payments, 'search' => $request->input('search')]);
+        return view('admin.payment', ['payments' => $payments]);
     }
     private function generateInvoiceNumber()
     {

@@ -73,7 +73,7 @@
                                                     <a href="{{ url('/admin/show-order/' . $order->id) }}" class="btn Client_table_action_icon px-2">
                                                         <i class="tf-icons ti ti-eye"></i>
                                                     </a>
-                                                    @if ($order->payment_status !== 'Paid' || $order->item_status !== 'delivered')
+                                                    @if ($order['paymentDetail']->status != 'Paid' || $order->item_status !== 'delivered')
                                                         <button class="btn Client_table_action_icon px-2"
                                                             onclick="window.location='{{ route('order.edit', $order->id) }}'">
                                                             <i class="tf-icons ti ti-pencil"></i>
@@ -84,14 +84,11 @@
                                                                 <i class="tf-icons ti ti-layout-grid"></i>
                                                             </button>
                                                             <ul class="dropdown-menu">
-                                                                @if ($order->payment_status !== 'Paid')
-                                                                    <li>
-                                                                        <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="{{ $order->id }}">
-                                                                            Settle Order
-                                                                        </a>
-                                                                    </li>
-                                                                @endif
-                                                                {{-- <li> <button type="button" class="btn mark-as-delivered-btn">Deliver</button></li> --}}
+                                                                <li>
+                                                                    <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="{{ $order->id }}">
+                                                                        Settle Order
+                                                                    </a>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     @endif
