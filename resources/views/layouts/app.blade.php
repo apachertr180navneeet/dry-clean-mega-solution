@@ -14,6 +14,7 @@
     <link rel="icon" type="image/x-icon" href="{{url('theam/Images/logo.png')}}" />
 
     @include('backend.layouts.include.style')
+    @include('backend.layouts.include.style')
     @yield('extrastyle')
 
     <!-- Page CSS -->

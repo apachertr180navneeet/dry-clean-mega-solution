@@ -111,6 +111,8 @@
                                         </td>
                                         <td colspan="2"></td>
                                     </tr>
+                                </tbody>
+                                <tbody id="invoiceRow">
                                     @foreach ($orders as $order)
                                     {{-- @dd($orders); --}}
                                     {{-- @if ($order->status === 'delivered') --}}
@@ -318,36 +320,85 @@
 
 
 
-                $('#invoiceSearch').keyup(function() {
-                    var searchText = $(this).val().toLowerCase();
-                    var noRecord = true;
-                    $('tbody tr').each(function() {
-                        var InvNumber = $(this).find('td:nth-child(2)').text()
-                            .toLowerCase();
-                        var OrderNo = $(this).find('td:nth-child(3)').text()
-                            .toLowerCase();
-                        var TaxNo = $(this).find('td:nth-child(4)').text()
-                            .toLowerCase();
-                        var TotalAmount = $(this).find('td:nth-child(5)').text()
-                            .toLowerCase();
-                        if (InvNumber.indexOf(searchText) === -1 &&
-                            OrderNo.indexOf(searchText) === -1 &&
-                            TaxNo.indexOf(searchText) === -1 &&
-                            TotalAmount.indexOf(searchText) === -1) {
-                            $(this).hide();
-                        } else {
-                            $(this).show();
-                            noRecord = false;
-                        }
+                // $('#invoiceSearch').keyup(function() {
+                //     var searchText = $(this).val().toLowerCase();
+                //     var noRecord = true;
+                //     $('tbody tr').each(function() {
+                //         var InvNumber = $(this).find('td:nth-child(2)').text()
+                //             .toLowerCase();
+                //         var OrderNo = $(this).find('td:nth-child(3)').text()
+                //             .toLowerCase();
+                //         var TaxNo = $(this).find('td:nth-child(4)').text()
+                //             .toLowerCase();
+                //         var TotalAmount = $(this).find('td:nth-child(5)').text()
+                //             .toLowerCase();
+                //         if (InvNumber.indexOf(searchText) === -1 &&
+                //             OrderNo.indexOf(searchText) === -1 &&
+                //             TaxNo.indexOf(searchText) === -1 &&
+                //             TotalAmount.indexOf(searchText) === -1) {
+                //             $(this).hide();
+                //         } else {
+                //             $(this).show();
+                //             noRecord = false;
+                //         }
+                //     });
+                //     if (noRecord) {
+                //         $('.no-records-found').show();
+                //         $('.pagination-container').hide(); // Hide pagination
+                //     } else {
+                //         $('.no-records-found').hide();
+                //         $('.pagination-container').show(); // Show pagination
+                //     }
+                // });
+
+                $('#invoiceSearch').on('keyup', function() {
+            var searchText = $(this).val().toLowerCase();
+            $.ajax({
+                url: '{{ route('invoice') }}',
+                type: 'GET',
+                data: {
+                    search: searchText
+                },
+                success: function(response) {
+                    var orders = response.orders;
+                    var pagination = response.pagination;
+                    var totalTaxableAmount = response.totalTaxableAmount;
+                    var totalAmount = response.totalAmount;
+                    // var tbody = document.getElementById('invoiceRow'); 
+                    var tbody = $('#invoiceRow');
+                    tbody.empty();
+
+                    if (orders.length === 0) {
+                    $('.no-records-found').show();
+                    $('.pagination-container').hide();
+                } else {
+                    $('.no-records-found').hide();
+                    $('.pagination-container').show().html(pagination);
+                }
+
+                $.each(orders, function(index, order) {
+                    var row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${order.invoice_number}</td>
+                            <td>${order.order_number}</td>
+                            <td>${(order.total_price/1.18).toFixed(2)}</td>
+                            <td>${order.total_price.toFixed(2)}</td>
+                            <td>
+                                <button type="button" class="btn btn-success shadow-none p-0 py-1 px-2">${order.status}</button>
+                            </td>
+                            <td>
+                                <a type="button" class="text-primary inv_btn" id="printReceipt" href="/admin/invoice/${order.id}">
+                                    <i class="fa-regular fa-file-lines"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
                     });
-                    if (noRecord) {
-                        $('.no-records-found').show();
-                        $('.pagination-container').hide(); // Hide pagination
-                    } else {
-                        $('.no-records-found').hide();
-                        $('.pagination-container').show(); // Show pagination
-                    }
-                });
+                }
+            });
+        });
             });
         });
     </script>

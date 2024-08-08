@@ -15,9 +15,9 @@
     <h6  style="color: #5d596c; font-weight: 600; font-size:16px;margin-bottom:0;margin-top:0;">Invoice Number: {{ $order->invoice_number }}</h6>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Date & Time:
         @php
-        $time = $order->updated_at->setTimezone('Asia/Kolkata');
-    @endphp
-    {{ $time }} 
+            $time = $order->updated_at->setTimezone('Asia/Kolkata');
+        @endphp
+        {{ $time }} 
     </p>
     <hr style="margin-bottom:10px;margin-top:10px;" />
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Bill To:</p>

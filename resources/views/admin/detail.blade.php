@@ -160,7 +160,7 @@
                                                         </div>
                                                     @else
                                                         <div class="badge rounded bg-label-success py-1">
-                                                            Completed
+                                                            Delivered
                                                         </div>
                                                     @endif
                                                 </td>

@@ -225,6 +225,8 @@ class OrderController extends Controller
                             'quantity' => $serviceData['quantity'],
                             'operation_price' => $serviceData['price'],
                             'price' => $serviceData['quantity'] * $serviceData['price'],
+                            'type' => $serviceData['nltype'],
+                            'comment' => $serviceData['comment'],
                             'status' => 'pending'
                         ]);
                     }
@@ -299,6 +301,8 @@ class OrderController extends Controller
                         $serviceId = $service['service'];
                         $qty = $service['quantity'];
                         $unitPrice = $service['price'];
+                        $nltype = $service['nltype'];
+                        $comment = $service['comment'];
 
                         $key = $categoryId . '-' . $typeId . '-' . $serviceId;
                         $existingItem = $existingOrderItems[$key] ?? null;
@@ -309,6 +313,8 @@ class OrderController extends Controller
                                 'quantity' => $qty,
                                 'operation_price' => $unitPrice,
                                 'price' => $qty * $unitPrice,
+                                'type' => $nltype,
+                                'comment' => $comment
                             ]);
                             $updatedItemIds[] = $existingItem->id;
                         } else {
@@ -320,7 +326,9 @@ class OrderController extends Controller
                                 'quantity' => $qty,
                                 'operation_price' => $unitPrice,
                                 'price' => $qty * $unitPrice,
-                                'status' => 'pending'
+                                'status' => 'pending',
+                                'type' => $nltype,
+                                'comment' => $comment
                             ]);
                             $updatedItemIds[] = $newItem->id;
                         }
@@ -1027,6 +1035,10 @@ class OrderController extends Controller
                 return $orderItem->quantity * $orderItem->operation_price;
             });
 
+            $subTotalqty = $order->orderItems->sum(function ($orderItem) {
+                return $orderItem->quantity;
+            });
+
             // Calculate the discount amount
             $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
             $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
@@ -1039,7 +1051,8 @@ class OrderController extends Controller
                 'order' => $order,
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
-                'totalAmount' => $totalAmount
+                'totalAmount' => $totalAmount,
+                'subTotalqty' => $subTotalqty
             ]);
         } catch (Throwable $throwable) {
             // Handle the exception and redirect with an error message
@@ -1058,32 +1071,36 @@ class OrderController extends Controller
                 'discounts'
             ])->find($orderId);
 
-            
-
-            // Additional data validation if necessary
             $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
                 return $orderItem->quantity * $orderItem->operation_price;
+            });
+
+            $subTotalqty = $order->orderItems->sum(function ($orderItem) {
+                return $orderItem->quantity;
             });
 
             $discountPercentage = $order->discounts->amount ?? 0;
             $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
             $totalAmount = $subTotalAmount - $discountAmount;
 
-            $customPaper = [0, 0, 144, 187]; // Ensure this matches your label size
+            // Define the custom paper size (144pt x 187pt)
+            $customPaper = [0, 0, 144, 187];
 
             $pdf = PDF::loadView('admin.downloadTagslist', [
                 'order' => $order,
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage' => $discountPercentage
-            ])->setPaper($customPaper, 'portrait');
+                'discountPercentage' => $discountPercentage,
+                'subTotalqty' => $subTotalqty
+            ])->setPaper($customPaper, 'portrait')->setOptions(['debug' => true]);
 
             return $pdf->stream("taglist-{$order->id}.pdf");
         } catch (\Throwable $throwable) {
             return redirect()->back()->with('error', $throwable->getMessage());
         }
     }
+
 
 
 

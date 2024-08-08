@@ -255,7 +255,9 @@
                                                                         <th>Select Type</th>
                                                                         <th>Select Service</th>
                                                                         <th>Quantity</th>
-                                                                        <th>Price</th>
+                                                                        <th>Price</th> 
+                                                                        <th style="display: none" id="commentheader">Comment</th>
+                                                                        {{-- <th>Comment</th> --}}
                                                                         <th>Action</th>
                                                                     </tr>
                                                                 </thead>
@@ -344,6 +346,14 @@
                                                                             <span class="price-error text-danger"
                                                                                 style="display:none;">Price is required
                                                                                 and must be a number.</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="hidden" name="nltype[]"
+                                                                                class="form-control nltype"
+                                                                                placeholder="Normal/Laundry" readonly> 
+                                                                                <input type="hidden" name="comment[]"
+                                                                                class="form-control comment" id="comment"
+                                                                                placeholder="Enter comment here"> 
                                                                         </td>
                                                                         <td>
                                                                             <div class="d-flex">
@@ -515,6 +525,22 @@
                 // Function to apply event listeners to each row
                 function applyEventListeners(row) {
                     row.find('.cat-select').on('change', function() {
+
+                        let catselect = $(this).val();
+                        console.log("catselect>>>>>>>>",catselect);
+                        let nltype = row.find('.nltype'); 
+                        let commentField = row.find('.comment'); 
+                        let commentHeader = $('#commentheader');
+                        if (catselect == 16 || catselect == 17) {
+                            nltype.val("Laundry");
+                            commentField.attr("type", "text");
+                            commentHeader.css("display", "");
+                            // commentField.attr("type", "hidden");
+                        }else{
+                            nltype.val("Normal");
+                            commentHeader.css("display", "none");
+                            commentField.attr("type", "hidden");
+                        }
                         filterOptions(row);
                         captureTableData();
                     });
@@ -602,6 +628,10 @@
                     row.find('input[name="quantity[]"]').on('input', function() {
                         captureTableData();
                     });
+                     
+                    row.find('input[name="comment[]"]').on('input', function() {
+                        captureTableData();
+                    });
                 }
 
                 // Initialize event listeners and data capture for existing rows
@@ -650,7 +680,15 @@
                                  <span class="error-message text-danger"></span>
                             </td>
                             <td style="min-width: 100px !important;"><input type="text" name="price[]" class="form-control price" placeholder="Price" readonly> <span class="error-message text-danger"></span></td>
-                            <td>
+                             <td>
+                                                                            <input type="hidden" name="nltype[]"
+                                                                                class="form-control nltype"
+                                                                                placeholder="Normal/Laundry" readonly> 
+                                                                                <input  name="comment[]"
+                                                                                class="form-control comment"
+                                                                                placeholder="Enter comment here"> 
+                                                                        </td>
+                                                                        <td>
                                 <div class="d-flex">
                                     <button type="button" class="btn p-0 me-2 addnewrow"><i class="fa-solid fa-circle-plus fs-3"></i></button>
                                     <button type="button" class="btn p-0 me-2 remove"><i class="fa-solid fa-circle-minus text-danger fs-3"></i></button>
@@ -737,6 +775,8 @@
                     let service = row.querySelector('select[name="service[]"]').value;
                     let quantity = row.querySelector('input[name="quantity[]"]').value;
                     let price = row.querySelector('input[name="price[]"]').value;
+                    let nltype = row.querySelector('input[name="nltype[]"]').value;
+                    let comment = row.querySelector('input[name="comment[]"]').value;
 
                     quantity = parseInt(quantity) || 0;
                     price = parseFloat(price) || 0;
@@ -778,7 +818,9 @@
                         orderItems[categoryIndex].types[typeIndex].services.push({
                             service: service,
                             quantity: quantity,
-                            price: price
+                            price: price,
+                            nltype: nltype,
+                            comment: comment
                         });
                     }
                 });
