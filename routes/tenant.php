@@ -36,13 +36,15 @@ use App\Http\Controllers\Tenant\{
 | Feel free to customize them however you want. Good luck!
 |
 */
-
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-])->group(function () {
-
+    ])->group(function () {
+        
+        Route::get('admin/Categorylists', function () {
+            return view('admin.CategoriesLists');
+        });
     // Welcome page
     Route::get('/', function () {
         return view('app.welcome');
