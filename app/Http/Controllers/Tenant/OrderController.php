@@ -441,8 +441,12 @@ class OrderController extends Controller
         $services = Service::all();
         $timeSlots = $this->generateTimeSlots();
 
+        $currentdatetime = Carbon::now();
+
+        $currentdate = $currentdatetime->format('Y-m-d');
+        $currenttime = $currentdatetime->format('H:i:s');
         // Return the view with the gathered data
-        return view('admin.EditOrder', compact('groupedProductItems', 'discounts', 'services', 'productItems', 'timeSlots'));
+        return view('admin.EditOrder', compact('groupedProductItems', 'discounts', 'services', 'productItems', 'timeSlots','currentdate','currenttime'));
     }
 
     public function getOperationData($pid, $pname, $others = [])
@@ -734,25 +738,25 @@ class OrderController extends Controller
     public function viewOrder(Request $request)
     {
        try {
-        // Use the query builder to define the query and paginate directly
-        $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
-            ->where('orders.is_deleted', '!=', 1)
-            ->orderBy('orders.id', 'desc')
-            ->paginate(10);
+            // Use the query builder to define the query and paginate directly
+            $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
+                ->where('orders.is_deleted', '!=', 1)
+                ->orderBy('orders.id', 'desc')
+                ->paginate(10);
 
-        // Map additional data to the orders
-        $orders->each(function ($order) {
-            $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
-            $order->name = $order->user ? $order->user->name : null;
-            $order->mobile = $order->user ? $order->user->mobile : null;
-            $order->item_status = $order->orderItems->max('status');
-        });
-        // dd($orders);
+            // Map additional data to the orders
+            $orders->each(function ($order) {
+                $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
+                $order->name = $order->user ? $order->user->name : null;
+                $order->mobile = $order->user ? $order->user->mobile : null;
+                $order->item_status = $order->orderItems->max('status');
+            });
+            // dd($orders);
 
-        return view('admin.viewOrder', ['orders' => $orders]);
-    } catch (Throwable $throwable) {
-        dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
-    }
+            return view('admin.viewOrder', ['orders' => $orders]);
+        } catch (Throwable $throwable) {
+            dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
+        }
     }
 
 

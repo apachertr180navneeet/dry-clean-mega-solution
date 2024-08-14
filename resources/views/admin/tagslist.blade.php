@@ -53,14 +53,14 @@
                         <div class="table-row">
                             @endif
                             <div class="table-item-container">
-                                <div class="table-item">
+                                <div class="table-item text-center">
                                     <p style="font-weight: bold; font-size: 14px; color: #6c757d;">Mega Dry Cleaning</p>
-                                    <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $order->user->name }}</p>
-                                    <p style="font-weight: bold; font-size: 10px; color: #6c757d;">
+                                    <p style="font-weight: bold; font-size: 14px; color: #6c757d;text-transform: capitalize;">{{ $order->user->name }}</p>
+                                    <p style="font-weight: bolder; font-size: 18px; color: #6c757d;">
                                         {{ $order->order_number }}</p>
                                     <p style="font-weight: bold; font-size: 14px; color: #6c757d;">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</p>
                                     <div><span>T {{ $orderItem->quantity }}</span></div>
-                                    <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->opertions->name }}</p>
+                                    <p style="font-weight: bold; font-size: 14px; color: #6c757d; border: 1px solid #000; width:35px; height: 30px;display: flex; align-items: center; justify-content: center; border-radius: 5px;margin: 5px auto;">{{ $orderItem->opertions->name }}</p>
                                     <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->productItem->name }}</p>
                                     <p style="font-weight: bold; font-size: 14px; color: #6c757d;">{{ $orderItem->productCategory->name }}</p>
                                 </div>

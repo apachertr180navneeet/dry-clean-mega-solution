@@ -20,20 +20,22 @@
             box-sizing: border-box;
             border: 1px solid #dbdade;
             display: block;
-            padding: 5pt; /* Ensure this is not causing extra space */
+            padding: 10pt 5pt 5pt 0pt; /* Ensure this is not causing extra space */
             margin: 0; /* Ensure there is no additional space between tags */
             border-radius: 5pt; /* Optional: Adjust or remove if necessary */
             page-break-inside: avoid;
+            text-align: center;
         }
 
         .table-item {
             text-align: center;
         }
-
+        
         .table-item p {
-            margin: 2pt 0; /* Adjust margins as needed */
+            margin: 2pt auto; /* Adjust margins as needed */
             font-size: 10pt; /* Ensure font size fits well within tag */
-            color: black;
+            color: black;            
+            width: 100%;
         }
     </style>
 </head>
@@ -41,23 +43,23 @@
 <body>
     @foreach ($order->orderItems as $orderItem)
         @for ($i = 0; $i < $orderItem->quantity; $i++)
-            <div class="table-item-container">
-                <div class="table-item">
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">Mega Dry Cleaning</p>
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->order_number }}</p>
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->user->name }}</p>
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->delivery_date }}</p>
+            <div class="table-item-container"  style=" border: 2px dashed #000; border-radius: 5px; margin: 2px;width:47mm; height: 59mm;">
+                <div class="table-item text-center" 5px">
+                    <p style="font-weight: bold; font-size: 14px; color: black; margin-bottom:10px; margin-top: 10px;">Mega Dry Cleaning</p>
+                    <p style="font-weight: bolder; font-size: 18px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->order_number }}</p>
+                    <p style="font-weight: bold; font-size: 14px; color: black; margin-bottom:10px; margin-top: 10px;text-transform: capitalize;">{{ $order->user->name }}</p>
+                    <p style="font-weight: bold; font-size: 14px; color: black; margin-bottom:10px; margin-top: 10px;">{{ $order->delivery_date }}</p>
                     <div style="margin-bottom:5px">
-                        <span style="padding:10px 25px; font-weight: 900; font-size: 12px;">T {{ $subTotalqty }}</span>
+                        <span style="padding:10px 25px; font-weight: 900; font-size: 14px;">T {{ $subTotalqty }}</span>
                     </div>
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">
+                    <p style="font-weight: bold; font-size: 14px; color: black; border: 1px solid #000;width:32px; padding: 5px 0 ;border-radius: 5px;margin: 7px auto;">
                         @if($orderItem->opertions)
                             {{ $orderItem->opertions->name }}
                         @else
                             Operation data missing
                         @endif
                     </p>
-                    <p style="font-weight: bold; font-size: 12px; color: black; margin-bottom:10px; margin-top: 10px;">
+                    <p style="font-weight: bold; font-size: 14px; color: black; margin-bottom:10px; margin-top: 10px;">
                         @if($orderItem->productItem && $orderItem->productCategory)
                             {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}
                         @else
