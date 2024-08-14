@@ -418,6 +418,7 @@ class OrderController extends Controller
 
         // Retrieve all product items with their categories and services
         $productItems = ProductItem::with(['categories', 'categories.service'])->get();
+
         $groupedProductItems = [];
 
         // Group product items with unique categories and related details
@@ -737,21 +738,48 @@ class OrderController extends Controller
 
     public function viewOrder(Request $request)
     {
-       try {
-            // Use the query builder to define the query and paginate directly
-            $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
-                ->where('orders.is_deleted', '!=', 1)
-                ->orderBy('orders.id', 'desc')
-                ->paginate(10);
+        try {
+            $query = Order::with(['user', 'paymentDetail', 'orderItems'])
+                ->where('orders.is_deleted', '!=', 1);
 
-            // Map additional data to the orders
+            // Apply search filters if provided
+            if ($request->ajax()) {
+                $search = $request->input('search');
+                if (!empty($search)) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('order_number', 'like', '%' . $search . '%')
+                            ->orWhereHas('user', function ($query) use ($search) {
+                                $query->where('name', 'like', '%' . $search . '%')
+                                    ->orWhere('mobile', 'like', '%' . $search . '%');
+                            });
+                    });
+                }
+
+
+                $orders = $query->orderBy('orders.id', 'desc')->paginate(10);
+
+                // Map additional data to the orders
+                $orders->each(function ($order) {
+                    $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
+                    $order->name = $order->user ? $order->user->name : null;
+                    $order->mobile = $order->user ? $order->user->mobile : null;
+                    $order->item_status = $order->orderItems->max('status');
+                });
+
+
+                return response()->json([
+                    'orders' => $orders->items(),
+                    'pagination' => (string) $orders->links()
+                ]);
+            }
+
+            $orders = $query->orderBy('orders.id', 'desc')->paginate(10);
             $orders->each(function ($order) {
                 $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
                 $order->name = $order->user ? $order->user->name : null;
                 $order->mobile = $order->user ? $order->user->mobile : null;
                 $order->item_status = $order->orderItems->max('status');
             });
-            // dd($orders);
 
             return view('admin.viewOrder', ['orders' => $orders]);
         } catch (Throwable $throwable) {

@@ -51,6 +51,19 @@
                                                 <input type="hidden" id="booking_time" value="{{ $currenttime }}" name="booking_time">
                                             </div>
                                         </div>
+
+                                        <!-- Discount Offer -->
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                                            <div class="form-group">
+                                                <label for="discount" class="form-label">Discount Offer</label>
+                                                <select name="discount" id="discount" class="form-select">
+                                                    <option value="0" selected>Select Discount Offer</option>
+                                                    @foreach ($discounts as $discount)
+                                                        <option value="{{ $discount->amount }}">{{ $discount->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                         <hr />
                                         <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
                                                 <p>No product</p>
@@ -119,21 +132,15 @@
                                         <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
                                             <div class="form-group">
                                                 <label for="delivery_time" class="form-label">Delivery Time</label>
-                                                <input type="time" id="delivery_time"
-                                                    value="{{ old('delivery_time', $order->delivery_time ?? '') }}"
-                                                    name="delivery_time" class="form-control">
-                                            </div>
-                                        </div>
-                                        <!-- Discount Offer -->
-                                        <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
-                                            <div class="form-group">
-                                                <label for="discount" class="form-label">Discount Offer</label>
-                                                <select name="discount" id="discount" class="form-select">
-                                                    <option value="0" selected>Select Discount Offer</option>
-                                                    @foreach ($discounts as $discount)
-                                                        <option value="{{ $discount->amount }}">{{ $discount->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="input-group">
+                                                    <select id="delivery_time" name="delivery_time" class="form-control">
+                                                        @foreach ($timeSlots['time_ranges'] as $time)
+                                                            <option value="{{ $time['start'] }}" {{ old('delivery_time', $order->delivery_time ?? '') == $time['start'] ? 'selected' : '' }}>
+                                                                {{ $time['range'] }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -165,26 +172,6 @@
                                         <!-- end -->
 
                                         <!-- Print Order Model -->
-                                        {{-- <div class="modal fade" id="yes" tabindex="-1" aria-labelledby="yesLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body text-center">
-                                                            <h5>Please Select from the Following Options</h5>
-                                                            <a type="button" class="btn btn-success" id="sendWhatsAppMessage" href="{{ url('/send-wh-message') }}">
-                                                                <i class="fab fa-whatsapp me-2"></i> Send On WhatsApp
-                                                            </a>
-                                                            <a type="button" class="btn btn-primary" href="{{ url('/admin/receipt/'. Session::get('orderId') ) }}">
-                                                                <i class="fa-solid fa-file-invoice me-2"></i> Print Receipt
-                                                            </a>
-
-                                                            <button type="button" class="btn btn-success"><i class="fa-solid fa-tag me-2"></i> Print Tag</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> --}}
                                         <!-- end -->
                                     </div>
                                 </div>
@@ -205,7 +192,6 @@
                                         </div>
                                         @foreach ($groupedProductItems as $groupedProductItem)
                                             @php
-                                                // dd($groupedProductItems);
                                                 $productItem = $groupedProductItem['product_item'];
                                                 $uniqueCategories = $groupedProductItem['unique_categories'];
                                             @endphp
@@ -346,4 +332,28 @@
                 </div>
             </div>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                $('#number').on("keyup", function() {
+                    const clientNum = $(this).val();
+                    if (clientNum.length === 10) {
+                        $.ajax({
+                            url: "/admin/fetch-client-name",
+                            method: "GET",
+                            data: { client_num: clientNum },
+                            success: response => {
+                                if (response.success) {
+                                    $("#client_name").val(response.client_name);
+                                } else {
+                                    console.error(response.message);
+                                }
+                            },
+                            error: (xhr, status, error) => console.error("Error fetching client name:", error)
+                        });
+                    } else if (clientNum.length < 10) {
+                        $("#client_name").val(''); // Clear the client name input
+                    }
+                });
+            });
+        </script>
     @endsection
