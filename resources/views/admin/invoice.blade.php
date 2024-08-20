@@ -99,7 +99,7 @@
                                     {{-- @php
                                     $serialNumber = 1; // Initialize serial number counter
                                 @endphp --}}
-                                    <tr id="totalsRow">
+                                    {{--  <tr id="totalsRow">
                                         <td colspan="3"><strong>Total</strong></td>
                                         <td id="totalTaxableAmount"> <button type="button"
                                                 class="btn btn-success shadow-none p-0 py-1 px-2">
@@ -110,7 +110,7 @@
                                                 {{ $totalAmount }} </button>
                                         </td>
                                         <td colspan="2"></td>
-                                    </tr>
+                                    </tr>  --}}
                                 </tbody>
                                 <tbody id="invoiceRow">
                                     @foreach ($orders as $order)
@@ -123,8 +123,8 @@
                                             {{-- <td>{{ $serialNumber++ }}</td> --}}
                                             <td>{{ $loop->iteration }}</td>
                                             <?php
-                                             
-                    
+
+
                                             $orderId = $order->id ?? null; // Ensure $order->id is set
                                             $bookingId =  $order->order_number;
                                             $incoiceid =  $order->invoice_number;
@@ -227,7 +227,7 @@
                 <tr id="totalsRow">
                     <td colspan="3"><strong>Total</strong></td>
                     <td id="totalTaxableAmount"><button type="button" class="btn btn-success shadow-none p-0 py-1 px-2"> ${totalTaxableAmount}</button></td>
-                    <td id="totalAmount"><button type="button" class="btn btn-success shadow-none p-0 py-1 px-2"> ${totalAmount}</button></td> 
+                    <td id="totalAmount"><button type="button" class="btn btn-success shadow-none p-0 py-1 px-2"> ${totalAmount}</button></td>
                     <td colspan="2"></td>
                 </tr>
             `;
@@ -364,7 +364,7 @@
                     var pagination = response.pagination;
                     var totalTaxableAmount = response.totalTaxableAmount;
                     var totalAmount = response.totalAmount;
-                    // var tbody = document.getElementById('invoiceRow'); 
+                    // var tbody = document.getElementById('invoiceRow');
                     var tbody = $('#invoiceRow');
                     tbody.empty();
 
