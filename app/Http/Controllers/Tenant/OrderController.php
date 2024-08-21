@@ -17,6 +17,8 @@ use App\Models\{ // Grouped imports for models
     Operations
 };
 
+
+
 // Importing necessary services and facades
 use Illuminate\Http\Request; // Handling HTTP requests
 use Barryvdh\DomPDF\Facade\Pdf; // PDF generation using DomPDF
