@@ -41,7 +41,7 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
     ])->group(function () {
-        
+
         Route::get('admin/Categorylists', function () {
             return view('admin.CategoriesLists');
         });
@@ -127,6 +127,15 @@ Route::middleware([
             Route::post('/add-service', 'addService')->name('add.service');
             Route::post('/edit-services/{id}', 'updateService');
             Route::get('/delete-services/{id}', 'deleteService');
+        });
+
+
+        // Item Type management routes
+        Route::controller(ServiceController::class)->prefix('admin')->group(function () {
+            Route::get('/itemtype', 'index')->name('itemtype');
+            Route::post('/add-itemtype', 'addService')->name('add.itemtype');
+            Route::post('/edit-itemtype/{id}', 'updateItemType');
+            Route::get('/delete-itemtype/{id}', 'deleteItemType');
         });
 
         // Payment management routes
