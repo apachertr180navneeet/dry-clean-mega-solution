@@ -24,6 +24,7 @@ use App\Http\Controllers\Tenant\{
     ServiceController,
     PaymentController,
     InvoiceController,
+    ItemTypeController
 };
 
 /*
@@ -131,9 +132,9 @@ Route::middleware([
 
 
         // Item Type management routes
-        Route::controller(ServiceController::class)->prefix('admin')->group(function () {
+        Route::controller(ItemTypeController::class)->prefix('admin')->group(function () {
             Route::get('/itemtype', 'index')->name('itemtype');
-            Route::post('/add-itemtype', 'addService')->name('add.itemtype');
+            Route::post('/add-itemtype', 'addType')->name('add.itemtype');
             Route::post('/edit-itemtype/{id}', 'updateItemType');
             Route::get('/delete-itemtype/{id}', 'deleteItemType');
         });
