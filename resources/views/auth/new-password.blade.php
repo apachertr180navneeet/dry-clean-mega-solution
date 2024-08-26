@@ -9,7 +9,7 @@
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4">
                             <a href="javascript:void(0);" class="app-brand-link gap-2">
-                                <img src="{{ url('theam/Images/logo.png') }}" style="width: 130px;">
+                                <img src="{{ url('public/theam/Images/logo.png') }}" style="width: 130px;">
                             </a>
                         </div>
                         <!-- /Logo -->
@@ -55,7 +55,7 @@
                                 </div>
 
                             </div>
-                           
+
                             <button class="btn btn_1F446E_hp w-100">Save</button>
                         </form>
                         <div class="text-center">
