@@ -113,7 +113,7 @@ public function handle(Request $request, Closure $next)
 
             // Redirect to the login page with an error message
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
-           
+
         }
     }
 
