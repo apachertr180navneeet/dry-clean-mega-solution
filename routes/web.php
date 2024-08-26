@@ -155,5 +155,5 @@ Route::middleware([
     });
 
     // Load tenant authentication routes
-    require __DIR__ . '/tenant-auth.php';
+    require __DIR__ . '/auth.php';
 });

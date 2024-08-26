@@ -1105,7 +1105,8 @@ class OrderController extends Controller
                 'discounts'
             ])->find($orderId);
 
-            $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
+
+           $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
                 return $orderItem->quantity * $orderItem->operation_price;
             });
 

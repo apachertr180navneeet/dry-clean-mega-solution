@@ -20,7 +20,6 @@
 
     <!-- Helpers -->
     <script src="{{url('public/theam/assets/vendor/js/helpers.js')}}"></script>
-    <script src="{{url('assets/vendor/js/template-customizer.js')}}"></script>
     <script src="{{url('public/theam/assets/js/config.js')}}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
