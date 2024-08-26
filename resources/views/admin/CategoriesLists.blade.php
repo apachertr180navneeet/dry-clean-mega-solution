@@ -64,7 +64,7 @@
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center">
                                             <img class="mb-3"
-                                                src="{{ url('theam/Images/shirt/shirt.jpg') }}"
+                                                src="{{ url('public/theam/Images/shirt/shirt.jpg') }}"
                                                 alt="" style="width: 70px;height: 50px;object-fit: contain;">
                                             <div class="Add_order_btn_area">
                                                 <button type="button" id="addbtnpreview"
@@ -73,7 +73,7 @@
                                                     aria-controls="offcanvasRight"
                                                     data-product-name=""
                                                     data-images="">Add</button>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -91,7 +91,7 @@
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center">
                                             <img class="mb-3"
-                                                src="{{ url('theam/Images/shirt/shirt.jpg') }}"
+                                                src="{{ url('public/theam/Images/shirt/shirt.jpg') }}"
                                                 alt="" style="width: 70px;height: 50px;object-fit: contain;">
                                             <div class="Add_order_btn_area">
                                                 <button type="button" id="addbtnpreview"
@@ -100,7 +100,7 @@
                                                     aria-controls="offcanvasRight"
                                                     data-product-name=""
                                                     data-images="">Add</button>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center">
                                             <img class="mb-3"
-                                                src="{{ url('theam/Images/shirt/shirt.jpg') }}"
+                                                src="{{ url('public/theam/Images/shirt/shirt.jpg') }}"
                                                 alt="" style="width: 70px;height: 50px;object-fit: contain;">
                                             <div class="Add_order_btn_area">
                                                 <button type="button" id="addbtnpreview"
@@ -127,7 +127,7 @@
                                                     aria-controls="offcanvasRight"
                                                     data-product-name=""
                                                     data-images="">Add</button>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -145,7 +145,7 @@
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center">
                                             <img class="mb-3"
-                                                src="{{ url('theam/Images/shirt/shirt.jpg') }}"
+                                                src="{{ url('public/theam/Images/shirt/shirt.jpg') }}"
                                                 alt="" style="width: 70px;height: 50px;object-fit: contain;">
                                             <div class="Add_order_btn_area">
                                                 <button type="button" id="addbtnpreview"
@@ -154,18 +154,18 @@
                                                     aria-controls="offcanvasRight"
                                                     data-product-name=""
                                                     data-images="">Add</button>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-        
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
 @endsection

@@ -1,10 +1,10 @@
 <div class="row justify-content-between mb-3"
     style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-    {{-- <!-- <img src="{{ url('theam/Images/logo.png') }}"  class="mt-0 mb-3" style="width: 200px;">      --> --}}
+    {{-- <!-- <img src="{{ url('public/theam/Images/logo.png') }}"  class="mt-0 mb-3" style="width: 200px;">      --> --}}
     {{-- <img src="https://fastly.picsum.photos/id/142/200/200.jpg?hmac=L8yY8tFPavTj32ZpuPiqsLsfWgDvW1jvoJ0ETDOUMGg"
         class="mt-0 mb-3" style="width: 200px;"> --}}
     <img src="{{ public_path() . '\theam\Images\logo.png' }}" class="mt-0 mb-3 d-none" style="width: 200px;">
-    {{-- <img src="/theam/Images/logo.png" class="mt-0 mb-3" style="width: 200px;"> --}}
+    {{-- <img src="/public/theam/Images/logo.png" class="mt-0 mb-3" style="width: 200px;"> --}}
     <h6 class="mb-0" style="color: #5d596c; font-weight: 600; margin-bottom:0; font-size:18px;margin-top:0;">RECEIPT
     </h6>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Mega Solutions</p>

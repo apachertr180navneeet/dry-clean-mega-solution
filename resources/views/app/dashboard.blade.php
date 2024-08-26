@@ -54,12 +54,12 @@
                       <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                   </div>
-                 
+
                 </div>
               </div>
             </div>
           </div>
-          
+
         </div>
         <hr>
         <div class="col-lg-12 mb-4">
@@ -123,16 +123,16 @@
                 {{-- @if ($orders->count() > 0) --}}
                         <div class="pagination-container">
                           <a type="button" class="btn btn-primary text-white" id="backButton" href="{{route('viewOrder')}}">
-                            View All 
+                            View All
                         </a>
                         </div>
                     {{-- @endif --}}
-                 
+
                 </div>
               </div>
             </div>
           </div>
-          
+
         </div>
         <hr>
         <div class="col-lg-12 mb-4">
@@ -163,7 +163,7 @@
                     <div class="progress w-75" style="height: 4px">
                       <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                   
+
                   </div>
                   <hr>
                   <div class="table-responsive-sm">
@@ -205,27 +205,27 @@
                 <div class="pagination-container">
                   {{-- <button type="button" class="btn btn-primary">text-primary d-flex align-items-center View All</button> --}}
                   <a type="button" class="btn btn-primary text-white" id="backButton" href="{{route('viewOrder')}}">
-                    View All 
+                    View All
                 </a>
                 </div>
                     {{-- @endif --}}
-                 
+
                 </div>
               </div>
             </div>
           </div>
-          
+
         </div>
-         
+
         <br>
         <br>
         <hr>
         <br>
-       
+
       <br>
       <br>
       <br>
-      
+
         <!--/ Earning Reports -->
       </div>
     </div>

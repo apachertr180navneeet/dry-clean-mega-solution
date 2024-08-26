@@ -214,7 +214,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center ">
-                                            <img src="{{ url('theam/Images/shirt/shirt.jpg') }}" alt="shirt "
+                                            <img src="{{ url('public/theam/Images/shirt/shirt.jpg') }}" alt="shirt "
                                                 style="width: 50px;">
                                             <div class="Add_order_btn_area">
                                                 <button class="btn" data-bs-toggle="offcanvas"
@@ -251,7 +251,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-3 col-md-3 text-center ">
-                                            <img src="{{ url('theam/Images/shirt/shirt.jpg') }}" alt="shirt "
+                                            <img src="{{ url('public/theam/Images/shirt/shirt.jpg') }}" alt="shirt "
                                                 style="width: 50px;">
                                             <div class="Add_order_btn_area">
                                                 <button class="btn">Add</button>

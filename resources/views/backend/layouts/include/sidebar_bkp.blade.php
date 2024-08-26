@@ -9,7 +9,7 @@
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M7.77295 16.3566L23.6563 0H32V6.88383C32 6.88383 31.8262 9.17836 30.6591 10.4057L19.7824 22H13.6938L7.77295 16.3566Z" fill="#7367F0" />
                 </svg>
             </span>
-            <img src="{{url('theam/logo/logo.png')}}" style="width: 130px;" class="mt-3">
+            <img src="{{url('public/theam/logo/logo.png')}}" style="width: 130px;" class="mt-3">
         </a>
 
         <!-- <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -197,7 +197,7 @@
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="{{url('theam/assets/img/avatars/1.png')}}" alt class="h-auto rounded-circle" />
+                        <img src="{{url('public/theam/assets/img/avatars/1.png')}}" alt class="h-auto rounded-circle" />
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -206,7 +206,7 @@
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
                                     <div class="avatar avatar-online">
-                                        <img src="{{url('theam/assets/img/avatars/1.png')}}" alt class="h-auto rounded-circle" />
+                                        <img src="{{url('public/theam/assets/img/avatars/1.png')}}" alt class="h-auto rounded-circle" />
                                     </div>
                                 </div>
                                 @php
