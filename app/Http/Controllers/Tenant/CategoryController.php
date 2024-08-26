@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductItem;
+use App\Models\ProductType;
 use App\Models\Service;
 use App\Models\Tenant;
 use Carbon\Carbon;
@@ -200,7 +201,8 @@ class CategoryController extends Controller
         }
         $products = Product::all();
         $services = Service::all();
-        return view('admin.category', ['products' => $products, 'services' => $services]);
+        $producttypes = ProductType::all();
+        return view('admin.category', ['products' => $products, 'services' => $services, 'producttypes' => $producttypes]);
     }
 
     public function storeCategory(Request $request)

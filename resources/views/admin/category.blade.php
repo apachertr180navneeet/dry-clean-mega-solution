@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
 @section('content')
-<style> 
+<style>
     .check-error{
         color: #6f6b7d !important;
     }
@@ -49,8 +49,14 @@
                                                                 name is required and must be less than 50 characters.</span>
                                                         </td>
                                                         <td>
-                                                            <input type="text" name="item_type[0][]" id=""
-                                                                class="form-control item-type check-error" placeholder="Item Type">
+                                                            <select name="item_type[0][]" id="" class="form-select service-select check-error">
+                                                                <option value="" selected disabled> Select item type
+                                                                </option>
+                                                                @foreach ($producttypes as $producttype)
+                                                                    <option value="{{ $producttype->id }}">{{ $producttype->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
                                                             <span class="type-error text-danger" style="display:none;">Item
                                                                 type is required and must be less than 50 characters.</span>
                                                         </td>
@@ -63,9 +69,6 @@
                                                                     <option value="{{ $Service->id }}">{{ $Service->name }}
                                                                     </option>
                                                                 @endforeach
-                                                                {{-- <option value="1">DC</option>
-                                                            <option value="2">Pressing</option>
-                                                            <option value="3">Strarch</option> --}}
                                                             </select>
                                                             <span class="service-error text-danger"
                                                                 style="display:none;">Item name is required and must be less
@@ -147,11 +150,6 @@
                                         number: true,
                                         maxlength: 8
                                     },
-                                    "image[0][]": {
-                                        required: true,
-                                        extension: "jpg|jpeg|png|bmp",
-                                        filesize: 5242880 // 5 MB in bytes
-                                    }
                                 },
                                 messages: {
                                     "category[]": {
@@ -173,11 +171,6 @@
                                         number: "Please enter a valid number",
                                         maxlength: "Price must be less than 8 characters"
                                     },
-                                    "image[0][]": {
-                                        required: "Image is required.",
-                                        extension: "Please upload only image files.",
-                                        filesize: "Image size must be less than 5 MB."
-                                    }
                                 },
                                 errorPlacement: function(error, element) {
                                     if (element.attr("name").includes("item_name")) {
@@ -225,7 +218,7 @@
                                         .preventDefault(); // Prevent default form submission
                                     let valid = true;
                                     // $("#categoryForm").find('select.cat-select').each(function() {
-                                    //     $(this).rules("add", 
+                                    //     $(this).rules("add",
                                     //         {
                                     //             required: true,
                                     //             messages: {
@@ -265,7 +258,7 @@
 
                                     if (valid) {
                                         form.submit(); // Submit the form if valid
-                                    } 
+                                    }
                                     // else {
                                     //     $('#error-message').text('Please correct the errors in the form.').show();
                                     // }
@@ -277,17 +270,17 @@
                             return this.optional(element) || (element.files[0].size <= param);
                         }, "File size must be less than {0}");
 
-                        
+
                         applyValidation();
 
                         // Reapply validation on dynamic addition
                         // $(document).on('click', '.addnewrow, .addsection', function() {
                         //     applyValidation();
                         // });
-                        $(document).on('click', '.addnewrow', function() { 
+                        $(document).on('click', '.addnewrow', function() {
                             applyValidation();
                         });
-                        $(document).on('click', '.addsection', function() { 
+                        $(document).on('click', '.addsection', function() {
                             applyValidation();
                         });
 
@@ -347,8 +340,15 @@
                         <tr class="rowClass">
                             <td><input type="text" name="item_name[` + new_count + `][]" id="" class="form-control check-error" placeholder="Item">
                                 <span class="name-error text-danger" style="display:none;">Item name is required and must be less than 20 characters.</span></td>
-                            <td><input type="text" name="item_type[` + new_count + `][]" id="" class="form-control check-error" placeholder="Item Type">
-                                <span class="type-error text-danger" style="display:none;">Item type is required and must be less than 20 characters.</span></td>
+                            <td>
+                                <select name="item_type[` + new_count + `][]" id="" class="form-select check-error">
+                                    <option value="" selected disabled> Select Service</option>
+                                    <?php foreach ($producttypes as $producttype): ?>
+                                        <option value="<?php echo $producttype->id; ?>"><?php echo $producttype->name; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <span class="type-error text-danger" style="display:none;">Item type is required and must be less than 20 characters.</span>
+                            </td>
                             <td>
                                 <select name="service[` + new_count + `][]" id="" class="form-select check-error">
                                     <option value="" selected disabled> Select Service</option>
@@ -420,7 +420,7 @@
                                                 <span class="price-error text-danger" style="display:none;">Price is required and must be a number.</span>
                                             </td>
                                             <td><input type="file" name="image[` + new_count + `][]" id="" class="form-control" >
-                                                <span class="image-error text-danger" style="display:none;"></span>    
+                                                <span class="image-error text-danger" style="display:none;"></span>
                                             </td>
                                             <td>
                                                 <div class="d-flex">
@@ -441,7 +441,7 @@
                     });
 
 
-                    
+
 
                 });
             });
