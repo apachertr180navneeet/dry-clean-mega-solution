@@ -112,12 +112,6 @@
                 </a>
             </li>
             <li class="menu-item">
-                <a href="{{ route('itemtype') }}" class="menu-link">
-                    <i class="menu-icon ti ti-server"></i>
-                    <div data-i18n="Layouts">Product Type </div>
-                </a>
-            </li>
-            <li class="menu-item">
                 <a href="{{ route('orders.analitices') }}" class="menu-link">
                     <i class="menu-icon ti ti-server"></i>
                     <div data-i18n="Layouts">Analytics Dashboard </div>
@@ -176,7 +170,7 @@
                 {{-- @dd(Auth::user()->image); --}}
                 @if(Auth::user()->image != "")
                 <div class="avatar avatar-online">
-                    <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                    <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                 </div>
             @else
                 <div class="avatar avatar-online">
@@ -186,7 +180,7 @@
                 @else
                     @if(Auth::user()->image != "")
                         <div class="avatar avatar-online">
-                            <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                            <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                         </div>
                     @else
                         <div class="avatar avatar-online">
@@ -205,7 +199,7 @@
                                     {{-- @dd(Auth::user()->image); --}}
                                     @if(Auth::user()->image != "")
                                     <div class="avatar avatar-online">
-                                        <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                        <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                     </div>
                                      @else
                                     <div class="avatar avatar-online">
@@ -215,7 +209,7 @@
                                     @else
                                         @if(Auth::user()->image != "")
                                             <div class="avatar avatar-online">
-                                                <img src="{{ url('images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
+                                                <img src="{{ url('public/images/'.Auth::user()->image) }}" alt class="h-auto rounded-circle" />
                                             </div>
                                         @else
                                             <div class="avatar avatar-online">

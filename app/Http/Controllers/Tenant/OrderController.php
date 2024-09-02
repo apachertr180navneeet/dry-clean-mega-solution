@@ -14,10 +14,9 @@ use App\Models\{ // Grouped imports for models
     OrderItem,
     Service,
     Tenant,
-    Operations
+    Operations,
+    Invoice
 };
-
-
 
 // Importing necessary services and facades
 use Illuminate\Http\Request; // Handling HTTP requests
@@ -227,8 +226,8 @@ class OrderController extends Controller
                             'quantity' => $serviceData['quantity'],
                             'operation_price' => $serviceData['price'],
                             'price' => $serviceData['quantity'] * $serviceData['price'],
-                            'type' => $serviceData['nltype'],
-                            'comment' => $serviceData['comment'],
+                            'type' => '0',
+                            'comment' => 'comment',
                             'status' => 'pending'
                         ]);
                     }
@@ -251,7 +250,7 @@ class OrderController extends Controller
             $clientPhoneNumber = '91' . $validatedData['client_num'];
             $message = $orderNumber . ' of amount ' . $totalPriceDis;
             $payload = json_encode([
-                "template_id" => "669e364ad6fc052bf21c7312",
+                "template_id" => "66cf2880d6fc053eab375372",
                 "recipients" => [
                     [
                         "mobiles" => $clientPhoneNumber,
@@ -303,8 +302,8 @@ class OrderController extends Controller
                         $serviceId = $service['service'];
                         $qty = $service['quantity'];
                         $unitPrice = $service['price'];
-                        $nltype = $service['nltype'];
-                        $comment = $service['comment'];
+                        $nltype = '0';
+                        $comment = 'comment';
 
                         $key = $categoryId . '-' . $typeId . '-' . $serviceId;
                         $existingItem = $existingOrderItems[$key] ?? null;
@@ -375,7 +374,7 @@ class OrderController extends Controller
             $clientPhoneNumber = '+91' . $request->client_num;
             $message = $order->order_number . ' of amount ' . $totalPriceDis;
             $payload = json_encode([
-                "template_id" => "669e3596d6fc0569d040c232",
+                "template_id" => "66cf27fbd6fc055a1d6212b2",
                 "recipients" => [
                     [
                         "mobiles" => $clientPhoneNumber,
@@ -420,7 +419,6 @@ class OrderController extends Controller
 
         // Retrieve all product items with their categories and services
         $productItems = ProductItem::with(['categories', 'categories.service'])->get();
-
         $groupedProductItems = [];
 
         // Group product items with unique categories and related details
@@ -444,12 +442,8 @@ class OrderController extends Controller
         $services = Service::all();
         $timeSlots = $this->generateTimeSlots();
 
-        $currentdatetime = Carbon::now();
-
-        $currentdate = $currentdatetime->format('Y-m-d');
-        $currenttime = $currentdatetime->format('H:i:s');
         // Return the view with the gathered data
-        return view('admin.EditOrder', compact('groupedProductItems', 'discounts', 'services', 'productItems', 'timeSlots','currentdate','currenttime'));
+        return view('admin.EditOrder', compact('groupedProductItems', 'discounts', 'services', 'productItems', 'timeSlots'));
     }
 
     public function getOperationData($pid, $pname, $others = [])
@@ -617,6 +611,10 @@ class OrderController extends Controller
         $order = Order::select("users.name", "users.mobile", "orders.*")
             ->join('users', 'users.id', '=', 'orders.user_id')
             ->findOrFail($id);
+        
+        if($order->is_deleted == '1'){
+            return redirect()->back()->with('error', 'Order Not Found');
+        }
             // Convert the delivery time to 12-hour format
         $deliveryTime = Carbon::parse($order->delivery_time);
         $ditime = $deliveryTime->format('g:i A');
@@ -714,7 +712,12 @@ class OrderController extends Controller
     {
         try {
             $orders = Order::with('orderItems.productCategory', 'orderItems.productItem', 'orderItems.opertions', 'paymentDetail')
-                ->findOrFail($orderId);
+                ->find($orderId);
+            
+            if($orders->is_deleted == '1'){
+                return redirect()->back()->with('error', 'Order Not Found');
+            }
+            
             $subTotalAmount = 0;
             foreach ($orders->orderItems as $orderItem) {
                 $subTotalAmount += $orderItem->quantity * $orderItem->operation_price;
@@ -740,54 +743,55 @@ class OrderController extends Controller
 
     public function viewOrder(Request $request)
     {
-        try {
-            $query = Order::with(['user', 'paymentDetail', 'orderItems'])
-                ->where('orders.is_deleted', '!=', 1);
-
-            // Apply search filters if provided
-            if ($request->ajax()) {
-                $search = $request->input('search');
-                if (!empty($search)) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('order_number', 'like', '%' . $search . '%')
-                            ->orWhereHas('user', function ($query) use ($search) {
-                                $query->where('name', 'like', '%' . $search . '%')
-                                    ->orWhere('mobile', 'like', '%' . $search . '%');
-                            });
-                    });
-                }
-
-
-                $orders = $query->orderBy('orders.id', 'desc')->paginate(10);
-
-                // Map additional data to the orders
-                $orders->each(function ($order) {
-                    $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
-                    $order->name = $order->user ? $order->user->name : null;
-                    $order->mobile = $order->user ? $order->user->mobile : null;
-                    $order->item_status = $order->orderItems->max('status');
-                });
-
-
-                return response()->json([
-                    'orders' => $orders->items(),
-                    'pagination' => (string) $orders->links()
-                ]);
-            }
-
-            $orders = $query->orderBy('orders.id', 'desc')->paginate(10);
+       try {
+            // Use the query builder to define the query and paginate directly
+            $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
+                ->where('orders.is_deleted', '!=', 1)
+                ->orderBy('orders.id', 'desc')
+                ->paginate(10);
+                
+            // Map additional data to the orders
             $orders->each(function ($order) {
                 $order->payment_status = $order->paymentDetail ? $order->paymentDetail->status : null;
                 $order->name = $order->user ? $order->user->name : null;
                 $order->mobile = $order->user ? $order->user->mobile : null;
                 $order->item_status = $order->orderItems->max('status');
             });
-
             return view('admin.viewOrder', ['orders' => $orders]);
         } catch (Throwable $throwable) {
             dd($throwable->getMessage(), $throwable->getFile(), $throwable->getLine());
         }
     }
+
+    public function searchOrder(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('search');
+
+            // Query to get the orders with related data
+            $orders = Order::with(['user', 'paymentDetail', 'orderItems'])
+                ->where('is_deleted', '!=', 1)
+                ->where(function ($query) use ($searchTerm) {
+                    $query->where('order_number', 'like', "%{$searchTerm}%")
+                        ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                            $userQuery->where('name', 'like', "%{$searchTerm}%")
+                                        ->orWhere('email', 'like', "%{$searchTerm}%");
+                        });
+                })
+                ->orderBy('orders.id', 'desc')
+                ->paginate(10); // Adjust pagination as needed
+
+            // Return the orders and pagination as a JSON response
+            return response()->json([
+                'orders' => $orders,
+                'pagination' => (string) $orders->links(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching orders.'], 500);
+        }
+    }
+
+
 
 
 
@@ -887,6 +891,7 @@ class OrderController extends Controller
 
             return $pdf->download("invoice-{$order->id}.receipt.pdf");
         } catch (Throwable $throwable) {
+            dd($throwable->getMessage());
             // Handle the exception and redirect with an error message
             return redirect()->back()->with('error', $throwable->getMessage());
         }
@@ -909,13 +914,19 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
+            $invoice = Invoice::where('order_id',$orderId)->first();
+
+            
+            $invoiceNumber = $invoice->invoice_number;
+
             // Pass data to the view
             $pdf = PDF::loadView('admin.invoiceDetail', [
                 'order' => $order,
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
+                'discountPercentage' => $discountPercentage, // Include discountPercentage in the view data
+                'invoiceNumber' => $invoiceNumber,
             ]);
 
             return $pdf->download("invoice-{$order->id}.invoice.pdf");
@@ -941,7 +952,7 @@ class OrderController extends Controller
             // Calculate the discount amount
             $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
             $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
-
+            
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
             //dd($order->toArray());
@@ -951,7 +962,7 @@ class OrderController extends Controller
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage'=> $discountPercentage
+                'discountPercentage'=> $discountPercentage,
             ]);
         } catch (Throwable $throwable) {
             // Handle the exception and redirect with an error message
@@ -1006,7 +1017,10 @@ class OrderController extends Controller
             // Calculate the discount amount
             $discountPercentage = $order->discounts->amount ?? 0; // Default to 0 if no discount
             $discountAmount = ($discountPercentage / 100) * $subTotalAmount;
-
+            $invoice = Invoice::where('order_id',$orderId)->first();
+            
+            
+            $invoiceNumber = $invoice->invoice_number;
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
             //dd($order->toArray());
@@ -1016,7 +1030,8 @@ class OrderController extends Controller
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage'=> $discountPercentage
+                'discountPercentage'=> $discountPercentage,
+                'invoiceNumber' => $invoiceNumber,
             ]);
         } catch (Throwable $throwable) {
             // Handle the exception and redirect with an error message
@@ -1043,13 +1058,19 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
+            $invoice = Invoice::where('order_id',$orderId)->first();
+
+            
+            $invoiceNumber = $invoice->invoice_number;
+
             // Pass data to the view
             $pdf = PDF::loadView('admin.invoiceDetail', [
                 'order' => $order,
                 'subTotalAmount' => $subTotalAmount,
                 'discountAmount' => $discountAmount,
                 'totalAmount' => $totalAmount,
-                'discountPercentage' => $discountPercentage // Include discountPercentage in the view data
+                'discountPercentage' => $discountPercentage,
+                'invoiceNumber' => $invoiceNumber,
             ]);
 
              return $pdf->stream("invoice-{$order->id}.invoice.pdf");
@@ -1080,6 +1101,13 @@ class OrderController extends Controller
             // Calculate the total amount
             $totalAmount = $subTotalAmount - $discountAmount;
 
+            $data = [
+                'order' => $order,
+                'subTotalAmount' => $subTotalAmount,
+                'discountAmount' => $discountAmount,
+                'totalAmount' => $totalAmount,
+                'subTotalqty' => $subTotalqty
+            ];
             // Pass data to the view
             return view('admin.tagslist', [
                 'order' => $order,
@@ -1105,8 +1133,7 @@ class OrderController extends Controller
                 'discounts'
             ])->find($orderId);
 
-
-           $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
+            $subTotalAmount = $order->orderItems->sum(function ($orderItem) {
                 return $orderItem->quantity * $orderItem->operation_price;
             });
 

@@ -13,10 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 class DashboardController extends Controller
-{
+{ 
     public function index(Request $request)
     {
-        echo "hello"; die;
         $tenantId = tenant('id');
 
         // if (!$tenantId) {
@@ -40,12 +39,12 @@ class DashboardController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-
+        
         $clientCounts = User::where(['is_deleted' => 0, 'role_id' => 2])->count();
         $orderCounts = Order::where(['is_deleted' => 0])->count();
-
+        
         $today = Carbon::today();
-
+        
         $orderCounts = Order::where('is_deleted', 0)
         ->where('status', 'pending') // Replace 'pending' with the actual status value for pending orders
         ->where('created_at', '>=', $today)

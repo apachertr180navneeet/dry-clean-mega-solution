@@ -47,16 +47,17 @@ class InvoiceController extends Controller
                 return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
             }
 
-            $orders = Order::select('orders.id', 'orders.invoice_number','orders.order_number', 'orders.total_price', 'orders.status', 'users.name', 'users.mobile', 'orders.total_qty')
+            $orders = Order::select('orders.id','orders.order_number', 'orders.total_price', 'orders.status', 'users.name', 'users.mobile', 'orders.total_qty', 'invoices.invoice_number as invoice_number')
                 ->join('users', 'users.id', '=', 'orders.user_id')
+                ->join('invoices', 'invoices.order_id', '=', 'orders.id')
                 ->where('orders.is_deleted', 0)
-                ->orderBy('orders.invoice_number','desc')
+                ->orderBy('invoices.id','desc')
                 ->where('orders.status', 'delivered')
                 ->paginate(10);
 
              // Calculate total taxable amount and total amount
         $totalTaxableAmount = $orders->sum(function($order) {
-            return $order->total_price - ($order->total_price * 0.18);
+            return $order->total_price / 1.18;
         });
 
         $totalAmount = $orders->sum('total_price');
@@ -98,9 +99,11 @@ class InvoiceController extends Controller
                 return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
             }
 
-            $ordersQuery = Order::select('orders.id', 'orders.invoice_number','orders.order_number', 'orders.total_price', 'orders.status', 'users.name', 'users.mobile', 'orders.total_qty')
+            $ordersQuery = Order::select('orders.id','orders.order_number', 'orders.total_price', 'orders.status', 'users.name', 'users.mobile', 'orders.total_qty', 'invoices.invoice_number as invoice_number')
                 ->join('users', 'users.id', '=', 'orders.user_id')
+                ->join('invoices', 'invoices.order_id', '=', 'orders.id')
                 ->where('orders.is_deleted', 0)
+                ->orderBy('invoices.id','desc')
                 ->where('orders.status', 'delivered');
 
             if ($request->has('startDate') && $request->has('endDate')) {
@@ -111,6 +114,7 @@ class InvoiceController extends Controller
             }
 
             $orders = $ordersQuery->orderBy('orders.created_at', 'desc')->get();
+
 
             $totalTaxableAmount = $orders->sum(function($order) {
                 return  $order->total_price / 1.18;
@@ -153,14 +157,25 @@ class InvoiceController extends Controller
         $startDate = Carbon::createFromFormat('d/m/Y', $startDate)->startOfDay();
         $endDate = Carbon::createFromFormat('d/m/Y', $endDate)->endOfDay();
 
-        $orders = Order::with('paymentDetail')
-            ->whereBetween('updated_at', [$startDate, $endDate])
-            ->where('is_deleted', 0)
-            ->where('status', 'delivered')
-            ->get();
+        $orders = Order::select('orders.id', 'orders.order_number', 'orders.total_price', 'orders.status', 'orders.updated_at', 'orders.total_qty', 'invoices.invoice_number as invoice_number', 'users.name', 'users.mobile')
+        ->with('paymentDetail')
+        ->join('users', 'users.id', '=', 'orders.user_id')
+        ->join('invoices', 'invoices.order_id', '=', 'orders.id')
+        ->whereBetween('orders.updated_at', [$startDate, $endDate])
+        ->where('orders.is_deleted', 0)
+        ->where('orders.status', 'delivered')
+        ->orderBy('invoices.id', 'asc') // Order by invoice_number in descending order
+        ->get();
+    
         } else {
             // Otherwise, fetch all orders
-            $orders = Order::all();
+            $orders = Order::select('orders.id','orders.order_number', 'orders.total_price', 'orders.status', 'orders.total_qty' , 'orders.updated_at', 'invoices.id as invoice_number', 'users.name', 'users.mobile')->with('paymentDetail')
+            ->join('users', 'users.id', '=', 'orders.user_id')
+            ->join('invoices', 'invoices.order_id', '=', 'orders.id')
+            ->where('orders.is_deleted', 0)
+            ->where('orders.status', 'delivered')
+            ->orderBy('invoices.id', 'asc') // Order by invoice_number in descending order
+            ->get();
         }
 
         if ($orders->isEmpty()) {

@@ -16,7 +16,7 @@
           <div class="card h-100">
             <div class="card-header pb-0 d-flex justify-content-between mb-lg-n4">
               <div class="card-title mb-0">
-                <h5 class="mb-0">Total Reports</h5>
+                <h5 class="mb-0">Total Reports edfsf</h5>
                 <small class="text-muted">Overview</small>
               </div>
             </div>

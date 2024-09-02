@@ -81,4 +81,42 @@ class CheckActiveStatus
 
 
 
+public function handle(Request $request, Closure $next)
+    {
+        // Get the current tenant
+        $tenantId = tenant('id');
+
+        // Fetch tenant with subscription information
+        $tenant = Tenant::where('tenants.id', $tenantId)
+                        ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
+                        ->select('tenants.*', 'subscriptions.starting_date', 'subscriptions.end_date')
+                        ->first();
+
+        // Get current date
+        $date = Carbon::now()->format("Y-m-d");
+
+        // Check if tenant exists and validate tenant status and subscription dates
+        if ($tenant) {
+            if ($tenant->is_active == 0 || !($tenant->starting_date <= $date && $tenant->end_date >= $date)) {
+                // Log out the user
+            //     Auth::logout();
+            //     // $request->session()->flash('error', 'Your tenant is inactive or your subscription has expired. Please contact your Super Admin.');
+            //     // Session::flash('error', 'Your tenant is inactive or your subscription has expired. Please contact your Super Admin.');
+            // // $request->session()->invalidate();
+            // // $request->session()->regenerateToken();
+
+            // // Redirect to the login page with an error message
+            // return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+            Auth::logout();
+            // $request->session()->invalidate();
+            // $request->session()->regenerateToken();
+
+            // Redirect to the login page with an error message
+            return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+           
+        }
+    }
+
+        return $next($request);
+    }
 }

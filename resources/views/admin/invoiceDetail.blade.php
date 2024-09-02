@@ -12,7 +12,7 @@
         Jodhpur, Rajasthan, 342003</p>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">GST: 08BQFPA2674G2ZZ</p>
     <hr style="margin-bottom:10px;margin-top:10px;" />
-    <h6  style="color: #5d596c; font-weight: 600; font-size:16px;margin-bottom:0;margin-top:0;">Invoice Number: {{ $order->invoice_number }}</h6>
+    <h6  style="color: #5d596c; font-weight: 600; font-size:16px;margin-bottom:0;margin-top:0;">Invoice Number: {{ $invoiceNumber }}</h6>
     <p class="mb-0" style="color: #5d596c;margin-bottom:0;font-size:16px; margin-top:0;">Date & Time:
         @php
             $time = $order->updated_at->setTimezone('Asia/Kolkata');
@@ -176,7 +176,7 @@
                     style="margin:0;padding: 0;margin-bottom: 0px;margin-top: 0; padding:0;">
                     <h6
                         style="margin:0;padding: 0;color: #5d596c; font-weight: 600; margin-bottom: 10px; margin-top:10px; font-size: 14px; ">
-                        INR {{ $totalAmount }}
+                        INR {{ $order->total_price }}
                     </h6>
                 </td>
             </tr>

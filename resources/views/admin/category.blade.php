@@ -49,14 +49,8 @@
                                                                 name is required and must be less than 50 characters.</span>
                                                         </td>
                                                         <td>
-                                                            <select name="item_type[0][]" id="" class="form-select service-select check-error">
-                                                                <option value="" selected disabled> Select item type
-                                                                </option>
-                                                                @foreach ($producttypes as $producttype)
-                                                                    <option value="{{ $producttype->id }}">{{ $producttype->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
+                                                            <input type="text" name="item_type[0][]" id=""
+                                                                class="form-control item-type check-error" placeholder="Item Type">
                                                             <span class="type-error text-danger" style="display:none;">Item
                                                                 type is required and must be less than 50 characters.</span>
                                                         </td>
@@ -340,15 +334,8 @@
                         <tr class="rowClass">
                             <td><input type="text" name="item_name[` + new_count + `][]" id="" class="form-control check-error" placeholder="Item">
                                 <span class="name-error text-danger" style="display:none;">Item name is required and must be less than 20 characters.</span></td>
-                            <td>
-                                <select name="item_type[` + new_count + `][]" id="" class="form-select check-error">
-                                    <option value="" selected disabled> Select Service</option>
-                                    <?php foreach ($producttypes as $producttype): ?>
-                                        <option value="<?php echo $producttype->id; ?>"><?php echo $producttype->name; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <span class="type-error text-danger" style="display:none;">Item type is required and must be less than 20 characters.</span>
-                            </td>
+                            <td><input type="text" name="item_type[` + new_count + `][]" id="" class="form-control check-error" placeholder="Item Type">
+                                <span class="type-error text-danger" style="display:none;">Item type is required and must be less than 20 characters.</span></td>
                             <td>
                                 <select name="service[` + new_count + `][]" id="" class="form-select check-error">
                                     <option value="" selected disabled> Select Service</option>

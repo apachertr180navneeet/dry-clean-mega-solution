@@ -305,6 +305,7 @@
                                                                                         <input type="number"
                                                                                             name="quantity[]"
                                                                                             class="form-control"
+                                                                                            min="1" max="1000" step="1"
                                                                                             value="{{ $orderItem->quantity }}">
                                                                                     </td>
                                                                                     <td
@@ -418,7 +419,7 @@
                                                     <h6>{{ round(($grossTotal * $discountAmount) / 100, 2) }}</h6>
                                                 </div>
                                             </div>
-                                            <div class="row justify-content-between">
+                                            {{-- <div class="row justify-content-between">
                                                 <div class="col-xl-4 col-lg-4 col-md-4 col-12">
                                                     <h6>Express Amount:</h6>
                                                 </div>
@@ -429,7 +430,7 @@
                                                             value="1" onchange="toggleCheckbox()">
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <div class="row justify-content-between">
                                                 <input type="hidden" name="total_qty" id="total_qty"
                                                     value="{{ $order->total_qty }}" />
@@ -868,16 +869,6 @@
                     let typeSelect = row.find('.type-select');
                     let serviceSelect = row.find('.service-select');
 
-                    // typeSelect.empty().append('<option value="" selected disabled>Select Type</option>');
-                    // serviceSelect.empty().append('<option value="" selected disabled>Select Service</option>');
-                    // if (!typeSelect.val()) {
-                    //     typeSelect.empty().append(
-                    //     '<option value="" selected disabled>Select Type</option>');
-                    // }
-                    // if (!serviceSelect.val()) {
-                    //     serviceSelect.empty().append(
-                    //         '<option value="" selected disabled>Select Service</option>');
-                    // }
 
                     if (selectedItemId) {
                         let selectedProduct = productItems.find(product => product.id == selectedItemId);
@@ -1039,7 +1030,7 @@
                             <span class="error-message text-danger"></span>
                         </td>
                         <td style="min-width: 100px !important;">
-                            <input type="number" name="quantity[]" class="form-control" value="1">
+                            <input type="number" name="quantity[]" class="form-control" value="1" min="1" max="1000" step="1">
                             <span class="error-message text-danger"></span>
                         </td>
                         <td style="min-width: 100px !important;"><input type="text" name="price[]" class="form-control price" placeholder="Price" readonly><span class="error-message text-danger"></span></td>
@@ -1096,7 +1087,7 @@
                             <span class="error-message text-danger"></span>
                         </td>
                         <td style="min-width: 100px !important;">
-                            <input type="number" name="quantity[]" class="form-control" value="1">
+                            <input type="number" name="quantity[]" class="form-control" value="1" min="1" max="1000" step="1">
                             <span class="error-message text-danger"></span>
                         </td>
                         <td style="min-width: 100px !important;"><input type="text" name="price[]" class="form-control price" placeholder="Price" readonly><span class="error-message text-danger"></span></td>
@@ -1249,5 +1240,14 @@
                 document.getElementById('orderItemsData').value = JSON.stringify(orderItems);
             }
 
+            $(document).ready(function() {
+                $('input[name="quantity[]"]').on('input', function() {
+                    var value = $(this).val();
+                    // If the first character is 0, remove it
+                    if (value.startsWith('0')) {
+                        $(this).val(value.substring(1));
+                    }
+                });
+            });
         });
     </script>

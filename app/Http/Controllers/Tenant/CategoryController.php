@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductItem;
-use App\Models\ProductType;
 use App\Models\Service;
 use App\Models\Tenant;
 use Carbon\Carbon;
@@ -182,6 +181,10 @@ class CategoryController extends Controller
     {
         $tenantId = tenant('id');
 
+        // if (!$tenantId) {
+        //     Auth::logout();
+        //     return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
+        // }
 
         $tenant = Tenant::where('tenants.id', $tenantId)
                         ->join('subscriptions', 'tenants.id', '=', 'subscriptions.tenant_id')
@@ -201,12 +204,32 @@ class CategoryController extends Controller
         }
         $products = Product::all();
         $services = Service::all();
-        $producttypes = ProductType::all();
-        return view('admin.category', ['products' => $products, 'services' => $services, 'producttypes' => $producttypes]);
+        return view('admin.category', ['products' => $products, 'services' => $services]);
     }
 
     public function storeCategory(Request $request)
     {
+        // dd($request->all());
+        // $available_data = $request->validate([
+        //     'category' => 'required|array',
+        //     // 'category.*' => 'required|exists:products,id',
+        //     'item_name' => 'required|array',
+        //     // 'item_name.*' => 'required|array',
+        //     // 'item_name.*.*' => 'required|string|max:20',
+        //     'item_type' => 'required|array',
+        //     // 'item_type.*' => 'required|array',
+        //     // 'item_type.*.*' => 'required|string|max:20',
+        //     'service' => 'required|array',
+        //     // 'service.*' => 'required|array',
+        //     // 'service.*.*' => 'required|exists:operations,id',
+        //     'price' => 'required|array',
+        //     // 'price.*' => 'required|array',
+        //     // 'price.*.*' => 'required|numeric|max:8',
+        //     'image' => 'required|array',
+        //     // 'image.*' => 'required|array',
+        //     // 'image.*.*' => 'required|file|mimes:jpg,jpeg,png,bmp|max:5242880', // 5MB
+        // ]);
+        // dd($available_data);
         $currentTimestamp = Carbon::now();
         $category = $request->category;
         // dd($category);

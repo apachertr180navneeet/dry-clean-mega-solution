@@ -55,21 +55,42 @@ class ClientController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|min:4|max:20',
+                'name' => [
+                    'required',
+                    'string',
+                    'min:4',
+                    'max:20',
+                    'regex:/^[a-zA-Z\s]+$/', // Only letters and spaces, no numbers or special characters
+                ],
                 'mobile' => [
                     'required',
                     'regex:/^[0-9()+-]+$/',
-                    'min:4',
-                    'max:15',
+                    'min:10',
+                    'max:10',
                     Rule::unique('users')->where(function ($query) {
                         return $query->where('is_deleted', 0);
                     }),
                 ],
+            ], [
+                'name.required' => 'The name field is required.',
+                'name.string' => 'The name must be a string.',
+                'name.min' => 'The name must be at least 4 characters long.',
+                'name.max' => 'The name must not be more than 20 characters long.',
+                'name.regex' => 'The name must contain only letters and spaces without any numbers or special characters.',
+                'mobile.required' => 'The mobile number is required.',
+                'mobile.regex' => 'The mobile number must contain only numbers, parentheses, plus, or hyphens.',
+                'mobile.min' => 'The mobile number must be exactly 10 digits long.',
+                'mobile.max' => 'The mobile number must be exactly 10 digits long.',
+                'mobile.unique' => 'The mobile number has already been taken.',
             ]);
-
+            
             if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator->errors())->withInput();
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
             }
+            
+            
             // Check if a user with the same mobile number and is_deleted = 1 exists
             $existingUser = User::where('mobile', $request->mobile)->where('is_deleted', 1)->first();
 

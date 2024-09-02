@@ -24,7 +24,6 @@ use App\Http\Controllers\Tenant\{
     ServiceController,
     PaymentController,
     InvoiceController,
-    ItemTypeController
 };
 
 /*
@@ -37,15 +36,13 @@ use App\Http\Controllers\Tenant\{
 | Feel free to customize them however you want. Good luck!
 |
 */
+
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
-    ])->group(function () {
+])->group(function () {
 
-        Route::get('admin/Categorylists', function () {
-            return view('admin.CategoriesLists');
-        });
     // Welcome page
     Route::get('/', function () {
         return view('app.welcome');
@@ -92,6 +89,7 @@ Route::middleware([
             Route::get('edit-order/{id}', 'editOrder')->name('order.edit');
             Route::put('update-order/{id}', 'updateOrder')->name('order.update');
             Route::get('/view-order', 'viewOrder')->name('viewOrder');
+            Route::get('/search-order', 'searchOrder')->name('searchOrder');
             Route::get('/show-order/{orderId}', 'OrderDetail')->name('OrderDetail');
             Route::get('/delete-order/{id}', 'deleteOrder');
             Route::get('/receipt/{orderId}', 'PrintReceipt')->name('receipt');
@@ -128,15 +126,6 @@ Route::middleware([
             Route::post('/add-service', 'addService')->name('add.service');
             Route::post('/edit-services/{id}', 'updateService');
             Route::get('/delete-services/{id}', 'deleteService');
-        });
-
-
-        // Item Type management routes
-        Route::controller(ItemTypeController::class)->prefix('admin')->group(function () {
-            Route::get('/itemtype', 'index')->name('itemtype');
-            Route::post('/add-itemtype', 'addType')->name('add.itemtype');
-            Route::post('/edit-itemtype/{id}', 'updateItemType');
-            Route::get('/delete-itemtype/{id}', 'deleteItemType');
         });
 
         // Payment management routes

@@ -45,7 +45,7 @@ class PaymentController extends Controller
             Auth::logout();
             return redirect()->route('login')->withErrors(['Your tenant is inactive. Please contact your Super Admin.']);
         }
-        $query = PaymentDetail::select('payment_details.*', 'users.mobile','orders.order_number')
+        $query = PaymentDetail::select('payment_details.updated_at', 'payment_details.payment_type','users.mobile','orders.order_number','orders.total_price')
             ->join('orders', 'orders.id', '=', 'payment_details.order_id')
             ->join('users', 'users.id', '=', 'orders.user_id')
             ->where('orders.is_deleted', 0)
@@ -122,22 +122,33 @@ class PaymentController extends Controller
             // Deliver the order
             $order = Order::findOrFail($orderId);
             $order->status = 'delivered';
+            $invoiceNumberCheck = Invoice::where('order_id', $orderId)->first();
+            if(!$invoiceNumberCheck){
 
-            // Generate a new invoice number
-            $newInvoiceNumber = $this->generateInvoiceNumber();
-            // Create a new invoice and associate it with the order
-            $invoice = Invoice::create([
-                'order_id' => $orderId,
-            ]); // Automatically saves the invoice
+                $lastInvoiceNumber = Invoice::orderBy('id', 'desc')->value('invoice_number');
+                //dd($lastInvoiceNumber);
+                // Generate a new invoice number
+                $newInvoiceNumber = $this->generateInvoiceNumber();
+                // Create a new invoice and associate it with the order
+                $invoice = Invoice::create([
+                    'order_id' => $orderId,
+                    'invoice_number' => $lastInvoiceNumber + 1
+                ]); // Automatically saves the invoice
 
 
-            // $order->invoice_number = $newInvoiceNumber;
-            // $order->save(); // Save the order with updated status and invoice number
+                // $order->invoice_number = $newInvoiceNumber;
+                // $order->save(); // Save the order with updated status and invoice number
 
-            Order::where('id', $orderId)->update([
-                'invoice_number' => $newInvoiceNumber,
-                'status' => 'delivered'
-            ]);
+                Order::where('id', $orderId)->update([
+                    'invoice_number' => $newInvoiceNumber,
+                    'status' => 'delivered'
+                ]);
+            }else{
+                Invoice::where('order_id',$orderId,)->update([
+                    'order_id' => $orderId,
+                ]);
+            }
+            
             $order->orderItems()->update(['status' => 'delivered']);
 
             // Commit the transaction
@@ -150,7 +161,7 @@ class PaymentController extends Controller
             $curl = curl_init();
             $message = $order->order_number.' '.'of amount'.' '.$order->total_price;
             $payload = json_encode([
-                "template_id" => "669e3613d6fc050576099402",
+                "template_id" => "66cf2853d6fc05549845c672",
                 "recipients" => [
                     [
                         "mobiles" => $clientPhoneNumber,

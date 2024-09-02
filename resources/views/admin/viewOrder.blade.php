@@ -73,10 +73,13 @@
                                                     <a href="{{ url('/admin/show-order/' . $order->id) }}" class="btn Client_table_action_icon px-2">
                                                         <i class="tf-icons ti ti-eye"></i>
                                                     </a>
-                                                    @if ($order->payment_status !== 'Paid' || $order->item_status !== 'delivered')
+                                                    @if ($order->paymentDetail->status !== 'Paid' || $order->status !== 'delivered')
                                                         <button class="btn Client_table_action_icon px-2"
                                                             onclick="window.location='{{ route('order.edit', $order->id) }}'">
                                                             <i class="tf-icons ti ti-pencil"></i>
+                                                        </button>
+                                                        <button class="btn Client_table_action_icon px-2 delete_order_btn" data-id="{{ $order->id }}" data-bs-toggle="modal" data-bs-target="#delete_order">
+                                                            <i class="tf-icons ti ti-trash"></i>
                                                         </button>
                                                         <div class="btn-group dropstart order_list_action_menu_dropmenu">
                                                             <button type="button" class="btn Client_table_action_icon dropdown-toggle px-2"
@@ -84,7 +87,7 @@
                                                                 <i class="tf-icons ti ti-layout-grid"></i>
                                                             </button>
                                                             <ul class="dropdown-menu">
-                                                                @if ($order->payment_status !== 'Paid')
+                                                                @if ($order->paymentDetail->status !== 'Paid')
                                                                     <li>
                                                                         <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="{{ $order->id }}">
                                                                             Settle Order
@@ -97,9 +100,6 @@
                                                     @endif
                                                     <button type="button" class="btn Client_table_action_icon px-2 rcp_btn" data-order_id="{{ $order->id }}">
                                                         <i class="fas fa-list"></i>
-                                                    </button>
-                                                    <button class="btn Client_table_action_icon px-2 delete_order_btn" data-id="{{ $order->id }}" data-bs-toggle="modal" data-bs-target="#delete_order">
-                                                        <i class="tf-icons ti ti-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -229,50 +229,30 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         $(document).ready(function() {
-            // $('#orderSearch').keyup(function () {
-            //     var searchText = $(this).val().toLowerCase();
-            //     var noRecord = true;
-            //     $('tbody tr').each(function () {
-            //         var bookingId = $(this).find('td:nth-child(2)').text()
-            //             .toLowerCase();
-            //         var clientName = $(this).find('td:nth-child(3)').text()
-            //             .toLowerCase();
-            //         var clientNumber = $(this).find('td:nth-child(4)').text()
-            //             .toLowerCase();
-            //         if (bookingId.indexOf(searchText) === -1 &&
-            //             clientName.indexOf(searchText) === -1 &&
-            //             clientNumber.indexOf(searchText) === -1) {
-            //             $(this).hide();
-            //         } else {
-            //             $(this).show();
-            //             noRecord = false;
-            //         }
-            //     });
-            //     if (noRecord) {
-            //         $('.no-records-found').show();
-            //         $('.pagination-container').hide(); // Hide pagination
-            //     } else {
-            //         $('.no-records-found').hide();
-            //         $('.pagination-container').show(); // Show pagination
-            //     }
-            // });
 
             $('#orderSearch').on('keyup', function() {
-                var searchText = $(this).val().toLowerCase();
+                var searchText = $(this).val().toLowerCase(); // Get the search text
+                //console.log("Search Text:", searchText); // Debugging log
+
+                // Perform AJAX request to fetch filtered orders based on search text
                 $.ajax({
-                    url: '/admin/view-order', // The route for searching orders
+                    url: '/admin/search-order', // The route for searching orders
                     type: 'GET',
-                    data: {
-                        search: searchText
-                    },
+                    data: { search: searchText },
                     success: function(response) {
-                        console.log("new", response);
+                        //console.log("Response:", response); // Debugging log
+
+                        //console.log(orders);
                         var orders = response.orders;
-                        var pagination = response.pagination;
+                        console.log(orders);
+                                                
+                        var pagination = orders.pagination;
                         var tbody = $('tbody');
-                        tbody.empty();
-                        var serialNumber = 1;
-                        if (orders.length === 0) {
+                        tbody.empty(); // Clear the table body
+                        var serialNumber = 1; // Initialize serial number
+
+                        // Handle the display of orders or a 'no records found' message
+                        if (orders.total === 0) {
                             $('.no-records-found').show();
                             $('.pagination-container').hide();
                         } else {
@@ -280,50 +260,57 @@
                             $('.pagination-container').show().html(pagination);
                         }
 
-                        $.each(orders, function(index, order) {
+                        // Append each order to the table body
+                        $.each(orders.data, function(index, order) {
+                            
                             var row = `
-                <tr>
-                    <td>${serialNumber++}</td>
-                    <td>${order.order_number}</td>
-                    <td>${order.name}</td>
-                    <td>${order.mobile}</td>
-                    <td>${order.total_qty}</td>
-                    <td>
-                        <div class="Client_table_action_area">
-                            <a href="/admin/show-order/${order.id}" class="btn Client_table_action_icon px-2">
-                                <i class="tf-icons ti ti-eye"></i>
-                            </a>
-                            ${order.payment_status !== 'Paid' || order.item_status !== 'delivered' ? `
-                                    <button class="btn Client_table_action_icon px-2" onclick="window.location='/admin/edit-order/${order.id}'">
-                                        <i class="tf-icons ti ti-pencil"></i>
-                                    </button>
-                                    <div class="btn-group dropstart order_list_action_menu_dropmenu">
-                                        <button type="button" class="btn Client_table_action_icon dropdown-toggle px-2" data-bs-toggle="dropdown" aria-expanded="false" data-order_id="${order.id}">
-                                            <i class="tf-icons ti ti-layout-grid"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            ${order.payment_status !== 'Paid' ? `
-                                    <li>
-                                        <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="${order.id}">
-                                            Settle Order
-                                        </a>
-                                    </li>` : ''}
-                                        </ul>
-                                    </div>` : ''}
-                            <button class="btn Client_table_action_icon px-2 rcp_btn" data-order_id="${order.id}">
-                                <i class="fas fa-list"></i>
-                            </button>
-                            <button class="btn Client_table_action_icon px-2 delete_order_btn" data-id="${order.id}" data-bs-toggle="modal" data-bs-target="#delete_order">
-                                <i class="tf-icons ti ti-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
+                                <tr>
+                                    <td>${serialNumber++}</td>
+                                    <td>${order.order_number}</td>
+                                    <td>${order.user.name}</td>
+                                    <td>${order.user.mobile}</td>
+                                    <td>${order.total_qty}</td>
+                                    <td>
+                                        <div class="Client_table_action_area">
+                                            <a href="/admin/show-order/${order.id}" class="btn Client_table_action_icon px-2">
+                                                <i class="tf-icons ti ti-eye"></i>
+                                            </a>
+                                            ${order.payment_detail.status !== 'Paid' || order.status !== 'delivered' ? `
+                                                <button class="btn Client_table_action_icon px-2" onclick="window.location='/admin/edit-order/${order.id}'">
+                                                    <i class="tf-icons ti ti-pencil"></i>
+                                                </button>
+                                                <button class="btn Client_table_action_icon px-2 delete_order_btn" data-id="${order.id}" data-bs-toggle="modal" data-bs-target="#delete_order">
+                                                        <i class="tf-icons ti ti-trash"></i>
+                                                </button>
+                                                <div class="btn-group dropstart order_list_action_menu_dropmenu">
+                                                    <button type="button" class="btn Client_table_action_icon dropdown-toggle px-2" data-bs-toggle="dropdown" aria-expanded="false" data-order_id="${order.id}">
+                                                        <i class="tf-icons ti ti-layout-grid"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        ${order.payment_detail.status !== 'Paid' ? `
+                                                            <li>
+                                                                <a class="dropdown-item set_ord_btn" data-bs-toggle="modal" data-bs-target="#SettleOrder" data-order_id="${order.id}">
+                                                                    Settle Order
+                                                                </a>
+                                                            </li>` : ''}
+                                                    </ul>
+                                                </div>` : ''}
+                                            <button class="btn Client_table_action_icon px-2 rcp_btn" data-order_id="${order.id}">
+                                                <i class="fas fa-list"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
                             tbody.append(row);
                         });
+
+                        // Reattach event handlers after content update
                         attachEventHandlers();
-                        // Reattach event handlers for buttons (if any)
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error:", status, error); // Debugging log
+                        console.log(xhr.responseText); // Log the response text
                     }
                 });
             });
@@ -387,39 +374,40 @@
             }
             attachEventHandlers();
             $('#settleAndDeliverButton').on('click', function() {
-                    var modal = $('#SettleOrder');
-                    var orderId = modal.data('order-id');
-                    var paymentOption = $('input[name="paymentOption"]:checked').val();
+                var modal = $('#SettleOrder');
+                var orderId = modal.data('order-id');
+                var paymentOption = $('input[name="paymentOption"]:checked').val();
 
-                    if (!paymentOption) {
-                        // alert('Please select a payment option.');
-                        $('#paymentError').text('Please select a payment option.');
-                        return;
+                if (!paymentOption) {
+                    $('#paymentError').text('Please select a payment option.');
+                    return;
+                }
+
+                // Disable the button to prevent multiple clicks
+                $(this).prop('disabled', true);
+
+                $.ajax({
+                    url: '/admin/settle-and-deliver-order/' + orderId,
+                    method: 'POST',
+                    data: {
+                        paymentType: paymentOption,
+                        _token: $('meta[name="csrf-token"]').attr('content') // Assuming you have a CSRF token meta tag
+                    },
+                    success: function(response) {
+                        // Handle success, e.g., show a success message and close the modal
+                        alert('Order settled and delivered successfully.');
+                        modal.modal('hide');
+                        window.location.href = '{{ route('invoice') }}';
+                    },
+                    error: function(xhr) {
+                        // Handle error
+                        alert('Error: ' + xhr.responseText);
+                        // Re-enable the button in case of an error
+                        $('#settleAndDeliverButton').prop('disabled', false);
                     }
-
-                    $.ajax({
-                        url: '/admin/settle-and-deliver-order/' + orderId,
-                        method: 'POST',
-                        data: {
-                            paymentType: paymentOption,
-                            _token: $('meta[name="csrf-token"]').attr(
-                                    'content'
-                                    ) // Assuming you have a CSRF token meta tag
-                        },
-                        success: function(response) {
-                            // Handle success, e.g., show a success message and close the modal
-                            alert('Order settled and delivered successfully.');
-                            modal.modal('hide');
-                            // location
-                            //     .reload(); // Optional: Reload the page to update the order status
-                            window.location.href = '{{ route('invoice') }}';
-                        },
-                        error: function(xhr) {
-                            // Handle error
-                            alert('Error: ' + xhr.responseText);
-                        }
-                    });
                 });
+            });
+
             // Cash On Button Click Handler
             $('.cash-on-btn').on('click', function() {
                     var modal = $('#SettleOrder');

@@ -27,7 +27,7 @@
                             <label for="">Booking ID</label>
                             <?php
                             // Format the order ID
-                            $bookingId = 'ORD-' . date('Y') . '-' . str_pad($orders->id, 3, '0', STR_PAD_LEFT);
+                            $bookingId = $orders->order_number;
                             ?>
                             <h4>{{ $bookingId }}</h4>
                         </div>
@@ -95,7 +95,9 @@
                                     $prevCategory = null;
                                     $prevItem = null;
                                 @endphp
-
+                                @php
+                                    $subtotalamount = 0;
+                                @endphp
                                 @foreach ($orders->orderItems as $orderItem)
                                     <tr>
                                         @if ($orderItem->productCategory->name != $prevCategory || $orderItem->productItem->name != $prevItem)
@@ -118,6 +120,7 @@
                                     </tr>
 
                                     @php
+                                        $subtotalamount += $orderItem->quantity * $orderItem->operation_price;
                                         $prevCategory = $orderItem->productCategory->name;
                                         $prevItem = $orderItem->productItem->name;
                                     @endphp
@@ -126,7 +129,7 @@
                                     <tr>
                                         <td colspan="4" class="border-0"></td>
                                         <th colspan="2" class="fw-bold text-dark">Sub-Total Amount</th>
-                                        <th class="fw-bold text-dark">₹ {{ $subTotalAmount }}</th>
+                                        <th class="fw-bold text-dark">₹ {{ $subtotalamount }}</th>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="border-0"></td>

@@ -217,15 +217,6 @@
 
         </div>
 
-        <br>
-        <br>
-        <hr>
-        <br>
-
-      <br>
-      <br>
-      <br>
-
         <!--/ Earning Reports -->
       </div>
     </div>

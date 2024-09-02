@@ -271,10 +271,17 @@
                         var id = $(this).data('id');
                         var name = $(this).data('name');
                         var mobile = $(this).data('mobile');
+
+                        // Populate the form fields with the current client data
                         $('.client_id').val(id);
                         $('.client_name').val(name);
                         $('.client_mobile').val(mobile);
+
+                        // Hide all error messages
+                        $('#edit_name_error').text('');
+                        $('#edit_mobile_error').text('');
                     });
+
 
                     $('.delete_client_btn').click(function() {
                         var id = $(this).data('id');
@@ -306,24 +313,58 @@
             $('#editclientform').on('submit', function(event) {
                 event.preventDefault(); // Prevent default form submission
 
-                var id = $('.client_id').val();
-                var formData = new FormData(this);
+                // Clear previous error messages
+                $('#edit_name_error').text('');
+                $('#edit_mobile_error').text('');
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/admin/edit-client/' + id,
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        console.log(response);
-                        $('#edit_client').modal('hide');
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
+                var isValid = true;
+                var name = $('#edit_client_name').val().trim();
+                var mobile = $('#edit_client_mobile').val().trim();
+                var id = $('.client_id').val();
+
+                // Validate name: not blank and no special characters
+                if (name === '') {
+                $('#edit_name_error').text('Name cannot be blank.');
+                    isValid = false;
+                } else if (name.length > 20) {
+                    $('#edit_name_error').text('Name cannot exceed 20 characters.');
+                    isValid = false;
+                } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+                    $('#edit_name_error').text('Name cannot contain special characters.');
+                    isValid = false;
+                } else {
+                    $('#edit_name_error').text(''); // Clear any previous error messages
+                }
+
+
+                // Validate mobile: exactly 10 digits, no special characters, and no text
+                if (mobile === '') {
+                    $('#edit_mobile_error').text('Mobile number cannot be blank.');
+                    isValid = false;
+                } else if (!/^\d{10}$/.test(mobile)) {
+                    $('#edit_mobile_error').text('Mobile number must be exactly 10 digits.');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/edit-client/' + id,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            console.log(response);
+                            $('#edit_client').modal('hide');
+                            window.location.reload();
+                        },
+                        error: function(error) {
+                            console.log(error);
+                        }
+                    });
+                }
             });
         });
     </script>

@@ -32,11 +32,10 @@
                         <div class="client_list_heading_area">
                             <h4>Payment</h4>
                             <div class="client_list_heading_search_area">
-                                <form action="{{ route('payment') }}" method="GET" class="d-flex">
+                                <form action="" method="" class="d-flex">
                                     <i class="menu-icon tf-icons ti ti-search" id="resetSearch"></i>
                                     <input type="search" name="search" class="form-control" placeholder="Searching ..."
                                         id="paymentSearch" value="{{ request()->input('search') }}">
-                                    <button type="submit" class="btn btn-primary ms-2">Search</button>
                                 </form>
                             </div>
                         </div>
@@ -72,7 +71,7 @@
                                             <td> {{ $payment->order_number }} </td>
                                             <td>{{ \Carbon\Carbon::parse($payment->updated_at)->format('j F, Y') }}</td>
                                             <td>{{ $payment->payment_type }}</td>
-                                            <td>₹ {{ $payment->total_amount }}</td>
+                                            <td>₹ {{ $payment->total_price }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -116,15 +115,21 @@
                             }
 
                             $.each(payments, function(index, payment) {
+                                var updatedAt = new Date(payment.updated_at);
+                                var formattedDate = updatedAt.toLocaleDateString('en-IN', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                });
                                 var row = `
-                            <tr>
-                                <td>${serialNumber++}</td>
-                                <td>${payment.order_number}</td> 
-                                <td>${payment.updated_at}</td> 
-                                <td>${payment.payment_type}</td>
-                                <td>₹ ${payment.total_amount}</td>
-                            </tr>
-                        `;
+                                    <tr>
+                                        <td>${serialNumber++}</td>
+                                        <td>${payment.order_number}</td> 
+                                        <td>${formattedDate}</td> 
+                                        <td>${payment.payment_type}</td>
+                                        <td>₹ ${payment.total_price}</td>
+                                    </tr>
+                                `;
                                 tbody.append(row);
                             });
                         }

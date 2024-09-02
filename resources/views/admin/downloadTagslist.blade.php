@@ -61,7 +61,7 @@
                     </p>
                     <p style="font-weight: bold; font-size: 14px; color: black; margin-bottom:10px; margin-top: 10px;">
                         @if($orderItem->productItem && $orderItem->productCategory)
-                            {{ $orderItem->productItem->name }}/{{ $orderItem->productCategory->name }}
+                            {{ $orderItem->productItem->name }}
                         @else
                             Product or Category data missing
                         @endif
